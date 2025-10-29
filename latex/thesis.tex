@@ -1,0 +1,112 @@
+\documentclass[11pt,a4paper,twoside]{report}
+% - twoside, openright: options for printed version
+
+%% PACKAGES
+\usepackage[utf8]{inputenc}
+\usepackage{csquotes}
+\usepackage[numericrefs,juri]{feupteses}
+% - portugues: portuguese version
+% - onpaper  : links are not shown (for paper versions)
+% - backrefs : include back references from bibliography to citation place
+% - juri     : for juri evaluation
+% - final    : final version
+\usepackage[toc=true,section=chapter,acronym]{glossaries}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{amsthm,thmtools}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{subcaption}
+\usepackage[backend=biber,
+            style=numeric-comp,
+            citestyle=numeric-comp,
+            sorting=none,
+            mincitenames=50,
+            maxcitenames=50,
+            minbibnames=50,
+            maxbibnames=50
+            ]{biblatex}
+\usepackage[final]{pdfpages}
+
+%% GLOSSARIES
+\setglossarystyle{listgroup}
+\makeglossaries
+\input{prolog/glossaries}
+
+%% INDEX (at the end of the document)
+\makeindex
+
+%% PATH TO FIGURES DIRECTORY
+\graphicspath{{figures/}}
+
+%% MACROS
+\input{mymacros}
+
+%% OTHER CONFIGURATIONS
+\urlstyle{same}
+\DefineBibliographyStrings{english}{bibliography = {References}}
+\addbibresource{bibliography/myrefs.bib}
+
+
+
+%%========================================
+%% DOCUMENT
+%%========================================
+\begin{document}
+
+%% METADATA
+\title{RicoSLAM: Localization and Mapping in Dynamic Environments}
+\author{%
+Ricardo B. Sousa
+\href{https://orcid.org/0000-0003-4537-5095}{\includegraphics[width=1em]{orcid.pdf}}}
+
+% \degree{Programa Doutoral em Engenharia Electrot\'{e}cnica e de Computadores}
+\degree{Doctoral Program in Electrical and Computer Engineering}
+
+%\thesisdate{December 31, 2024}
+\copyrightnotice{\the\year{}, Ricardo B. Sousa, INESC TEC}
+
+\supervisor{Supervisor}{%
+Prof. Ant\'{o}nio Paulo Moreira
+\href{https://orcid.org/0000-0001-8573-3147}{\includegraphics[width=1em]{orcid.pdf}},
+PhD}
+\supervisor{Second Supervisor}{%
+H\'{e}ber Miguel Sobreira
+\href{https://orcid.org/0000-0002-8055-1093}{\includegraphics[width=1em]{orcid.pdf}},
+PhD}
+
+% Committee:
+% \committeetext{Approved by \ldots:}
+\committeetext{PhD Thesis submitted for the doctoral final oral examination \ldots:}
+\committeemember{President}{TBD}
+\committeemember{Referee}{Doctor Robert Deaves, Honorary Professor}
+\committeemember{Referee}{Doctor Paulo G. Costa, Associate Professor}
+\committeemember{Advisor}{Doctor Ant\'{o}nio Paulo Moreira, Full Professor}
+
+\signature
+
+\schoollogo{uporto-feup.pdf}
+\institutionlogo{inesctec.png}
+
+% \additionalfronttext{Thesis Research Plan}
+
+%% PROLOG
+\begin{Prolog}
+\input{prolog/0_index}
+\end{Prolog}
+
+%% BODY
+\StartBody
+\input{content/0_index}
+
+%% BIBLIOGRAPHY
+\printbibliography[heading=bibintoc]
+
+%% APPENDIXES
+\appendix
+\input{appendices/0_index}
+
+%% INDEX
+\PrintIndex
+
+\end{document}
