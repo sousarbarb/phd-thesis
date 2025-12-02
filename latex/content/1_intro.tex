@@ -65,6 +65,31 @@ multiple purposes, such as path planning, providing a visual reference for
 human operators, while allowing the robot to reset its localization error when
 revisiting known areas~\cite{cadena:tro:2016}.
 
+In a static scene, the robot would only need to map once because the map and
+sensor data would remain consistent with the environment throughout time.
+However, industrial and intralogistics locations, agricultural sites,
+warehouses, and service-oriented applications, such as shopping centers and
+healthcare institutions, have inherently moving elements in the scene
+(humans, objects), reconfiguration of the environment
+(reorganization of machines, patient beds), and appearance variations
+(lighting, weather, seasonal, or daytime changes).
+The deployment of \glspl{amr} in these varying conditions are a challenge for
+the \gls{slam} system, where the system should decide how (consider the most
+current state, the evolution of the environment dynamics, or only the most
+static changes?) and when to update the map (when the variations occur, or only
+after a certain time?). This challenge is also known as the stability-plasticity
+dilemma, where a lifelong~\gls{slam} system should both adapt to new environment
+changes and preserve old states over time~\cite{biber-duckett:ijrr:2009}.
+Furthermore, the map would grow indefinitely when gathering new information from
+the environment without any map management system. This ever-growing problem
+poses another challenge for the \gls{slam} system in the long-term due to the
+limited computational resources of the mapping vehicle. Indeed, the map size
+should be dependent on the environment area and not on the trajectory length of
+the mapping process nor operation time, only growing when the robot would
+explore unknown locations~\cite{kretzschmar-stachniss:ijrr:2012}.
+
+\todo{Brief literature analysis (only after finishing Literature Review chapter)}
+
 \section{Motivation}\label{sec:intro:motivation}
 \section{Problem Statement}\label{sec:intro:problem}
 \section{Research Questions and Hypotheses}\label{sec:intro:rq+h}
