@@ -1,8 +1,70 @@
 \chapter{Introduction}\label{chap:intro}
 
-TBC
+This research,
+\textit{RicoSLAM: localization and mapping in dynamic environments},
+aims to advance the current state of the art in \gls{slam}.
+This work focuses on improving localization and mapping performance when
+performing \gls{slam} in dynamic environments, using wheeled odometry and 2D~laser
+scanner data from sensors onboard industrial ground mobile robots.
+\gls{slam} in dynamic environments is closely tied to lifelong~\gls{slam} and
+long-term operation of mobile robots, enabling robots to maintain accurate
+localization and mapping over extended periods while adapting to continuous
+environmental changes.
+
+This chapter is divided into seven sections.
+First, \secref{sec:intro:context} contextualizes this research work and
+describes the primary challenges related to localization and mapping in dynamic
+environments.
+\secref{sec:intro:motivation} outlines the key motivations and reasons for
+undertaking this research.
+Next, \secref{sec:intro:problem} introduces the problem that this PhD~Thesis
+seeks to address.
+\secref{sec:intro:rq+h} presents the main research questions and hypotheses that
+guided the research work.
+Then, \secref{sec:intro:scope} defines the scope and objectives of the
+PhD~Thesis.
+\secref{sec:intro:contributions} highlights the unique contributions the
+research makes to the literature, emphasizing its novelty and impact.
+Lastly, \secref{sec:intro:structure} outlines the document's organization.
+A final note is provided regarding the funding that supported the work carried
+out throughout the PhD~Thesis.
 
 \section{Context}\label{sec:intro:context}
+Nowadays, \glspl{amr} are being increasingly deployed in
+several industries, including logistics, retail, warehousing, automotive and
+aerospace manufacturing, agriculture, and healthcare.
+\glspl{amr} may automate tasks such as material transport, automated inspection,
+and security monitoring.
+By improving operational efficiency, flexibility and productivity,
+\glspl{amr} help companies achieve higher efficiencies and
+reduce production costs.
+Consequently, these improvements contribute to the growth of the global economy
+and increase the worldwide interest in the \gls{amr} market.
+According to a study by ABI Research, the global robotics market is estimated to
+be roughly US\$50 billion in 2025, growing at a \gls{cagr}
+of about 14\% to reach approximately US\$111 billion by 2030.
+This market growth is driven by labour workforce shortages, supply chain
+reformation, and high turnover rates, with the concurrent increasing consumer
+demand. Mobile robots in particular can mitigate these challenges by expediting
+the loading/unloading of trucks, automating inventory management, and performing
+last-mile delivery services~\cite{abi-research:tech-report:2025}.
+
+An \gls{amr} must interpret its surroundings by extracting meaningful data from
+its sensors to localize itself within the environment, enabling autonomous
+navigation~\cite{siegwart:book:2004}.
+\gls{slam} addresses this perception and localization challenge by concurrently
+incorporating the robot state estimation into the mapping process to build a
+representation of the environment as perceived by the robot.
+The state is typically described by the robot's pose (position and orientation),
+although other variables, such as velocity and calibration parameters, may also
+be included in the state. As for the environment representation, the mapping
+process involves creating a map incrementally, built as the robot explores
+unknown areas or refines it through passages in known locations, to describe
+the environment in which the robot operates. The map representation serves
+multiple purposes, such as path planning, providing a visual reference for
+human operators, while allowing the robot to reset its localization error when
+revisiting known areas~\cite{cadena:tro:2016}.
+
 \section{Motivation}\label{sec:intro:motivation}
 \section{Problem Statement}\label{sec:intro:problem}
 \section{Research Questions and Hypotheses}\label{sec:intro:rq+h}

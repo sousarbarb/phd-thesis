@@ -6,10 +6,11 @@
 \newcommand{\doi}[1]{\href{https://doi.org/#1}{#1}}
 \newcommand{\doinote}[1]{DOI: \doi{#1}}
 \renewcommand{\glsnamefont}[1]{\textbf{#1}}
-\newcommand{\etal}{\textit{et.~al.}}
-\newcommand{\ie}{\textit{i.e.}}
-\newcommand{\eg}{\textit{e.g.}}
-\newcommand{\etc}{\textit{etc.}}
+\newcommand{\etal}{\emph{et~al.}}
+\newcommand{\ie}{\emph{i.e.}}
+\newcommand{\eg}{\emph{e.g.}}
+\newcommand{\etc}{\emph{etc.}}
+\newcommand{\todo}[1]{\textbf{[TODO: #1}]}
 
 \newtheorem{definition}{Definition}[section]
 
@@ -19,3 +20,9 @@
 
 \DeclareMathOperator*{\argmax}{argmax}
 \DeclareMathOperator*{\argmin}{argmin}
+
+\def\secref#1{Section~\ref{#1}}
+\def\figref#1{Fig.~\ref{#1}}
+\def\tabref#1{Table~\ref{#1}}
+\def\eqref#1{Equation~(\ref{#1})}
+\def\algref#1{Algorithm~\ref{#1}}
