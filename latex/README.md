@@ -7,7 +7,7 @@ sudo apt install texlive-full
 ## Usage
 ### Build
 ```sh
-latexmk thesis.tex -bibtex -pdf -quiet
+latexmk thesis.tex -bibtex -pdf -quiet -f
 ```
 ### Clean
 ```sh
