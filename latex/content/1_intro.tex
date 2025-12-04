@@ -118,13 +118,39 @@ unknown, and dynamic environments. Indeed, these environments often include
 unanticipated scenarios, which robots must be capable of handling and
 adapting to. Consequently, robots may present significant risks to both people
 and the environment, underscoring the need for reliable and trustworthy
-autonomous operations. As a result, improving localization and mapping processes
-on industrial mobile robots within dynamic environments contributes to increased
-levels of autonomy, expands the range of scenarios where the robots can operate,
-and contributes to long-term operation and lifelong autonomy of \gls{amr},
-aligning with \gls{srida}.
+autonomous operations.
+As a result, \gls{srida} motivates research on improving localization and
+mapping processes for industrial mobile robots within dynamic environments,
+aiming to increase their levels of autonomy.
+This expansion of the range of scenarios where robots can operate without human
+intervention contributes to the long-term operation and reliable,
+lifelong autonomy of \glspl{amr}.
 
-\todo{motivation based on industrial landscape, possibly referring PPS from GreenAuto project}
+Furthermore, the logistics industry has high dynamic environments with
+constantly shifting elements, such as pallets, boxes, workers,
+moving \glspl{amr} (base platforms, rack and cart lifting robots,
+car pulling \glspl{amr}, moving pallet platforms, conveyor robots,
+mobile manipulators, pallet jack \glspl{amr}, tugger robots to tow carts like a
+convoy, and autonomous forklifts~\cite{pastor:agv-network}),
+and manually operated mobile machines.
+Additionally, logistics warehouse environments may have featureless
+characteristics that make it difficult for \glspl{amr} to localize within the
+environment over time.
+One situation that is particularly critical to address in dynamic logistics
+environments involving robots' localization is cases involving random slotting
+warehouse strategies, which optimize space and enhance efficiency in modern
+operations.
+In random slotting, products are stored in any available space in the warehouse
+based on their characteristics (weight and size), thereby reducing replenishment
+time and increasing warehouse efficiency~\cite{cisneros:qmh:2025}.
+Subsequently, the interpretation and processing of dynamic changes in the
+environment by \glspl{amr} would enable the maintenance of an up-to-date map
+representation of the robots' surroundings in logistics environments.
+An up-to-date representation would allow the use of dynamic elements in the
+scene that are temporarily static, thereby improving the robot localization
+estimation in the environment.
+
+\todo{motivation from PPS18 of GreenAuto project}
 
 \section{Problem Statement}\label{sec:intro:problem}
 \section{Research Questions and Hypotheses}\label{sec:intro:rq+h}
@@ -182,7 +208,3 @@ and Business Innovation, integrated in the Resilience Dimension of the Recovery
 and Resilience Plan within the scope of the Recovery and Resilience
 Mechanism~(MRR) of the European Union (EU), framed in the Next Generation~EU,
 for the period 2021--2026, within project GreenAuto, with reference 54.
-
-\gls{un}
-
-\gls{sdg}
