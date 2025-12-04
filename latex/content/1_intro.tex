@@ -153,14 +153,78 @@ estimation in the environment.
 \todo{motivation from PPS18 of GreenAuto project}
 
 \section{Problem Statement}\label{sec:intro:problem}
+
+\todo{TBC}
+
+Define localization, mapping processes.
+Define state (robot pose, scan poses, map, etc.).
+Explain how dynamic elements may influence the previous processes.
+Explain how calibration influences localization and mapping.
+
 \section{Research Questions and Hypotheses}\label{sec:intro:rq+h}
+
+\todo{TBC}
+
+\begin{question}\label{question:calib}
+\textbf{How to estimate the extrinsic parameters of the robot's sensors without
+external equipment to improve the data consistency between the sensors and,
+subsequently, the \gls{SLAM} results?}
+\end{question}
+
+\todo{TBC (review hypothesis given that may be not updated...)}
+
+\begin{hypothesis}\label{hypothesis:calib}
+The maximization of the convergence of relative motion estimations of the
+robot's different sensors in the same coordinate frame, when actuating the robot
+to follow not necessarily a pre-defined path but one that can make observable
+all the extrinsic sensor parameters, will lead to an improve consistency on the
+data estimations of the sensors when performing \gls{SLAM} with multiple
+sensors, including both proprioceptive and exteroceptive data sources.
+\end{hypothesis}
+
+\todo{TBC}
+
+\begin{question}\label{question:mapping}
+\textbf{How to improve the mapping results when performing \gls{SLAM} with a
+ground mobile robot in a dynamic indoor environment?}
+\end{question}
+
+\todo{TBC (again, review hypothesis...)}
+
+\begin{hypothesis}\label{hypothesis:mapping:1}
+Ray tracing-based strategy...
+\end{hypothesis}
 
 \section{Scope and Objectives}\label{sec:intro:scope}
 
 \todo{scope and goals of the PhD thesis}
-possibly refer here INESC TEC and so on.
 
-Within the scope of the 2030 Agenda for sustainable development agreed by 195 nations in September 2015~\cite{un:agenda-2030:sdg}, this research work falls under the following \glspl{SDG}:
+The host institution of this PhD Thesis was \gls{inesctec}.
+All the work developed at \gls{iilab} from \gls{criis} at \gls{inesctec}.
+
+GreenAuto Agenda -- Green Innovation for the Automotive Industry.
+\gls{wp}~10 -- Automated logistics for the automotive industry.
+\gls{pps}~18 -- 3D Navigation System for Mobile Robotic Equipment.
+Consortium partners:
+Flowbotic Mobile Systems, Lda (PPS leader);
+\gls{feup};
+\gls{inesctec};
+STAR Institute -- Science & Technology Applied Research;
+Kaizen Institute;
+and Institute for Systems and Robotics~(ISR)--Coimbra.
+
+Scope: logistics environments (e.g., in automotive industry).
+
+Goals:
+improve long-term operation / autonomy of robots through automatic calibration
+(\todo{TBC});
+improve reliability of the localization and mapping processes;
+deal with dynamic elements in the scene;
+improve localization and mapping in dynamic scenes.
+
+Within the scope of the 2030 Agenda for sustainable development agreed by
+195~nations in September 2015~\cite{un:agenda-2030:sdg},
+this research work falls under the following \glspl{SDG}:
 \begin{itemize}
 \item SDG8: Decent work and economic growth;
 \item SDG9: Industry, innovation and infrastructure;
@@ -195,6 +259,17 @@ TBC
 \end{description}
 
 \section{Document Structure}\label{sec:intro:structure}
+
+The remaining of this document is organized as follows (\todo{complete!}):
+\begin{itemize}
+\item \chapref{chap:literature} literature review;
+\item \chapref{chap:datasets} datasets used within the scope of the thesis;
+\item \chapref{chap:calibration} automatic calibration;
+\item \chapref{chap:features} corner-like features with geometric invariance;
+\item \chapref{chap:distance-maps} distance map-based alignment strategies;
+\item \chapref{chap:slam} SLAM in dynamic environments;
+\item \chapref{chap:conclusions} presents conclusions of the PhD Thesis.
+\end{itemize}
 
 \section*{Funding}
 This work has received funding from National Funds through the Portuguese
