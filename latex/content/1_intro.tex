@@ -151,8 +151,8 @@ scene that are temporarily static, thereby improving the robot localization
 estimation in the environment.
 
 Finally, the \gls{wp}~10 of the
-\textit{GreenAuto -- Green Innovation for the Automotive Industry} project
-aims to develop technologies that reduce the production costs of
+\textit{GreenAuto -- Green Innovation for the Automotive Industry}~\cite{greenauto}
+project aims to develop technologies that reduce the production costs of
 electric vehicles, which are currently higher than those of
 traditional internal combustion engine alternatives.
 The use of autonomous logistic platforms on the factory floor,
@@ -171,12 +171,42 @@ in the environment, aiming to enhance the robustness of the final autonomous sys
 
 \section{Problem Statement}\label{sec:intro:problem}
 
-\todo{TBC}
+As discussed in \secref{sec:intro:context},
+a map representation in static environments does not require updates, as it
+remains consistent with the surrounding environment that has been explored.
+However, most use cases for \glspl{amr} involve dynamic environments with moving
+elements or reconfigurations that affect the consistency of the map over time.
+Consequently, the system must determine how and when to update the map, a
+challenge known as the stability-plasticity dilemma. In this context, a
+long-term SLAM system must adapt to new changes while preserving older features,
+particularly when the environment reverts to previous
+states~\cite{biber-duckett:ijrr:2009}.
 
-Define localization, mapping processes.
-Define state (robot pose, scan poses, map, etc.).
-Explain how dynamic elements may influence the previous processes.
-Explain how calibration influences localization and mapping.
+This PhD thesis addresses the problem of localizing a mobile robot within
+dynamic indoor environments. This problem is directly related to \gls{slam},
+given the need to update the map concurrently with localization upon
+dynamic changes in the robot's surroundings.
+Furthermore, this research is not limited to a specific type of dynamics,
+for example, only detecting semi-static dynamics --
+changes between running sessions, \ie, changes occurring outside of the sensors'
+\gls{fov} at different time instants that, when observed again by the sensors,
+appear static but elements were effectively moved in the scene -- or only
+dealing with highly dynamic elements (\eg, moving persons or objects).
+Instead, this thesis studies the detection of dynamic changes by comparing the
+current observation with a local reference map representation.
+
+In terms of the sensor setup, this PhD thesis assumes that the robot is equipped
+with at least one 2D~laser scanner and, optionally, wheeled odometry data.
+This sensor setup is commonly found in \glspl{amr} within the logistics
+industry, where wheeled odometry is typically estimated by counting the ticks
+from the motor encoders while taking into account the robot's kinematic
+model~\cite{sousa:jint:2022}.
+In addition, \glspl{amr} often use 2D~laser scanners not only for navigation
+but also as safety devices, in compliance with the
+ISO~10218-1:2025~\cite{iso-10218-1:2025} and
+ANSI/RIA~R15.06-2025~\cite{ansi/ria-r15.06:2025} standards, which ensure a
+safe stopping distance and help prevent collisions with obstacles.
+Consequently, this thesis focuses solely on range data.
 
 \section{Research Questions and Hypotheses}\label{sec:intro:rq+h}
 
