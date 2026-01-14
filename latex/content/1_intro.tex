@@ -210,36 +210,87 @@ Consequently, this thesis focuses solely on range data.
 
 \section{Research Questions and Hypotheses}\label{sec:intro:rq+h}
 
-\todo{TBC}
-
-\begin{question}\label{question:calib}
-\textbf{How to estimate the extrinsic parameters of the robot's sensors without
-external equipment to improve the data consistency between the sensors and,
-subsequently, the \gls{SLAM} results?}
-\end{question}
-
-\todo{TBC (review hypothesis given that may be not updated...)}
-
-\begin{hypothesis}\label{hypothesis:calib}
-The maximization of the convergence of relative motion estimations of the
-robot's different sensors in the same coordinate frame, when actuating the robot
-to follow not necessarily a pre-defined path but one that can make observable
-all the extrinsic sensor parameters, will lead to an improve consistency on the
-data estimations of the sensors when performing \gls{SLAM} with multiple
-sensors, including both proprioceptive and exteroceptive data sources.
-\end{hypothesis}
-
-\todo{TBC}
+In response to the problem outlined in \secref{sec:intro:problem},
+this thesis proposes some research questions aimed at addressing and solving
+the identified problem. For each of these research questions, it is possible to
+formulate hypotheses that guide the investigation toward feasible solutions.
 
 \begin{question}\label{question:mapping}
-\textbf{How to improve the mapping results when performing \gls{SLAM} with a
+\textbf{How to improve the mapping results when performing \gls{slam} with a
 ground mobile robot in a dynamic indoor environment?}
 \end{question}
 
-\todo{TBC (again, review hypothesis...)}
+\todo{PUT MORE CONTEXT INFORMATION HERE}
 
-\begin{hypothesis}\label{hypothesis:mapping:1}
-Ray tracing-based strategy...
+\begin{hypothesis}\label{hypothesis:mapping:ray-tracing}
+Exploring the application of ray tracing techniques to update map
+representations based on the latest sensor observations continuously.
+These techniques can help determine whether a sensor observation corresponds
+to a new point or an update to an outdated one,
+depending on whether the latest ranging data is closer than the existing map
+point or if the sensor observation is passing through an existing feature.
+\end{hypothesis}
+
+\begin{hypothesis}\label{hypothesis:mapping:relocalization}
+Researching techniques for robot relocalization on existing graphs
+representations, avoiding the addition of redundant data to the map.
+Linking graph growth to the spatial extent of the environment explored,
+this approach could help avoid unnecessary graph expansion,
+keeping the graph size manageable and improving computational efficiency
+without the graph size being dependent on the operation time.
+\end{hypothesis}
+
+\begin{hypothesis}\label{hypothesis:mapping:clean-map}
+Investigating the offline removal of dynamic points using ray tracing techniques
+during the generation of the environment representation.
+This representation could be leveraged for more accurate mobile robot
+localization by excluding transient or moving objects from the map.
+\end{hypothesis}
+
+\begin{hypothesis}\label{hypothesis:mapping:ogba}
+Studying offline global map refinement techniques, removing dynamic points in
+the process, while trying to remove map distortions from the online-based
+map representation.
+\end{hypothesis}
+
+\begin{question}\label{question:localization}
+\textbf{How to integrate environment dynamics in the localization process
+when performing \gls{slam} with a ground mobile robot
+in a dynamic indoor environment?}
+\end{question}
+
+\todo{PUT MORE CONTEXT INFORMATION HERE}
+
+\begin{hypothesis}\label{hypothesis:localization:features}
+Exploring the use of geometric feature extraction, such as corners or lines,
+from 2D laser scanner data for localization purposes,
+rather than relying solely on raw ranging data.
+This approach may help filter out irrelevant data, providing more meaningful and
+stable features for localization, even in dynamic environments.
+\end{hypothesis}
+
+\begin{hypothesis}\label{hypothesis:localization:distance-maps}
+Researching the use of distance map data structures for
+2D point cloud registration. Distance maps can provide access to the
+nearest-neighbor point distance, enabling an
+\gls{icp}~\cite{besl-mckay:tpami:year}-like registration process without the
+need for the traditional association step. By applying robust kernels,
+this approach can improve the handling of dynamic environment point observations
+by considering them as outliers in the alignment optimization process
+or assigning them a lower weight.
+\end{hypothesis}
+
+\begin{hypothesis}\label{hypothesis:localization:local-maps}
+Exploring local map strategies to continuously update the local environment
+representation with the latest sensor observations. Unlike scan-based
+localization, which may be more prone to false positives or negatives,
+local maps facilitate loop closure detection through a scan-to-map alignment
+rather than scan-to-scan approaches that consider singular scans.
+Moreover, local maps can enhance the localization stability of mobile robots in
+highly dynamic environments, as they are continuously updated locally with the
+latest sensor observations, while allowing the incorporation of
+ray-tracing-based techniques to detect dynamic elements and update the local
+representation accordingly.
 \end{hypothesis}
 
 \section{Scope and Objectives}\label{sec:intro:scope}
