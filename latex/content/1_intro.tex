@@ -220,7 +220,36 @@ formulate hypotheses that guide the investigation toward feasible solutions.
 ground mobile robot in a dynamic indoor environment?}
 \end{question}
 
-\todo{PUT MORE CONTEXT INFORMATION HERE}
+In dynamic environments, \gls{slam} algorithms can be
+affected by the presence of moving objects and changing surroundings.
+One key contributing factor to reduced \gls{slam} accuracy is the inability of
+traditional static map representations to stay updated with real-time changes
+in the environment, leading to mismatches between current sensor observations
+and previously mapped data. As a result, the correspondence between these
+observations and the reference environment representation becomes weaker,
+leading to degraded map quality.
+
+Another issue arises from the growing amount of information
+to process over time. As the robot moves,
+the accumulation of data from sensors can lead to redundant information,
+especially in environments where sensor noise, matching errors, or
+outlier observations occur frequently.
+Consequently, the appearance of ``fat'' walls in the map representation
+obtained from \gls{slam} can occur.
+Another consequence of this issue is that,
+while the map may appear fine locally,
+distortions and inaccuracies can accumulate at the global level,
+leading to inconsistencies between the map representation
+and the real environment itself.
+
+Given these challenges, we propose several research hypotheses aimed at
+improving mapping results during \gls{slam} in dynamic indoor environments.
+The primary focus is on removing outdated or redundant observations from the
+environment representation to reduce the noise introduced by both the sensor
+and the matching process, continuously updating the map with the latest sensor
+observations to increase the inliers matching ratio, while exploring
+concurrently offline global bundle adjustment techniques
+to remove distortions from the global map.
 
 \begin{hypothesis}\label{hypothesis:mapping:ray-tracing}
 Exploring the application of ray tracing techniques to update map
