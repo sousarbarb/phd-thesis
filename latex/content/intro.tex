@@ -212,8 +212,8 @@ Consequently, this thesis focuses solely on range data.
 
 In response to the problem outlined in \secref{sec:intro:problem},
 this thesis proposes some research questions aimed at addressing and solving
-the identified problem. For each of these research questions, it is possible to
-formulate hypotheses that guide the investigation toward feasible solutions.
+the identified problem. For each of these research questions, we
+formulate hypotheses that guided the investigation toward feasible solutions.
 
 \begin{question}\label{question:mapping}
 \textbf{How to improve the mapping results when performing \gls{slam} with a
@@ -228,7 +228,6 @@ in the environment, leading to mismatches between current sensor observations
 and previously mapped data. As a result, the correspondence between these
 observations and the reference environment representation becomes weaker,
 leading to degraded map quality.
-
 Another issue arises from the growing amount of information
 to process over time. As the robot moves,
 the accumulation of data from sensors can lead to redundant information,
@@ -242,7 +241,7 @@ distortions and inaccuracies can accumulate at the global level,
 leading to inconsistencies between the map representation
 and the real environment itself.
 
-Given these challenges, we propose several research hypotheses aimed at
+Given the previous challenges, we propose research hypotheses aimed at
 improving mapping results during \gls{slam} in dynamic indoor environments.
 The primary focus is on removing outdated or redundant observations from the
 environment representation to reduce the noise introduced by both the sensor
@@ -288,7 +287,24 @@ when performing \gls{slam} with a ground mobile robot
 in a dynamic indoor environment?}
 \end{question}
 
-\todo{PUT MORE CONTEXT INFORMATION HERE}
+The localization process in \gls{slam} is also dependent on the quality of the
+sensor data, especially when dynamic elements are present in the environment.
+Moving objects, such as people, vehicles, or machinery,
+can introduce significant challenges during the data registration step.
+When these dynamic observations are considered during data registration
+without any outliers rejection technique, could introduce errors on pose
+estimation, potentially causing the robot's localization to drift
+or even fail entirely. In order to mitigate the effects of environment dynamics
+in the localization process, we explore several strategies formulated by the
+following research hypotheses. These hypotheses focus on extracting geometric
+features from the 2D~laser scanner data, using robust kernels during the
+data registration process to reduce the influence of outliers
+while applying distance maps to avoid the traditional association step
+to speed up the data registration process.
+Additionally, implementing local map strategies to continuously update
+the local environment representation with the latest sensor observations
+can help maintain a more accurate knowledge of the robot's surroundings,
+improving localization stability in highly dynamic environments.
 
 \begin{hypothesis}\label{hypothesis:localization:features}
 Exploring the use of geometric feature extraction, such as corners or lines,
