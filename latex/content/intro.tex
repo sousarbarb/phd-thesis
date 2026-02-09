@@ -367,23 +367,24 @@ reference representation (\eg, singular scan or a local map),
 generating odometry and loop closure constraints,
 while the back-end of the framework implements a pose graph optimization
 using the \texttt{srrg2\_solver}~\cite{grisetti:robotics:2020};
-\item ray tracing-based techniques for deal with dynamic observations
+\item ray tracing-based techniques to deal with dynamic observations
 on the 2D~point cloud map representation of the environment;
 \item offline global bundle adjustment formulation based on distance maps
 to try to remove distortions from the global map.
 \end{itemize}
 
-Furthermore, while the degree-granting institution is \gls{feup},
+Furthermore, while the degree-granting institution is the \gls{feup},
 the host institution of this PhD thesis is \gls{inesctec}.
 Specifically, all work conducted in this thesis was performed at
 \gls{iilab}, within \gls{criis} from \gls{inesctec}. Throughout the PhD journey,
 the research was executed alongside \gls{pps}18 -- \textit{3D~navigation system
 for mobile robotic equipment}, part of \gls{wp}10 -- \textit{automated logistics
 for the automotive industry}, within the
-\textit{GreenAuto Agenda: Green Innovation for the Automotive Industry},
+\textit{GreenAuto Agenda: Green Innovation for the Automotive Industry}~\cite{greenauto},
 as a contribution for the long-term \gls{slam} research topic.
 This \gls{pps} involves several partners, including \gls{feup}, \gls{inesctec},
-and the leading partner, Flowbotic Mobile Systems, responsible for the
+and the leading partner,
+Flowbotic Mobile Systems~\cite{flowbotic}, responsible for the
 development of an autonomous forklift for the automotive industry.
 
 Within the scope of the 2030 Agenda for sustainable development
@@ -404,34 +405,107 @@ this research work falls under the following \glspl{sdg}:
 \end{figure}
 
 \section{Contributions}\label{sec:intro:contributions}
-TBC
+This doctoral research advances localization and mapping
+for mobile robots in dynamic industrial environments
+by combining state of the art research, experimental evaluation,
+and system-level integration. The work resulted in peer-reviewed publications
+covering perception and feature extraction from 2D~laser scanners,
+multimodal sensing integration, localization in dynamic environments,
+and \gls{slam} benchmarking. Beyond the scientific contributions,
+this thesis also includes the public release of a dataset
+to support reproducibility and benchmarking,
+as well as the development of open-source software.
 
 \subsection{Main contributions}
 \begin{description}[leftmargin=1cm,style=nextline,font=\normalfont]
-\item[\cite{sousa:jfr:2023}] \fullcite{sousa:jfr:2023}
-\item[\cite{sousa:icara:2024}] \fullcite{sousa:icara:2024}
-\item[\cite{sousa:icarsc:2025}] \fullcite{sousa:icarsc:2025}
+\item[\cite{sousa:jfr:2023}] \fullcite{sousa:jfr:2023}.
+\item[\cite{sousa:icara:2024}] \fullcite{sousa:icara:2024}.
+\item[\cite{sousa:icarsc:2025}] \fullcite{sousa:icarsc:2025}.
 \end{description}
 \subsection{Complementary contributions}
 \begin{description}[leftmargin=1cm,style=nextline,font=\normalfont]
-\item[\cite{ribeiro:access:2025}] \fullcite{ribeiro:access:2025}
-\item[\cite{lopes:icara:2026}] \fullcite{lopes:icara:2026}
+\item[\cite{ribeiro:access:2025}] \fullcite{ribeiro:access:2025}.
+\item[\cite{lopes:icara:2026}] \fullcite{lopes:icara:2026}.
 \end{description}
 \subsection{Public datasets}
 \begin{description}[leftmargin=1cm,style=nextline,font=\normalfont]
-\item[\cite{ribeiro:dataset:2025}] \fullcite{ribeiro:dataset:2025}
+\item[\cite{ribeiro:dataset:2025}] \fullcite{ribeiro:dataset:2025}.
 \end{description}
+\subsection{Open-source Software}
+\begin{itemize}[leftmargin=1cm,style=nextline,font=\normalfont]
+\item \url{https://github.com/INESCTEC/inesctec_mrdt_line_fit_based_corner_detector_2d_laser}:
+C++ implementation compatible with \gls{ros}~1 of the
+line fitting-based corner-like detector for 2D~lasers~\cite{sousa:icara:2024};
+\item \url{https://github.com/INESCTEC/inesctec_mrdt_hangfa_discovery_q2}:
+repository containing all the documentation
+(hardware, 3D modelling, electronics, network configuration, sensor setup)
+and code (firmware, C++ nodes compatible with both \gls{ros}~1 and \gls{ros}~2)
+associated with the modifications made on the
+Hangfa Discovery Q2 omnidirectional platform~\cite{amr:hangfa-q2}
+to integrate multimodal perception~\cite{sousa:icarsc:2025};
+  \begin{itemize}[style=nextline,font=\normalfont]
+  \item \url{https://oss.inesctec.pt/inesctec_mrdt_hangfa_discovery_q2/}:
+  GitHub.io public website to help researchers replicate the multimodal
+  perception integration discussed in \cite{sousa:icarsc:2025}.
+  \end{itemize}
+\item \url{https://github.com/sousarbarb/slr-ltlm-mr}:
+repository containing all the documentation, data, and Python scripts used in
+the scope of the systematic literature review on long-term localization and
+mapping~\cite{sousa:jfr:2023};
+\item \url{https://github.com/sousarbarb/hector_slam}:
+added an offline node to the original
+Hector~\gls{slam}~\cite{kohlbrecher:ssr:2011} open-source repository
+(\url{https://github.com/tu-darmstadt-ros-pkg/hector_slam})
+to process multiple \gls{ros} bag files,
+generate the 2D~occupancy grid map,
+and save the robot pose data into TUM format~\cite{sturm:iros:2012};
+\item \url{https://github.com/sousarbarb/slam_gmapping}:
+same addition made to the \texttt{hector\_slam} \gls{ros} package
+for the GMapping~\cite{grisetti:tro:2007} open-source implementation;
+\item \url{https://github.com/sousarbarb/stage_ros}:
+native \gls{ros} wrapper for the
+Stage~Simulator~\cite{gerkey:iros:2001,vaughan:si:2008,stage},
+added compatibility with both \gls{ros}~1 and \gls{ros}~2 versions;
+\item \url{https://gitlab.com/sousarbarb_srrg-software/srrg_system}:
+added CMake compatibility with both \gls{ros}~1 and \gls{ros}~2 versions
+of the packages \texttt{srrg2\_core}, \texttt{srrg2\_qgl\_viewport},
+and \texttt{srrg2\_solver}~\cite{grisetti:robotics:2020}.
+\end{itemize}
 
 \section{Document Structure}\label{sec:intro:structure}
 
-The remaining of this document is organized as follows (\todo{complete!}):
+The remaining of this document is organized as follows
+(\todo{update lated the following text}):
 \begin{itemize}
-\item \chapref{chap:literature} literature review;
-\item \chapref{chap:datasets} datasets used within the scope of the thesis;
-\item \chapref{chap:features} corner-like features with geometric invariance;
-\item \chapref{chap:distance-maps} distance map-based alignment strategies;
-\item \chapref{chap:slam} SLAM in dynamic environments;
-\item \chapref{chap:conclusions} presents conclusions of the PhD Thesis.
+\item \chapref{chap:literature}
+presents concepts and methodologies for the \gls{slam} problem,
+covering scan matching, \gls{ekf}-based \gls{slam}, particle filters,
+and pose graph formulations. The chapter also reviews the literature on
+long-term \gls{slam} in dynamic environments,
+including map representation, map matching,
+dynamic object detection, and dynamics prediction modeling;
+\item \chapref{chap:datasets}
+describes the various mobile platforms and datasets used in this PhD thesis,
+including robots such as the 5dpo omnidirectional robot,
+the Avantgarde tricycle and Flowbotics differential autonomous forklifts,
+and also details the IILABS~3D and other datasets from the literature;
+\item \chapref{chap:features}
+presents a corner-like feature detection algorithm for 2D laser-scanner data
+and evaluates its geometric invariance to various viewpoints;
+\item \chapref{chap:distance-maps}
+explores the concept of using distance maps for data registration,
+discussing optimization algorithms, covariance estimation,
+and point-to-point and point-to-plane alignment error formulations;
+\item \chapref{chap:slam}
+presents the research conducted in this PhD thesis on
+\gls{slam} in dynamic environments,
+focusing on techniques such as online \gls{slam},
+dynamics removal, and offline global bundle adjustment;
+\item \chapref{chap:conclusions}
+summarizes the conclusions and contributions of this research
+and offers final remarks on future work,
+including potential areas for further exploration
+and involvement in the scientific community.
 \end{itemize}
 
 \section*{Funding}
