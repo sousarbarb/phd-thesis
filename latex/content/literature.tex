@@ -15,17 +15,123 @@ TBC
 \section{Systematic Literature Review}\label{sec:literature:systematic}
 
 \subsection{Purpose of the study}\label{sec:literature:systematic:purpose}
-Refer main SLAM reviews known in the literature (e.g., Cadena, Bresson, etc.).
-Identify their main limitations:
-- theoretical tutorials focused on problem formulation instead of current
-literature and identification of possible challenges for long-term SLAM
-(only refer a few...);
-- Cadena from 2016, possibly outdated
-- Lowry only focused on vision sensors
-- Bresson discussion more focused on loop closure and relocalization modules
-- Saeedi reviews multirobot SLAM, identifying several challenges but do not
-overview how to solver them
-- Kunze and Zaffar refer them specifically
+
+The main studies reviewing the \gls{slam} literature are presented in
+\tabref{tab:literature:systematic:purpose:current-literature}.
+In terms of introducing the problem formulation,
+the studies focus on explaining different frameworks for performing \gls{slam}.
+Durrant-Whyte~and~Bailey~\cite{durrant-whyte-bailey:ram:2006,bailey-durrant-whyte:ram:2006}
+discuss Bayesian-based probabilistic formulations,
+namely, \gls{ekf} and the Rao-Blackwellized particle filter frameworks,
+also categorized as filtering approaches.
+In contrast, Grisetti~\etal~\cite{grisetti:itsm:2010} explain in detail
+a smoothing formulation, the graph-based \gls{slam},
+which estimates the full trajectory of the robot
+from a set of sensor measurements.
+Thrun~\cite{thrun:inbook:2008} introduces both probabilistic
+(\gls{ekf} and particle filter) and
+smoothing (graph) formulations.
+Focusing on vision sensorization,
+Scaramuzza~and~Fraundorfer~\cite{scaramuzza-fraundorfer:ram:2011,fraundorfer-scaramuzza:ram:2012}
+present an extensive tutorial on visual odometry for
+estimating relative motion from visual data,
+where the study discusses camera modeling and calibration,
+motion estimation, and feature matching.
+Yousif~\etal~\cite{yousif:iis:2015} extend
+the previous visual odometry tutorial
+to include methodologies for the vision-based \gls{slam} problem.
+Although the introductions mentioned here
+provide comprehensive explanations of the problem formulation itself, none of
+them focus the discussion on the possible long-term challenges of \gls{slam}.
+
+\input{tables/literature/purpose_current-reviews.tex}
+
+Moreover, other studies focus on theoretical aspects
+of the \gls{slam} formulation.
+Dissanayake~\etal~\cite{dissanayake:iciinfs:2011} discuss the
+fundamental properties of \gls{slam}:
+observability (whether the problem is solvable),
+convergence (whether the state uncertainty converges to a finite value),
+and consistency (whether the estimated state is unbiased).
+Huang~and~Dissanayake~\cite{huang-dissanayake:ijars:2016}
+extend the previous work by providing an in-depth explanation of the
+fundamental properties and defining criteria for the
+performance evaluation of \gls{slam} algorithms in terms of
+consistency, accuracy, and computational efficiency.
+In contrast to \cite{dissanayake:iciinfs:2011},
+which focuses mainly on filtering-based \gls{slam},
+Huang~and~Dissanayake~\cite{huang-dissanayake:ijars:2016} also discuss the
+properties for smoothing formulations.
+Both studies focus only on theoretical aspects,
+without addressing the problem of long-term localization and mapping.
+
+In terms of surveys on \gls{slam} trends,
+Cadena~\etal~\cite{cadena:tro:2016} provide a broad overview
+of metric and semantic \gls{slam} works.
+The work briefly discusses localization and mapping robustness
+in terms of loop closure validation and handling dynamic environments,
+and \gls{slam} scalability in terms of pose graph sparsification
+and parallel and distributed computing.
+By contrast, Lowry~\etal~\cite{lowry:tro:2016} focus on topological
+\gls{slam}, providing a comprehensive review of visual place recognition.
+Although the study discusses the challenges of navigation
+across varying conditions, it is limited to vision sensors.
+Bresson~\etal~\cite{bresson:tiv:2017} survey trends in single- and
+multi-vehicle \gls{slam} and in large-scale experiments for autonomous vehicles.
+Although the study compares the methods on accuracy, scalability, availability,
+recovery, map updateability, and scene dynamics,
+their study only refers to approaches composed of at least odometry and a
+mapping module, not discussing localization-only algorithms.
+Also, the discussion is more focused on loop closure and relocalization modules
+and on leveraging existing data, rather than on methodologies for
+addressing the long-term challenges of continuous \gls{slam}.
+
+Similar to \cite{bresson:tiv:2017},
+Kuutti~\etal~\cite{kuutti:jiot:2018} and Badue~\etal~\cite{badue:eswa:2021}
+analyze trends for self-driving vehicles.
+While Kuutti~\etal~\cite{kuutti:jiot:2018} focus on sensorization and
+cooperative localization between vehicles,
+Badue~\etal~\cite{badue:eswa:2021} concentrate on the architecture of
+autonomous driving systems. However, neither of those studies discuss the
+challenges of achieving long-term \gls{slam}.
+Saeedi~\etal~\cite{saeedi:jfr:2016} present a review of multi-robot \gls{slam}.
+Even though the authors identify large-scale, dynamic environments,
+multi-session operations, and agent scalability as challenges for
+multi-robot \gls{slam}, their study does not provide an overview of
+existing methodologies to address these problems.
+Paull~\etal~\cite{paull:joe:2014} and Ebadi~\etal~\cite{ebadi:tro:2024}
+also present overviews of the \gls{slam} literature,
+but are more specific in their domains:
+the former focuses on autonomous underwater navigation,
+and the latter on \gls{slam} in extreme underground environments.
+However, those two studies do not discuss long-term \gls{slam}.
+
+The surveys by Kunze~\etal~\cite{kunze:ral:2018} and
+Zaffar~\etal~\cite{zaffar:ahs:2018} focus on
+some challenges of long-term autonomy.
+Kunze~\etal~\cite{kunze:ral:2018} provides a brief overview of how \gls{ai}
+can enable the long-term operation of autonomous systems.
+Although the survey discusses challenges such as environments with
+varying appearance and the dynamics of moving elements,
+the discussion is limited to \gls{ai}-related work.
+The work only briefly analyzes localization and mapping tasks,
+while also focusing on reasoning, human-robot interaction, and planning.
+As for Zaffar~\etal~\cite{zaffar:ahs:2018},
+the study focuses solely on reviewing, discussing, and comparing sensors
+with respect to sensor lifetime, field operability, ease of replacement,
+and suitability for various environments.
+
+Nevertheless, none of the studies presented in
+\tabref{tab:literature:systematic:purpose:current-literature} describe
+their methodology for selecting the works for discussion.
+This limitation prevents other researchers from repeating the review process,
+\eg, to update existing studies and maintain an up-to-date understanding
+of the current state of the art in \gls{slam}.
+
+
+-----------------------
+
+\todo{finish section!}
 
 Motivation and goals:
 - following PRISMA for reproducibility of the review methodology itself
