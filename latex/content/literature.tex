@@ -129,7 +129,8 @@ This limitation prevents other researchers from repeating the review process,
 of the current state of the art in \gls{slam}.
 
 As a result, \textit{A systematic literature review on long-term localization
-and mapping for mobile robots}~\cite{sousa:jfr:2023} was made in the scope of
+and mapping for mobile robots}~\cite{sousa:jfr:2023}
+(see \appxref{appx:slr}) was written in the scope of
 this PhD~thesis. The review follows the \gls{prisma}~\cite{page:bmj:2021}
 guidelines, defining a systematic methodology to ensure the repeatability of the
 selection and data extraction processes while allowing future updates
@@ -140,7 +141,7 @@ These considerations improve the study's coverage of
 the long-term localization and mapping topic,
 compared to the existent \gls{slam} surveys.
 
-In summary, the following questions are the focus of the systematic review on
+In summary, the following questions are the focus of our systematic review on
 long-term localization and mapping literature~\cite{sousa:jfr:2023}:
 \begin{itemize}
 \item main challenges inherent to lifelong \gls{slam};
@@ -152,57 +153,188 @@ long-term operations.
 \end{itemize}
 
 \subsection{Review methodology}\label{sec:literature:systematic:method}
+A systematic literature review uses explicit, rigorous, and
+reproducible systematic methods to synthesize the findings of studies related
+to a particular research question, topic area, or phenomenon of interest.
+This type of review ensures the quality and trustworthiness of its findings
+by presenting a complete, organized, and summarized analysis of all works
+considered, while allowing others to replicate or update the review.
+The most common standard for performing a systematic review is the \gls{prisma}
+statement~\cite{page:bmj:2021}.
+Although \gls{prisma} was initially designed to evaluate the effects of health
+interventions, its methodology checklist items are general and applicable
+to other subject areas~\cite{benos:sensors:2021,chukwu-garg:access:2020,moayedi:nca:2020,qureshi:ijim:2020,qureshi:ijim:2020}.
+Thus, the methodology used in our systematic review on long-term localization
+and mapping, extensively discussed in \appxref{appx:slr}, follows the
+\gls{prisma} guidelines. This methodology is composed of the following steps:
+\begin{enumerate}
+\item definition of eligibility criteria;
+\item conceptualization of the search strategy;
+\item selection process:
+  \begin{enumerate}
+  \item identification;
+  \item screening;
+  \item quality assessment.
+  \end{enumerate}
+\item data extraction;
+\item synthesis and analysis of the included works.
+\end{enumerate}
 
-PRISMA context:
-1. definition of eligibility criteria;
-2. conceptualization of the search strategy;
-3. selection process:
-(a) identification;
-(b) screening;
-(c) quality assessment.
-4. data extraction;
-5. synthesis and analysis of the included works.
+First, we excluded eligible studies according to the exclusion criteria
+presented in \tabref{tab:literature:systematic:method:exclusion-criteria}.
+These criteria focus on the type of paper, availability, and relevance to the
+research topic of long-term localization and mapping.
+Studies must be published in scientific venues to ensure peer review.
+Only primary literature and English-language papers available in digital
+libraries are considered to ensure accessibility and reproducibility.
+Additionally, studies not categorized in the scientific databases under
+\textit{Computer Science}, \textit{Engineering}, \textit{Mathematics}, or
+\textit{Multidisciplinary} subject areas
+are excluded, as these fields are closely related to the research topic.
+We also excluded works that focus solely on datasets, as these are not
+considered original research, as well as odometry-only approaches,
+which are not viable for long-term operations.
+Lastly, we excluded papers that are not directly related to
+long-term localization and mapping.
 
-Eligibility criteria: E1 -- E9 (\tabref{tab:literature:systematic:method:exclusion-criteria})
+\input{tables/literature/method_eligibility-criteria.tex}
 
-Search strategy:
-- databases
-- date and search query
-- publication date
+Next, our search strategy for the systematic literature review aimed
+to identify relevant data sources and define the search fields and base string
+to consider during the process of obtaining the included records.
+The review considered multiple databases to increase the overall scientific
+coverage, namely, ACM~\cite{acm}, Dimensions~\cite{dimensions},
+IEEE~Xplore~\cite{ieeexplore}, INSPEC~\cite{inspec},
+Scopus~\cite{scopus}, and Web~of~Science~\cite{wos}.
+Furthermore, the \textit{Title}, \textit{Abstract}, and \textit{Keywords}
+were the fields used to obtain search results and focus the search on the most
+relevant summary information. The \textit{Keywords} field includes the author
+keywords, database-indexed terms, and, if available, uncontrolled keywords.
+Also, we did not impose any date restrictions to avoid missing important studies
+and to provide a more comprehensive discussion on the topic.
+Finally, we last performed the search on May 17, 2022, for the review.
+The search query used the following base string, combining terms related to
+robots, vehicles, localization, mapping, \gls{slam}, and long-term operations,
+leveraging the asterisk (\texttt{*}) wildcard to consider multiple synonyms.
 
-Selection process:
-- identification
-- screening
-- quality assessment + graph (\tabref{tab:literature:systematic:method:quality-assessment})
+{\centering
+\texttt{(robot* OR vehicle*) AND ((locali* AND map*) OR "slam") AND}\\
+\texttt{("long term" OR "life long" OR lifelong)}
+\par}
 
-Data extraction process.
-
-Brief analysis number of included records in the review per year!
+\figref{sec:literature:systematic:method:prisma-flow} summarizes
+the selection process for the review. During the identification phase,
+the search strategy was applied to all data sources,
+using Parsifal~\cite{parsifal} to identify duplicate records across databases.
+The 232~excluded records in this phase include works that do not meet
+criteria~E4 (auxiliary Python scripts to identify short papers from BibTex
+bibliography data) and~E7 (searching for the \texttt{dataset} term in the
+titles). We have gone through a double-check procedure to ensure
+these criteria are applied correctly. As a result, we screened 589~records,
+requiring us to read their titles and abstracts to determine
+eligibility for the quality assessment phase.
+Initially rejected papers were subject to a further assessment
+to validate the exclusion. This assessment included analyzing
+the experimental results and conclusions presented in the original works
+to either confirm or reverse the exclusion decision.
+Overall, we rejected 178~studies in the screening phase,
+leaving 411~eligible works for quality assessment.
 
 \begin{figure}[t]
 \centering
 \includegraphics[height=10cm]{literature/selection.pdf}
-\caption[\glsentryfull{prisma} flow diagram for the selection process]{\glslink{prisma}{\glsentryfull{prisma}} flow diagram for the selection process}
+\caption[\glsentryfull{prisma} flow diagram for the selection process]{\glslink{prisma}{\glsentryfull{prisma}} flow diagram for the selection process~\cite{sousa:jfr:2023}}
 \label{sec:literature:systematic:method:prisma-flow}
 \end{figure}
 
-\input{tables/literature/method_eligibility-criteria.tex}
+The quality evaluation of the 411~eligible works followed the 8~Quality
+Evaluation~(QE) criteria presented in
+\tabref{tab:literature:systematic:method:quality-assessment}.
+All of them are subjective criteria derived from the analysis of the
+eligible works, focusing on the detail and relevance of the proposed
+methodologies, experimental results, and long-term consideration.
+Considering the possible scores for the QE~criteria in
+\tabref{tab:literature:systematic:method:quality-assessment},
+each work can only have a maximum score of~10.0.
+After we evaluated the 411~eligible works,
+our first observation was that works with a non-detailed or appropriate
+methodology, results' discussion, or
+conclusions should not be included in the review.
+Another observation is relative to rejecting works that do not consider
+either localization or mapping problems, or do not present
+any long-term experimental results.
+This rejection is due to the focus of the review on long-term
+localization and mapping. Furthermore, the quality assessment phase should
+include a cut-off score to filter out works with low quality scores.
+Therefore, we considered the following two reasons to reject a record in the
+quality assessment phase of the selection process,
+resulting in 175~studies for the data extraction phase:
+\begin{enumerate}
+\item QE2, QE3, QE5, QE8: reject works with a 0.0 (no compliance) score;
+\item cut-off score: reject works with a score lower or equal to 7.5/10.0.
+\end{enumerate}
 
 \input{tables/literature/method_quality-assessment.tex}
 
-\subsection{Discussion overview}\label{sec:literature:systematic:discussion}
-Refer here that dynamics parts will be discussed later.
-Present brief summary on the following topics, based on the categorization made
-within the data extraction framework...
+Finally, the data extraction process involved analyzing the eligible records
+from the quality assessment phase and extracting relevant information.
+In the scope of the systematic review on long-term localization and mapping,
+we considered the following Data Extraction~(DE) items required for each record:
+\begin{itemize}
+\item $\left[DE1\right]$ Long-term considerations -- long-term factors the works
+consider in their proposed approach and experiments. Considering the knowledge
+obtained in the previous phases of the review's methodology,
+we considered the following factors for categorizing the included works:
+  \begin{itemize}
+  \item appearance: varying conditions, appearance changes;
+  \item dynamics: environment dynamics, dynamic elements;
+  \item sparsity: map pruning, redundant data removal;
+  \item multi-session: map management;
+  \item computational: memory management, efficiency.
+  \end{itemize}
+\item $\left[DE2\right]$ Localization -- how the robot localizes itself and the
+type of localizer;
+\item $\left[DE3\right]$ Mapping -- type of the map;
+\item $\left[DE4\right]$ Multi-robot -- if the proposed methodologies consider
+multi-robot systems;
+\item $\left[DE5\right]$ Execution mode -- offline, online, if requires both,
+or if no information on this item;
+\item $\left[DE6\right]$ Environment and domain -- type of environment (indoor,
+outdoor) and domains (air, ground, water) tested with the proposed methodologies;
+\item $\left[DE7\right]$ Sensory setup -- which sensors considered in the
+methodologies;
+\item $\left[DE8\right]$ Non-public experiments -- if the authors performed
+experiments or tests with non-public data;
+\item $\left[DE9\right]$ Ground-truth -- how ground-truth for non-public data is
+obtained or its type, if available;
+\item $\left[DE10\right]$ Distance and time characteristics -- relative to the
+non-public experiments if available, as follows:
+  \begin{itemize}
+  \item total distance (km) of the non-public experiments;
+  \item path (km), in the case of repetitive paths;
+  \item total time (h) in terms of continuous operation;
+  \item time interval (day/week/month/year, or d/w/m/y) between the first and
+  the last run.
+  \end{itemize}
+\item $\left[DE11\right]$ Datasets -- if and which public datasets are used
+in the experiments;
+\item $\left[DE12\right]$ Evaluation metrics -- which metrics are used
+for evaluation.
+\end{itemize}
 
-\todo{probably, remove the following subsubsections, would make it too long...}
+Although the data extraction phase typically does not exclude records,
+33~of the 175~works analyzed had extended versions of the proposed
+methodologies, which we excluded to maintain the originality of the review.
+As a result, we included 142~original works for analysis and discussion
+in the systematic literature review study,
+representing 34.55\% of the eligible records.
+The extracted data for these works is available in \appxref{appx:slr}.
 
-\subsubsection{Appearance variance}
-\subsubsection{Map sparsification}
-\subsubsection{Multi-session}
-\subsubsection{Computational}
-\subsubsection{Long-term experimental data}
-\subsubsection{Evaluation metrics}
+\subsection{Results overview}\label{sec:literature:systematic:results}
+
+Brief analysis number of included records in the review per year!
+- original graph from the review
+- updated ones from INSPEC, Scopus, WOS at the present date oriented for dynamic
 
 \section{Long-Term SLAM in Dynamic Environments}\label{sec:literature:dynamic}
 
