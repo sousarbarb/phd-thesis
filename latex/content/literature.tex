@@ -222,7 +222,7 @@ leveraging the asterisk (\texttt{*}) wildcard to consider multiple synonyms.
 \texttt{("long term" OR "life long" OR lifelong)}
 \par}
 
-\figref{sec:literature:systematic:method:prisma-flow} summarizes
+\figref{fig:literature:systematic:method:prisma-flow} summarizes
 the selection process for the review. During the identification phase,
 the search strategy was applied to all data sources,
 using Parsifal~\cite{parsifal} to identify duplicate records across databases.
@@ -244,7 +244,7 @@ leaving 411~eligible works for quality assessment.
 \centering
 \includegraphics[height=10cm]{literature/selection.pdf}
 \caption[\glsentryfull{prisma} flow diagram for the selection process]{\glslink{prisma}{\glsentryfull{prisma}} flow diagram for the selection process~\cite{sousa:jfr:2023}}
-\label{sec:literature:systematic:method:prisma-flow}
+\label{fig:literature:systematic:method:prisma-flow}
 \end{figure}
 
 The quality evaluation of the 411~eligible works followed the 8~Quality
@@ -332,9 +332,102 @@ The extracted data for these works is available in \appxref{appx:slr}.
 
 \subsection{Results overview}\label{sec:literature:systematic:results}
 
-Brief analysis number of included records in the review per year!
-- original graph from the review
-- updated ones from INSPEC, Scopus, WOS at the present date oriented for dynamic
+The publications per year evolution can be used to evaluate the
+relevance of the long-term localization and mapping topic.
+\figref{fig:literature:systematic:results:year} presents this evolution on
+the 142~included records in our systematic review.
+The final year, 2022, has its data with a diagonal hatch pattern,
+indicating that it does not represent a full year.
+Analyzing \figref{fig:literature:systematic:results:year},
+the long-term localization and mapping topic started to gained relevance in
+2009, with 6~works, compared to only 2~in the previous years.
+From that year onwards, the graph shows an almost linear trend,
+reaching a maximum of 23~records in 2021,
+and already having 8 publications by May~17, 2022.
+This tendency indicates that long-term localization and mapping
+have gained interest over the years and, consequently,
+underscores the importance and relevance of the research topic
+to the scientific community.
+
+\begin{figure}[t]
+\centering
+\includegraphics[height=8.5cm]{literature/year_included-review.eps}
+\caption[Evolution of published records per year considering the 142 included records in the systematic literature review on long-term localization and mapping]{Evolution of published records per year considering the 142 included records in the systematic literature review on long-term localization and mapping. The time interval is between the smallest publication year found in the included records~(2002) and the year of last full inquiry's date~(2022). The latter is with a diagonal hatch pattern due to the fact that the last full inquiry did not consider the whole year~\cite{sousa:jfr:2023}}
+\label{fig:literature:systematic:results:year}
+\end{figure}
+
+Although the scope of our systematic literature review includes methodologies
+for handling the dynamicity of the scene, the original query did not focus on
+any particular challenge related to long-term localization and mapping.
+\figref{fig:literature:systematic:results:year:scopus-wos}
+presents the evolution of publication year during the identification phase
+of a systematic review, using the \textit{Title}, \textit{Abstract}, and
+\textit{Keywords} (authors' and indexed ones) as search fields,
+across two bibliographic databases:
+Scopus~\cite{scopus} and Web~of~Science~\cite{wos}.
+The consideration of the previous two with INSPEC~\cite{inspec}
+could improve the coverage of the search results,
+as discussed in \appxref{appx:slr}, where the joint consideration of
+the three databases guarantees the identification of all 142~included records.
+However, the b-on\footnote{\url{https://www.b-on.pt/}} agreement provided by the
+Portuguese funding agency, FCT -- Fundação para a Ciência e a Tecnologia,
+no longer has INSPEC~\cite{inspec} available to its participating entities,
+including \gls{feup} and \gls{inesctec}.
+Moreover, \figref{fig:literature:systematic:results:year:scopus-wos:all}
+uses the exact inquiry string used in our systematic review.
+% \texttt{(robot* OR vehicle*) AND ((locali* AND map*) OR "slam") AND ("long term" OR "life long" OR lifelong)}.
+\figref{fig:literature:systematic:results:year:scopus-wos:dyn}
+uses a different string to present the evolution of
+publications on the challenge of localization and mapping
+in dynamic environments, which aligns with the goals of this PhD Thesis.
+This scope reduction is accomplished by using the following search string:
+\texttt{(robot* OR vehicle*) AND ((locali* AND map*) OR "slam") AND ("long term" OR "life long" OR lifelong) AND (dynamic* OR mov*)}.
+The part of the query added to the original one (\texttt{dynamic* OR mov*})
+aims to limit search results to works
+featuring dynamic or moving elements in the scene.
+Also, only works since 2009 were considered in the analysis, given that year
+was the one where the long-term localization and mapping started to gain
+traction in the literature.
+
+\begin{figure}[t]
+\centering
+\subfloat[][]{\includegraphics[width=0.495\textwidth]{literature/year_scopus-wos_all.eps}%
+\label{fig:literature:systematic:results:year:scopus-wos:all}}
+\hfill
+\subfloat[][]{\includegraphics[width=0.495\textwidth]{literature/year_scopus-wos_dyn.eps}%
+\label{fig:literature:systematic:results:year:scopus-wos:dyn}}
+\caption[Evolution of published records per year in Scopus and Web of Science databases on long-term localization and mapping]{Evolution of published records per year in Scopus~\cite{scopus} and Web~of~Science~\cite{wos} databases on long-term localization and mapping:
+(a) \texttt{(robot* OR vehicle*) AND ((locali* AND map*) OR "slam") AND ("long term" OR "life long" OR lifelong)};
+(b) \texttt{(robot* OR vehicle*) AND ((locali* AND map*) OR "slam") AND ("long term" OR "life long" OR lifelong) AND (dynamic* OR mov*)}.
+Date of the last full inquiry: February 13, 2026.
+The time interval is between 2009 and the year of last full inquiry's date~(2026). The latter is with a diagonal hatch pattern due to the fact that the last full inquiry did not consider the whole year}
+\label{fig:literature:systematic:results:year:scopus-wos}
+\end{figure}
+
+When analyzing \figref{fig:literature:systematic:results:year:scopus-wos:all},
+the graph shows increasing interest among the scientific community in
+long-term localization and mapping. Since 2009,
+the graph shows a consistent upward trend, reaching a maximum of
+113~and 81~published records in 2025 for Scopus~\cite{scopus} and
+Web~of~Science~\cite{wos}, respectively. The trend indicates that
+long-term \gls{slam} is gaining prominence,
+underscoring its importance to the scientific community.
+This result conforms with the analysis of the year of publication
+for the 142~literature works included in our systematic review
+(see \figref{fig:literature:systematic:results:year}).
+
+Similarly, the graph shown in
+\figref{fig:literature:systematic:results:year:scopus-wos:dyn}
+indicates growing interest in the topic of this PhD~Thesis:
+localization and mapping in dynamic environments.
+From 2009 onwards, the topic has also gained relevance,
+achieving a maximum of 53~and 35~published works in 2025 for
+Scopus~\cite{scopus} and Web~of~Science~\cite{wos}, respectively.
+Although the overall number of publications related to dynamic environments
+is lower than for the broader long-term topic,
+the growing interest in addressing the challenges of
+localization and mapping in dynamic environments
+underscores the relevance of this PhD~Thesis.
 
 \section{Long-Term SLAM in Dynamic Environments}\label{sec:literature:dynamic}
 
