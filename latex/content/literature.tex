@@ -431,6 +431,33 @@ underscores the relevance of this PhD~Thesis.
 
 \section{Long-Term SLAM in Dynamic Environments}\label{sec:literature:dynamic}
 
+\cite{adkins:iros:2022}
+\cite{chen:itsc:2022}
+\cite{du:iros:2022}
+\cite{kim:icra:2022}
+\cite{wu:cvci:2022}
+\cite{deng:ram:2023}
+\cite{nielsen-hendeby:tiv:2023}
+\cite{soares:jint:2023}
+\cite{stefanini:sensors:2023}
+\cite{vodisch:isrr:2022}
+\cite{yin:tro:2023}
+\cite{yu:acait:2023}
+\cite{hroob:ras:2024}
+\cite{hroob:ral:2024}
+\cite{li:tii:2024}
+\cite{li:aaai:2024}
+\cite{pekkanen:mfi:2024}
+\cite{wang:ras:2024}
+\cite{yang:ral:2024}
+\cite{cheng:ral:2025}
+\cite{hu:tcsvt:2025}
+\cite{jia:tcsvt:2025}
+\cite{li:tim:2025}
+\cite{wang:tim:2025}
+\cite{zhu:tim:2025}
+\cite{vintr:ras:2026}
+
 \todo{review this fucking section based on TRP!!! + new works from scopus and web of science}
 
 In terms of works in the literature for long-term \gls{slam}, as previously mentioned, Appendix~\ref{ap:slr} includes a systematic literature review on that topic following the \gls{prisma}~\cite{methodology:prisma} guidelines. The literature review goes over several challenges related to long-term autonomy having the date of the last full inquiry for identifying records in the data sources considered in the study on May 17, 2022.
@@ -441,6 +468,11 @@ So, next, this section analyzes literature works focused on modeling and identif
 The discussion on dynamics modeling is organized into the following topics: specific map representations used to model or deal with dynamic elements in the scene, identification of dynamic elements matching the current observation to the current map, future prediction of dynamic properties of scene elements, and semantic identification of dynamic objects.
 
 \subsection{Map representation}
+
+\cite{yin:tro:2023}
+\cite{pekkanen:mfi:2024}
+\cite{cheng:ral:2025}
+\cite{li:tim:2025}
 
 Inspired by the human memory, Dayoub~\etal~\cite{dayoub:ras:2011} and Bacca~\etal~\cite{bacca:ras:2013} adapt the multi-store model of Atkinson~and~Shiffrin~\cite{atkinson-shiffrin:inbook:1968} for robot mapping. This model divides the memory into three stores: \gls{sm} to save the perceived information, \gls{stm}, and \gls{ltm}.
 Three mechanisms move information between memories: selective attention for \gls{sm} to \gls{stm}, rehearsal to commit information from \gls{stm} to \gls{ltm} or which one is forgotten, and the retrieval mechanism to move unused information from \gls{ltm} back to \gls{stm}.
@@ -469,6 +501,12 @@ Although the method \cite{nielsen-hendeby:fusion:2022} maintained an up-to-date 
 
 \subsection{Map matching}
 
+\cite{kim:icra:2022} session alignment + low dynamics detection and removal?
+\cite{stefanini:sensors:2023}
+\cite{li:tii:2024}
+\cite{yang:ral:2024}
+\cite{li:tim:2025}
+
 Environment dynamics can be identified by comparing the current observation to the map.
 Assuming a prior vector map as a permanent map, the work of Biswas and Veloso~\cite{biswas-veloso:ras:2017} determines the probability of observed features being long-term ones by the 2D laser scan-to-map matching distance. Short-term features are determined by the scan-to-scan matching distance, while the remaining ones are considered dynamic features and not considered for localization. Compared to \gls{mcl} with a static map and to Tipaldi~\etal~\cite{tipaldi:ijrr:2013}, Biswas and Veloso~\cite{biswas-veloso:ras:2017} obtained lower localization error in a parking-lot environment. However, the method \cite{biswas-veloso:ras:2017} would not handle semi-static changes.
 Instead of using a permanent map, Zhang~\etal~\cite{zhang:acc:2019} maintains a \gls{sdf} representation based on a prior occupancy map. The proposed approach \cite{zhang:acc:2019} rejects dynamic points identified by range flow and updates the \gls{sdf}-based map with semi-static changes observed in the scan-to-map difference. Compared to \gls{mcl} in a semi-static environment, Zhang~\etal~\cite{zhang:acc:2019} had lower pose errors and an improved representation of the environment.
@@ -495,6 +533,21 @@ The works \cite{einhorn-gross:ecmr:2013} and \cite{einhorn-gross:ras:2015} were 
 
 \subsection{Dynamic objects detection}
 
+\cite{chen:itsc:2022}
+\cite{kim:icra:2022} (from kimkim2018 to remove high dynamic pts)
+\cite{wu:cvci:2022}
+\cite{deng:ram:2023} (or prediction?...)
+\cite{soares:jint:2023}
+\cite{vodisch:isrr:2022}
+\cite{yu:acait:2023}
+\cite{hroob:ras:2024}
+\cite{hroob:ral:2024}
+\cite{li:aaai:2024}
+\cite{cheng:ral:2025}
+\cite{hu:tcsvt:2025}
+\cite{wang:tim:2025}
+\cite{zhu:tim:2025}
+
 In terms of detecting dynamic objects, Yue~\etal~\cite{yue:icra:2020} proposes a collaborative dynamic mapping for detecting humans using visual and thermal images and a 3D \gls{lidar}. The YOLOv3 algorithm extracts the bounding boxes from the images relative to humans. The 3D point cloud projection onto the images allows the creation of a static point cloud for localization and mapping of each robot by filtering out the points corresponding to humans. In the experiments, the dynamic objects removal generated a more accurate relative transformation of the collaborative maps compared to not removing those objects.
 Zhu~\etal~\cite{zhu:icra:2021} also uses YOLOv3 to extract bounding boxes of dynamic classes (parked cars) from a RGB image, and the projection of 3D \gls{lidar} points allows the creation of the static and semi-dynamic maps required for localization. Even though the method \cite{zhu:icra:2021} does not discard the dynamic objects, the localization module reduce the importance of weight of the corresponding observations.
 Instead of using visual data, Sun~\etal~\cite{sun:ral:2018} adapts the PointNet network for object recognition (pedestrian, cyclist, car, or background) to classify the scan points of a 3D \gls{lidar}. The proposed Recurrent-OctoMap maintains the occupancy and semantic information, where the latter information specifies the cell semantic state and the probability of the prediction. The transition between states is learned by a \gls{ltm} \gls{rnn}. In a long-term experiment, the method \cite{sun:ral:2018} was able to improve its 3D semantic map compared to a standard Bayes update.
@@ -514,6 +567,12 @@ Finally, Xing~\etal~\cite{xing:jfr:2022} proposes the DE-SLAM to deal with \gls{
 All of these methods using geometric constraints to improve semantic labeling only use static features for localization and mapping.
 
 \subsection{Prediction modeling}
+
+\cite{adkins:iros:2022}
+\cite{du:iros:2022}
+\cite{deng:ram:2023}? (probably not... check it)
+\cite{wang:ras:2024}
+\cite{vintr:ras:2026}
 
 In the included works, Markov processes are used to predict the dynamics of the environment.
 Tipaldi~\etal~\cite{tipaldi:ijrr:2013} uses a dynamic occupancy grid and exploits the stationary distribution and the state holding time associated with \glspl{hmm} on a 2D grid. The method uses past observations for each run to learn the state transition probabilities iteratively to estimate the \gls{hmm} parameters. Then, the localization can infer how often is expected to see a dynamic object in the environment and for how long. Comparing the proposed \gls{hmm}-based localization to \gls{mcl} using a standard grid, the former had a lower localization failure rate than \gls{mcl}, capable of dealing with high dynamics (moving cars) and lower ones (parked cars).
