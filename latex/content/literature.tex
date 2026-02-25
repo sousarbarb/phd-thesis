@@ -20,7 +20,8 @@ upon the mapping process~\cite{thrun:book:2005}.
 \begin{definition}[{\cite[p.~349]{siegwart:book:2004}}]\label{def:literature:slam}
 ``...the robot must not only create a map,
 but it must also do this while moving and localizing to explore the environment.
-In the robotics community, this is often called the \glsfirst{slam} problem.''
+In the robotics community, this is often called the
+\glslink{slam}{\glsentryfull{slam}} problem.''
 \end{definition}
 
 Two main formulations define \gls{slam} from a probabilistic perspective,
@@ -146,7 +147,142 @@ The problem of minimizing the error at the loop closure
 is instead called loop-closing.''
 \end{definition}
 
-\subsection{Particle filter}
+\subsection{Particle filter}\label{sec:literature:slam:pf}
+The graphical model of the \gls{slam} problem shown in
+\figref{fig:literature:slam} is equivalent to a discrete \gls{dbn}
+(see \defref{def:literature:slam:dbn}). A sampling-based inference algorithm for
+\glspl{dbn} is the particle filter.
+However, these filters suffer from the problem of dimensionality,
+scaling exponentially~\cite{doucet:uai:2000}.
+The assumption of conditional independence between map measurements
+allows using \glspl{rbpf} to solve the \gls{slam} problem.
+These filters use particles to represent the posterior probability
+over some variables (\eg, the robot path, correspondence variables)
+and Gaussians (or other parametric probabilistic distribution functions)
+to represent all other variables
+(\eg, the feature positions)~\cite{thrun:book:2005}.
+This marginalization of some variables implemented by \glspl{rbpf}
+improves the computational efficiency compared to standard particle filters,
+reducing the space size for the sampling step~\cite{doucet:uai:2000}.
+
+\begin{definition}[{\cite{grisetti:itsm:2010}}]\label{def:literature:slam:dbn}
+``A convenient way to describe this structure is via the
+\glslink{dbn}{\glsentryfull{dbn}}...
+A Bayesian network is a graphical model that
+describes a stochastic process as a directed graph.
+The graph has one node for each random variable in the process,
+and a directed edge (or arrow) between two nodes
+models a conditional dependence between them''
+\end{definition}
+
+An example of a \gls{rbpf}-based \gls{slam} is
+FastSLAM~\cite{montemerlo:aaai:2002,montemerlo:ijcai:2003}.
+This algorithm decomposes the \gls{slam} problem into a
+robot localization one and the estimation of map landmarks
+conditioned on the robot pose estimate.
+The decomposition and factoring of the posterior probability
+($p\left(x_t,m \;\vert\; z_{1:t},u_{1:t},c_{1:t}\right)$)
+followed by the FastSLAM~\cite{montemerlo:aaai:2002,montemerlo:ijcai:2003}
+algorithm is shown in \eqref{eq:literature:slam:fast-slam:factoring}.
+The algorithm assumes the conditional independence of the features ($m_n$)
+given the robot path ($x_{1:t}^{\left[N\right]}$), \ie,
+knowing the location of one feature does not add any additional information
+about the location of other features if the robot path is known.
+Moreover, \figref{fig:literature:slam:fastslam} represents the composition of
+particles implemented in FastSLAM. Each particle $k$ contains an estimate of
+the robot path until the current time instant $t$ and
+a set of \glspl{ekf} with a mean ($\mu_j^{\left[k\right]}$) and
+covariance ($\sum_j^{\left[k\right]}$) of the estimation,
+one for each feature $j=1..N$ represented in the map $m$.
+The basic steps of the FastSLAM~\cite{montemerlo:aaai:2002,montemerlo:ijcai:2003}
+algorithm are the following ones~\cite{thrun:book:2005}:
+\begin{itemize}
+\item for each particle $k=1..M$:
+  \begin{enumerate}
+  \item \textbf{retrieval:} retrieve a pose $x_{t-1}^{\left[k\right]}$
+  from the particle set;
+  \item \textbf{prediction:} sample a new pose
+  $x_{t}^{\left[k\right]} \sim p\left(x_t \;\vert\; x_{t-1}^{\left[k\right]},u_t\right)$
+  using the probabilistic motion model of the robot
+  (the improved version, FastSLAM~2.0~\cite{montemerlo:ijcai:2003},
+  incorporates also the sensor measurements $z_t^i$ in the prediction step);
+  \item \textbf{measurement update:} for each observed feature obtained from a
+  measurement $z_t^i$, identify the correspondence $j$ in the particle map,
+  and incorporate $z_t^i$ into the corresponding \gls{ekf},
+  updating the mean ($\mu_j^{\left[k\right]}$) and
+  covariance ($\sum_j^{\left[k\right]}$) of the
+  corresponding map feature accordingly;
+  \item \textbf{importance weight:} compute the importance weight
+  $w^{\left[k\right]}$ for the new particle.
+  \end{enumerate}
+\item \textbf{resampling:} sample, with replacement, the $M$ particles,
+where the probability of sampling being proportional to $w^{\left[k\right]}$, to
+incorporate the measurements $z_t^i$ into the robot pose $x_{t}^{\left[k\right]}$
+(due to only considering the most recent control $u_t$ in the previous steps,
+only in FastSLAM~1.0~\cite{montemerlo:aaai:2002}).
+\end{itemize}
+\begin{equation}\label{eq:literature:slam:fast-slam:factoring}
+\begin{aligned}
+p\left(x_t,m \;\vert\; z_{1:t},u_{1:t},c_{1:t}\right) & =
+p\left(x_t \;\vert\; z_{1:t},u_{1:t},c_{1:t}\right)
+p\left(m \;\vert\; x_t,z_{1:t},c_{1:t}\right) =\\
+& = p\left(x_t \;\vert\; z_{1:t},u_{1:t},c_{1:t}\right)
+\prod_{n=1}^{N} p\left(m_n \;\vert\; x_t,z_{1:t},c_{1:t}\right)
+\end{aligned}
+\end{equation}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.8\textwidth]{literature/slam-pf.pdf}
+  \caption[Composition of particles in FastSLAM in terms of path estimate and
+  the set of estimators and associated covariances for
+  individual feature locations]{%
+  Composition of particles in
+  FastSLAM~\cite{montemerlo:aaai:2002,montemerlo:ijcai:2003}
+  in terms of path estimate and the set of estimators and associated covariances
+  for individual feature locations~\cite{thrun:book:2005}}
+  \label{fig:literature:slam:fastslam}
+\end{figure}
+
+The adaptation of FastSLAM~\cite{montemerlo:aaai:2002,montemerlo:ijcai:2003}
+to occupancy grid-based \gls{slam} is implemented by the
+GMapping~\cite{grisetti:tro:2007} algorithm.
+This adaptation requires the modification of three modules relative to
+FastSLAM~\cite{montemerlo:aaai:2002,montemerlo:ijcai:2003}.
+First, GMapping~\cite{grisetti:tro:2007} considers the occupancy grid as
+the map representation for the \gls{slam} problem,
+where each particle contains a grid map.
+Next, the computation of a measurement likelihood
+($p\left(z_t \;\vert\; x_{t}^{\left[k\right]}, m_{t-1}^{\left[k\right]}\right)$)
+uses the beam endpoint sensor model,
+characteristic of range-bearing sensors such as 2D~lasers,
+instead of integrating the measures into an \gls{ekf} as in
+FastSLAM~\cite{montemerlo:aaai:2002,montemerlo:ijcai:2003}.
+This model considers the individual scan beams independent from each other,
+using the distance between the beam endpoint and the closest obstacle in
+the map to that point to compute the beam's individual likelihood.
+Lastly, the update of each particle's map
+($p\left(m_t^{\left[k\right]} \;\vert\; z_t x_{t}^{\left[k\right]}, m_{t-1}^{\left[k\right]}\right)$)
+computes a new occupancy grid map.
+This update estimates the probability of each individual cell,
+assuming the independence of each other,
+using a binary Bayes filter and the inverse model
+of the sensor measurements~\cite{thrun:book:2005}.
+
+A key advantage of particle filter-based \gls{slam} is the decisions on
+data associations being made on a per-particle basis,
+instead of the most likely one as in scan matching or \gls{ekf} approaches.
+This characteristic represents inherently multi-hypotheses associations
+in the filter, making it more robust to data association problems.
+Another advantage is particle filters being capable to model
+non-linear robot motions without requiring model approximations. However,
+a disadvantage of particle filters is relative to loop closure detection.
+Even though these filters are able to detect previously visited places,
+unlike scan matching approaches such as HectorSLAM~\cite{kohlbrecher:ssr:2011},
+this place recognition ability is only maintained through the diversity
+in the particle sets, possibly maintaining larger sets and
+requiring more computational resources~\cite{thrun:book:2005}.
+
 \subsection{Pose graph}
 
 \section{Systematic Literature Review}\label{sec:literature:systematic}
