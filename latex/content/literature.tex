@@ -283,7 +283,121 @@ this place recognition ability is only maintained through the diversity
 in the particle sets, possibly maintaining larger sets and
 requiring more computational resources~\cite{thrun:book:2005}.
 
-\subsection{Pose graph}
+\subsection{Pose graph}\label{sec:literature:slam:graph}
+Another solution for the \gls{slam} problem leveraging its graphical model
+(illustrated in \figref{fig:literature:slam}) is pose graph \gls{slam},
+also known as GraphSLAM. This optimization-based solution consists of two
+subsystems, as in filter-based approaches such as particle filters and \gls{ekf}.
+In filter-based \gls{slam}, the filters implement a prediction stage
+usually based on the vehicle's motion model, and then,
+the correction phase updates the predicted state
+by matching the sensor observation to the map.
+As for optimization-based solutions such as the posse graph formulation,
+a first module also known as the front-end is responsible to identify
+constraints (\eg, odometry, loop closure, landmark observations)
+of the problem based on sensor data by finding correspondences
+between new observations and the current map.
+Then, a second subsystem known as the back-end computes or refines
+the poses of the graph and the map minimizing the coherence errors as a whole.
+This second module usually requires optimization algorithms such as
+Gauss-Newton or Levenberg-Marquardt for minimizing the objective
+function~\cite{bresson:tiv:2017}. However, there are available in the literature
+optimization frameworks more specific for the pose graph formulation, namely,
+\gls{toro}~\cite{grisetti:tits:2009},
+\gls{isam}~\cite{kaess:tro:2008,kaess:icra:2011},
+\gls{gtsam}~\cite{dellaert:tech:2012,dellaert-kaess:ftr:2017},
+$g^2o$~\cite{kummerle:icra:2011}, or
+\texttt{srrg2\_solver}~\cite{grisetti:robotics:2020}.
+
+Furthermore, the edge connection in GraphSLAM between vertexes $x_i$ and $x_j$
+is illustrated in \figref{fig:literature:slam:graph-slam}.
+Considering $z_{ij}$ as a virtual measurement obtained from raw sensor data
+between those two vertexes, let $\overline{z}_{ij}$ and $\Omega_{ij}$
+be the mean and the information matrix of the virtual data, respectively.
+This virtual measurement actually represents the transformation that maximizes
+the overlap between the observations acquired from the pose nodes $i$ and $j$.
+The log-likelihood $l_{ij}$ (see \defref{def:literature:slam:log-likelihood})
+of the measurement $z_{ij}$ can be defined as in
+\eqref{eq:literature:slam:slam:graph:log-like},
+where $\hat{z}_{ij}\left(x_i,x_j\right)$ is the prediction of the
+virtual measurement given the configuration of the nodes $x_i$ and $x_j$.
+Then, the configuration of nodes $x^*=\left(x_1,\dots,x_T\right)^T$ can be found
+formulating a \gls{mle} problem that minimizes the negative log-likelihood
+function $F\left(x\right)$ (see \eqref{eq:literature:slam:slam:graph:function})
+of all the observations, seeking to solve the
+\eqref{eq:literature:slam:slam:graph:solution}~\cite{grisetti:itsm:2010}.
+For exemplification purposes, two possible examples of virtual measurements
+are wheeled odometry and 2D~laser scan matching data. Both cases would define
+the prediction of the measurement as $\hat{z}_{ij}=x_j-x_i$.
+The virtual measurement would be $z_{ij}=x_j - g\left(x_i,u_{ij}\right)$
+for wheeled odometry, where $g\left(x_i,u_{ij}\right)$ represents
+the relative transformation between $x_i$ and $x_j$ estimated by
+the odometry estimator, while using the wheeled odometry data $u_{ij}$
+between those two nodes. As for the scan matching case,
+the measurement would be $z_{ij}=h\left(z_i,z_j\right)$ representing the
+matching between the laser scans $z_i$ and $z_j$ acquired from
+the nodes $x_i$ and $x_j$, respectively.
+
+\begin{definition}[{\cite[p.~224]{rossi:book:2018}}]\label{def:literature:slam:log-likelihood}
+``...since the natural logarithm is a one-to-one function on $\mathbb{R}^+$,
+no information about $\theta$ is lost when the log-likelihood function
+$l\left(\theta\right)=\ln\left[p\left(\theta\right)\right]$ is used in place of
+$p\left(\theta\right)$. Moreover, for many probability models,
+it is easier to work with the log-likelihood function
+than with the likelihood function...''
+\end{definition}
+
+\begin{equation}\label{eq:literature:slam:slam:graph:log-like}
+l_{ij} \propto \left[z_{ij}-\hat{z}_{ij}\left(x_i,x_j\right)\right]^T \Omega_{ij} \left[z_{ij}-\hat{z}_{ij}\left(x_i,x_j\right)\right]
+\end{equation}
+\begin{equation}\label{eq:literature:slam:slam:graph:function}
+F\left(x\right) = \sum_{i,j} e_{ij}^T \Omega_{ij} e_{ij}
+\end{equation}
+\begin{equation}\label{eq:literature:slam:slam:graph:solution}
+x^* = \argmin_x F\left(x\right)
+\end{equation}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.55\textwidth]{literature/slam-graph.pdf}
+  \caption[Edge connection in the graph formulation of the SLAM problem
+  between vertexes $x_i$ and $x_j$ originated from a measurement $z_{ij}$]{%
+  Edge connection in the graph formulation of the \gls{slam} problem between
+  vertexes $x_i$ and $x_j$ originated from a measurement
+  $z_{ij}$~\cite{grisetti:itsm:2010}}
+  \label{fig:literature:slam:graph-slam}
+\end{figure}
+
+A pose graph \gls{slam} implementation is the \gls{slam}~Toolbox
+framework~\cite{macenski-jambrecic:joss:2021}, also available in
+the official navigation stack of the \gls{ros}~\cite{ros} (in version 2).
+This toolbox is intended for 2D~\gls{slam} using a 2D~laser scanner
+in conjunction with wheeled odometry obtained from
+the wheel encoders of the robot's motors.
+The optimization framework used for the pose graph back-end
+is the Ceres Solver~\cite{ceres:sw:2023}.
+Although \gls{slam}~Toolbox~\cite{macenski-jambrecic:joss:2021}
+states having lifelong mapping capabilities,
+these are only relative to being able to update existing maps and serialize
+the data for use in other mapping sessions,
+not for dynamic environments or appearance invariance.
+
+Overall, a key difference between pose graph \gls{slam} compared to
+other solutions for the \gls{slam} problem,
+such as filter and scan matching approaches,
+is that the former has access to the full data when building the map,
+being able to apply improved linearization and data association techniques.
+Indeed, in GraphSLAM, all data can be used to linearize and calculate
+correspondences, \ie, can revise past data association and linearize
+more than once~\cite{thrun:book:2005}.
+This key difference is pointed as a possible reason to graph \gls{slam}
+tending to give better results than filters,
+where the latter is more subject to linearization
+issues~\cite{bresson:tiv:2017}.
+However, the pose graph formulation shows a linear growth over time in the
+graph's size requiring techniques for constraining the graph size, and thus,
+limit the computational resources required for continuously performing
+GraphSLAM~\cite{thrun:book:2005}.
 
 \section{Systematic Literature Review}\label{sec:literature:systematic}
 \todo{TBC}
