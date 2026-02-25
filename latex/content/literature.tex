@@ -7,6 +7,88 @@ TBC
 TBC
 
 \subsection{Problem introduction}
+\gls{slam} is one of the most fundamental problems in robotics.
+This problem, also previously known as \gls{cml},
+may be formulated by \defref{def:literature:slam}.
+When the robot does not have access to a representation of the environment
+nor know its pose, \gls{slam} enables an \gls{amr} to build a map of
+its surroundings while simultaneously localizing itself.
+\gls{slam} may also be used to build a map in applications
+assuming a static scene, even if the map is only continuously updated
+upon the mapping process~\cite{thrun:book:2005}.
+
+\begin{definition}[{\cite[p.~349]{siegwart:book:2004}}]\label{def:literature:slam}
+``...the robot must not only create a map,
+but it must also do this while moving and localizing to explore the environment.
+In the robotics community, this is often called the \glsfirst{slam} problem.''
+\end{definition}
+
+Two main formulations define \gls{slam} from a probabilistic perspective,
+also illustrated in \figref{fig:literature:slam}.
+The first is online \gls{slam}, where the algorithm estimates
+the posterior over the momentary pose ($x_t$ at a time instant~$t$)
+along with the map ($m$), as defined in \eqref{eq:literature:slam:online},
+provided the sensor measurements ($z_{1:t}$)
+and the control variables ($u_{1:t}$).
+The online term is due to only involving the estimation of variables
+that persist at the current time instant $t$.
+Several algorithms incrementally implement online \gls{slam}, \ie,
+discarding past measurements and controls once they have been processed.
+The other probabilistic formulation is called full \gls{slam},
+given the goal to compute a posterior over the entire path ($x_{1:t}$)
+along with the map, as formulated in \ref{eq:literature:slam:full},
+instead of just the current pose ($x_t$).
+The difference between online and full \gls{slam} is
+that the former results in an integration of the past poses
+from the full \gls{slam} problem~\cite{thrun:book:2005}.
+\begin{equation}\label{eq:literature:slam:online}
+p\left(x_t,m \;\vert\; z_{1:t},u_{1:t}\right)
+\end{equation}
+\begin{equation}\label{eq:literature:slam:full}
+p\left(x_{1:t},m \;\vert\; z_{1:t},u_{1:t}\right)
+\end{equation}
+
+\begin{figure}[t]
+  \centering
+  \subfloat[][]{\includegraphics[width=0.495\textwidth]{literature/slam-online.pdf}%
+  \label{fig:literature:slam:online}}
+  \hfill
+  \subfloat[][]{\includegraphics[width=0.495\textwidth]{literature/slam-full.pdf}%
+  \label{fig:literature:slam:full}}
+  \caption[Graphical model of the \glsentryfull{slam} problem:
+  (a) online SLAM; (b) full SLAM.]{%
+  Graphical model of the \glslink{slam}{\glsentryfull{slam}} problem:
+  (a) online SLAM; (b) full SLAM~\cite{thrun:book:2005}}
+  \label{fig:literature:slam}
+\end{figure}
+
+In the case of the algorithm also estimating correspondences
+between measurements and map landmarks,
+the explicit inclusion of the correspondence variables ($c_t$ or $c_{1:t}$)
+in the estimation problem may be useful for reasoning
+if the perceived feature is the same one as previously detected
+and already represented in the map or if it is a new landmark.
+Consequently, \eqref{eq:literature:slam:online:with-association} and
+\eqref{eq:literature:slam:full:with-association} formulate
+the posterior estimation for online and full \gls{slam},
+respectively~\cite{thrun:book:2005}.
+\begin{equation}\label{eq:literature:slam:online:with-association}
+p\left(x_t,m,c_t \;\vert\; z_{1:t},u_{1:t}\right)
+\end{equation}
+\begin{equation}\label{eq:literature:slam:full:with-association}
+p\left(x_{1:t},m,c_{1:t} \;\vert\; z_{1:t},u_{1:t}\right)
+\end{equation}
+
+Although computing a full posterior captures all the information
+to be known about the map and the pose or the path,
+this estimation is practically unfeasible due to
+the high dimensionality of the continuous parameter space
+and the large number of discrete correspondence
+variables~\cite{thrun:book:2005}.
+So, next, the discussion on scan matching, particle filter,
+and pose graph implementations of \gls{slam} focuses on
+the practical aspects of performing continuous localization and mapping.
+
 \subsection{Scan matching}
 \subsection{Extended Kalman Filter (EKF) SLAM}
 \subsection{Particle filter}
