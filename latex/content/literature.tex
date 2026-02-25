@@ -6,7 +6,7 @@ TBC
 
 TBC
 
-\subsection{Problem introduction}
+\subsection{Problem introduction}\label{sec:literature:slam:problem}
 \gls{slam} is one of the most fundamental problems in robotics.
 This problem, also previously known as \gls{cml},
 may be formulated by \defref{def:literature:slam}.
@@ -55,8 +55,7 @@ p\left(x_{1:t},m \;\vert\; z_{1:t},u_{1:t}\right)
   \hfill
   \subfloat[][]{\includegraphics[width=0.495\textwidth]{literature/slam-full.pdf}%
   \label{fig:literature:slam:full}}
-  \caption[Graphical model of the \glsentryfull{slam} problem:
-  (a) online SLAM; (b) full SLAM.]{%
+  \caption[Graphical model of the \glsentryfull{slam} problem]{%
   Graphical model of the \glslink{slam}{\glsentryfull{slam}} problem:
   (a) online SLAM; (b) full SLAM~\cite{thrun:book:2005}}
   \label{fig:literature:slam}
@@ -89,8 +88,64 @@ So, next, the discussion on scan matching, particle filter,
 and pose graph implementations of \gls{slam} focuses on
 the practical aspects of performing continuous localization and mapping.
 
-\subsection{Scan matching}
-\subsection{Extended Kalman Filter (EKF) SLAM}
+\subsection{Scan matching}\label{sec:literature:slam:matching}
+
+A basic approach for solving the \gls{slam} problem is continuously
+matching the sensor scans to the map learned until the current instant.
+An example is HectorSLAM~\cite{kohlbrecher:ssr:2011} algorithm, where the
+block diagram describing that system is shown in
+\figref{fig:literature:slam:hector-slam}.
+This algorithm is considered to be online \gls{slam} due to
+only estimating the current pose and the map.
+Also, the method integrates incrementally the sensor readings
+to allow discarding those in subsequent iterations.
+Furthermore, HectorSLAM~\cite{kohlbrecher:ssr:2011} aligns the beam endpoints
+of a 2D~\gls{lidar} with the current map using a matcher inspired by an
+alignment algorithm based on computer
+vision~\cite{lucas-kanade:ijcai:1981}.
+The matcher estimates the homogeneous transformation between
+the sensor scan and the map (\ie, scan-to-map alignment) to update the latter
+with the latest scan, while also updating
+the current estimation of the robot pose.
+Although the matcher is specific to the HectorSLAM~\cite{kohlbrecher:ssr:2011}
+algorithm, it does not invalidate using other matchers,
+such as the PerfectMatch~\cite{lauer:robocup:2006},
+\gls{icp}~\cite{besl-mckay:tpami:1992},
+\gls{nicp}~\cite{serafin-grisetti:iros:2015},
+\gls{ndt}~\cite{biber-strasser:iros:2003}, or others,
+to obtain the transformation between the 2D~\gls{lidar} scan and the map,
+allowing to perform \gls{slam} with a scan matching methodology.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.65\textwidth]{literature/slam-hector.pdf}
+  \caption[Block diagram of the mapping and navigation systems of HectorSLAM]{%
+  Block diagram of the mapping and navigation systems of HectorSLAM~\cite{kohlbrecher:ssr:2011}}
+  \label{fig:literature:slam:hector-slam}
+\end{figure}
+
+The main advantage of scan matching \gls{slam} algorithms
+is the lower use of computational resources compared to more complex approaches.
+These algorithms do not require an exhaustive pose search
+or data association search with previous scans
+(the matching with all preceding scans is implicit in matching the current one
+with the map)~\cite{kohlbrecher:ssr:2011}.
+However, as in the case of HectorSLAM~\cite{kohlbrecher:ssr:2011},
+a pure scan matching approach does not implement loop closure
+(see \defref{def:literature:slam:loop-closure}).
+This limitation prevents correcting the map when recognizing a previously
+mapped location, which means there is no reduction in the uncertainty of the
+map estimate, nor any correction for map distortions
+caused by incremental alignment errors.
+
+\begin{definition}[{\cite[p.~188]{siegwart:book:2004}}]\label{def:literature:slam:loop-closure}
+``The problem of location recognition is also called loop-detection,
+because a loop is a closed trajectory of a vehicle that
+returns to a previously-visited point.
+The problem of minimizing the error at the loop closure
+is instead called loop-closing.''
+\end{definition}
+
 \subsection{Particle filter}
 \subsection{Pose graph}
 
