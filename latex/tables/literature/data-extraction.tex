@@ -1,0 +1,271 @@
+\begin{landscape}
+\begin{tiny}
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{%
+p{0.10\textwidth} |   % reference (author+[citation])
+p{0.10\textwidth} |   % DDE1 : mapping (pose graph, occupancy grid, keyframe...)
+p{0.10\textwidth} |   % DDE2 : localization (2D/3D/topological/place recognition)
+cc|                   % DDE3 : execution mode (offline/online/both)
+cc|ccc|               % DDE4 : environment (indoor/outdoor) and domain (air, ground, water)
+p{0.10\textwidth} |   % DDE5 : sensors
+p{0.15\textwidth} |   % DDE6 : dynamics detection method
+p{0.15\textwidth} |   % DDE7 : dynamics labelling (static, semi-static, dynamic, object-level?)
+p{0.15\textwidth} |   % DDE8 : dynamics statistics
+p{0.15\textwidth} |   % DDE9 : dynamics prediction
+p{0.15\textwidth}     % DDE10: dynamics removal
+}
+  \caption{Data extraction items retrieved from literature works related to
+  long-term localization and mapping in dynamic environments}
+  \vspace{0.5em}
+  \label{tab:literature:dynamics:discussion}\\
+
+%% FIRST TABLE HEADER
+\hline
+\multicolumn{1}{r|}{\textbf{DDE:}} &
+\textbf{1:} &
+\textbf{2:} &
+\multicolumn{2}{l|}{\textbf{3:}} &
+\multicolumn{5}{l|}{\textbf{4:}} &
+\textbf{5:} &
+\multicolumn{5}{l}{\textbf{6--10: Dynamics}}\\
+\hline
+\textbf{Ref.} &
+\rotatebox{90}{\textbf{Mapping}} &
+\rotatebox{90}{\textbf{Localization}\hspace{1em}} &
+\rotatebox{90}{\textbf{Offline}} &
+\rotatebox{90}{\textbf{Online}} &
+\rotatebox{90}{\textbf{Indoor}} &
+\rotatebox{90}{\textbf{Outdoor}} &
+\rotatebox{90}{\textbf{Air}} &
+\rotatebox{90}{\textbf{Ground}} &
+\rotatebox{90}{\textbf{Water}} &
+\rotatebox{90}{\textbf{Sensors}} &
+\rotatebox{90}{\textbf{Detection}} &
+\rotatebox{90}{\textbf{Labelling}} &
+\rotatebox{90}{\textbf{Statistics}} &
+\rotatebox{90}{\textbf{Prediction}} &
+\rotatebox{90}{\textbf{Removal}}\\
+\hline
+\endfirsthead
+
+%% TABLE HEADER IN THE FOLLOWING PAGES
+\multicolumn{16}{l}{\itshape{\tablename\ \thetable{} (Continued)}}
+\vspace{0.5em}\\
+\hline
+\multicolumn{1}{r|}{\textbf{DDE:}} &
+\textbf{1:} &
+\textbf{2:} &
+\multicolumn{2}{l|}{\textbf{3:}} &
+\multicolumn{5}{l|}{\textbf{4:}} &
+\textbf{5:} &
+\multicolumn{5}{l}{\textbf{6--10: Dynamics}}\\
+\hline
+\textbf{Ref.} &
+\rotatebox{90}{\textbf{Mapping}} &
+\rotatebox{90}{\textbf{Localization}\hspace{1em}} &
+\rotatebox{90}{\textbf{Offline}} &
+\rotatebox{90}{\textbf{Online}} &
+\rotatebox{90}{\textbf{Indoor}} &
+\rotatebox{90}{\textbf{Outdoor}} &
+\rotatebox{90}{\textbf{Air}} &
+\rotatebox{90}{\textbf{Ground}} &
+\rotatebox{90}{\textbf{Water}} &
+\rotatebox{90}{\textbf{Sensors}} &
+\rotatebox{90}{\textbf{Detection}} &
+\rotatebox{90}{\textbf{Labelling}} &
+\rotatebox{90}{\textbf{Statistics}} &
+\rotatebox{90}{\textbf{Prediction}} &
+\rotatebox{90}{\textbf{Removal}}\\
+\hline
+\endhead
+
+%% TABLE FOOTER
+\endfoot
+\hline
+\endlastfoot
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% TABLE CONTENT
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Biber and Duckett
+(2009)~\cite{biber-duckett:ijrr:2009} &
+submap (2D point cloud, graph, 3DoF edges) &
+point cloud alignment (2D, 3DoF) &
+x & x &
+x & & & x & &
+wheel odometry, laser (2D) &
+ray tracing, 1D robust statistics over dynamic sample sets
+(median, median of absolute differences), timescales &
+-- &
+-- &
+-- &
+-- \\
+\hline
+Dayoub~\etal\hspace{0pt}
+(2011)~\cite{dayoub:ras:2011} &
+keyframe (graph, 6DoF edges) &
+feature matching (location) &
+& x &
+x & & & x & &
+camera (omni) &
+-- &
+sensory + short + long-term memory (SM, STM, LTM) &
+hit + miss observations &
+-- &
+recall mechanism (forget unused features from LTM)\\
+\hline
+Walcott-Bryant~\etal\hspace{0pt}
+(2012)~\cite{walcott-bryant:iros:2012} &
+pose graph (graph, 2D point clouds, 3DoF edges; iSAM) &
+point cloud alignment (2D, 3DoF) &
+& x &
+x & & & x & &
+laser (2D) &
+scan-to-map matching &
+active + dynamic map, static + removed + added points &
+change score &
+-- &
+disable node sectors, inactive nodes removal (all sectors turned off)\\
+\hline
+Bacca~\etal\hspace{0pt}
+(2013)~\cite{bacca:ras:2013} &
+keyframe (graph; TORO) &
+Bayesian (2D, 3DoF) &
+& x &
+x & & & x & &
+camera (omni), laser (2D) &
+k-means clustering &
+short + long-term memory (STM, LTM) &
+feature stability histogram &
+-- &
+STM pruning\\
+\hline
+Einhorn and Gross
+(2013)~\cite{einhorn-gross:ecmr:2013} &
+pose graph (graph, 2D/3D NDT; $g^2o$) &
+odometry &
+& x &
+x & & & x & &
+camera (mono, RGBD), laser (2D) &
+explicit free space mapping &
+-- &
+-- &
+-- &
+explicit free space mapping\\
+\hline
+\cite{tipaldi:ijrr:2013}\\
+\hline
+\cite{saarinen:ijrr:2013}\\
+\hline
+\cite{pomerleau:icra:2014}\\
+\hline
+\cite{einhorn-gross:ras:2015}\\
+\hline
+\cite{rapp:itsc:2015}\\
+\hline
+\cite{santos:ral:2016}\\
+\hline
+\cite{an:as:2016}\\
+\hline
+\cite{biswas-veloso:ras:2017}\\
+\hline
+\cite{krajnik:tro:2017}\\
+\hline
+\cite{bescos:ral:2018}\\
+\hline
+\cite{sun:ral:2018}\\
+\hline
+\cite{lazaro:iros:2018}\\
+\hline
+\cite{boniardi:ras:2019}\\
+\hline
+\cite{wang:icra:2019}\\
+\hline
+\cite{zhang:acc:2019}\\
+\hline
+\cite{ganti-waslander:crv:2019}\\
+\hline
+\cite{song:iros:2019}\\
+\hline
+\cite{pan:sensors:2019}\\
+\hline
+\cite{wang:iros:2020}\\
+\hline
+\cite{yang:sensors:2020}\\
+\hline
+\cite{ding:tits:2020}\\
+\hline
+\cite{yue:icra:2020}\\
+\hline
+\cite{singh:itsc:2021}\\
+\hline
+\cite{thomas:icra:2021}\\
+\hline
+\cite{zhu:icra:2021}\\
+\hline
+\cite{du:tvcg:2022}\\
+\hline
+\cite{xing:jfr:2022}\\
+\hline
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% ------------------------- added works after SLR -------------------------- %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\cite{adkins:iros:2022}\\
+\hline
+\cite{chen:itsc:2022}\\
+\hline
+\cite{du:iros:2022}\\
+\hline
+\cite{kim:icra:2022}\\
+\hline
+\cite{wu:cvci:2022}\\
+\hline
+\cite{deng:ram:2023}\\
+\hline
+\cite{nielsen-hendeby:tiv:2023}\\
+\hline
+\cite{soares:jint:2023}\\
+\hline
+\cite{stefanini:sensors:2023}\\
+\hline
+\cite{vodisch:isrr:2022}\\
+\hline
+\cite{yin:tro:2023}\\
+\hline
+\cite{yu:acait:2023}\\
+\hline
+\cite{hroob:ras:2024}\\
+\hline
+\cite{hroob:ral:2024}\\
+\hline
+\cite{li:tii:2024}\\
+\hline
+\cite{li:aaai:2024}\\
+\hline
+\cite{pekkanen:mfi:2024}\\
+\hline
+\cite{wang:ras:2024}\\
+\hline
+\cite{yang:ral:2024}\\
+\hline
+\cite{cheng:ral:2025}\\
+\hline
+\cite{hu:tcsvt:2025}\\
+\hline
+\cite{jia:tcsvt:2025}\\
+\hline
+\cite{li:tim:2025}\\
+\hline
+\cite{wang:tim:2025}\\
+\hline
+\cite{zhu:tim:2025}\\
+\hline
+\cite{vintr:ras:2026}\\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{longtable}
+\end{tiny}
+\end{landscape}
