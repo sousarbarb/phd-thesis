@@ -3,16 +3,15 @@
 \setlength{\tabcolsep}{3pt}
 \begin{longtable}{%
 p{0.10\textwidth} |   % reference (author+[citation])
-p{0.10\textwidth} |   % DDE1 : mapping (pose graph, occupancy grid, keyframe...)
-p{0.10\textwidth} |   % DDE2 : localization (2D/3D/topological/place recognition)
-cc|                   % DDE3 : execution mode (offline/online/both)
-cc|ccc|               % DDE4 : environment (indoor/outdoor) and domain (air, ground, water)
-p{0.10\textwidth} |   % DDE5 : sensors
-p{0.15\textwidth} |   % DDE6 : dynamics detection method
-p{0.15\textwidth} |   % DDE7 : dynamics labelling (static, semi-static, dynamic, object-level?)
-p{0.15\textwidth} |   % DDE8 : dynamics statistics
-p{0.15\textwidth} |   % DDE9 : dynamics prediction
-p{0.15\textwidth}     % DDE10: dynamics removal
+p{0.10\textwidth} |   % DDE1: mapping (pose graph, occupancy grid, keyframe...)
+p{0.10\textwidth} |   % DDE2: localization (2D/3D/topological/place recognition)
+cc|ccc|               % DDE3: environment (indoor/outdoor) and domain (air, ground, water)
+p{0.10\textwidth} |   % DDE4: sensors
+p{0.16\textwidth} |   % DDE5: dynamics detection method
+p{0.16\textwidth} |   % DDE6: dynamics labelling (static, semi-static, dynamic, object-level?)
+p{0.16\textwidth} |   % DDE7: dynamics statistics
+p{0.16\textwidth} |   % DDE8: dynamics prediction
+p{0.16\textwidth}     % DDE9: dynamics removal
 }
   \caption{Data extraction items retrieved from literature works related to
   long-term localization and mapping in dynamic environments}
@@ -24,16 +23,13 @@ p{0.15\textwidth}     % DDE10: dynamics removal
 \multicolumn{1}{r|}{\textbf{DDE:}} &
 \textbf{1:} &
 \textbf{2:} &
-\multicolumn{2}{l|}{\textbf{3:}} &
-\multicolumn{5}{l|}{\textbf{4:}} &
-\textbf{5:} &
-\multicolumn{5}{l}{\textbf{6--10: Dynamics}}\\
+\multicolumn{5}{l|}{\textbf{3:}} &
+\textbf{4:} &
+\multicolumn{5}{l}{\textbf{5--9: Dynamics}}\\
 \hline
 \textbf{Ref.} &
 \rotatebox{90}{\textbf{Mapping}} &
 \rotatebox{90}{\textbf{Localization}\hspace{1em}} &
-\rotatebox{90}{\textbf{Offline}} &
-\rotatebox{90}{\textbf{Online}} &
 \rotatebox{90}{\textbf{Indoor}} &
 \rotatebox{90}{\textbf{Outdoor}} &
 \rotatebox{90}{\textbf{Air}} &
@@ -49,22 +45,19 @@ p{0.15\textwidth}     % DDE10: dynamics removal
 \endfirsthead
 
 %% TABLE HEADER IN THE FOLLOWING PAGES
-\multicolumn{16}{l}{\itshape{\tablename\ \thetable{} (Continued)}}
+\multicolumn{14}{l}{\itshape{\tablename\ \thetable{} (Continued)}}
 \vspace{0.5em}\\
 \hline
 \multicolumn{1}{r|}{\textbf{DDE:}} &
 \textbf{1:} &
 \textbf{2:} &
-\multicolumn{2}{l|}{\textbf{3:}} &
-\multicolumn{5}{l|}{\textbf{4:}} &
-\textbf{5:} &
-\multicolumn{5}{l}{\textbf{6--10: Dynamics}}\\
+\multicolumn{5}{l|}{\textbf{3:}} &
+\textbf{4:} &
+\multicolumn{5}{l}{\textbf{5--9: Dynamics}}\\
 \hline
 \textbf{Ref.} &
 \rotatebox{90}{\textbf{Mapping}} &
 \rotatebox{90}{\textbf{Localization}\hspace{1em}} &
-\rotatebox{90}{\textbf{Offline}} &
-\rotatebox{90}{\textbf{Online}} &
 \rotatebox{90}{\textbf{Indoor}} &
 \rotatebox{90}{\textbf{Outdoor}} &
 \rotatebox{90}{\textbf{Air}} &
@@ -94,7 +87,6 @@ Biber and Duckett
 (2009)~\cite{biber-duckett:ijrr:2009} &
 submap (2D point cloud, graph, 3DoF edges) &
 point cloud alignment (2D, 3DoF) &
-x & x &
 x & & & x & &
 wheel odometry, laser (2D) &
 ray tracing, 1D robust statistics over dynamic sample sets
@@ -108,7 +100,6 @@ Dayoub~\etal\hspace{0pt}
 (2011)~\cite{dayoub:ras:2011} &
 keyframe (graph, 6DoF edges) &
 feature matching (location) &
-& x &
 x & & & x & &
 camera (omni) &
 -- &
@@ -121,7 +112,6 @@ Walcott-Bryant~\etal\hspace{0pt}
 (2012)~\cite{walcott-bryant:iros:2012} &
 pose graph (graph, 2D point clouds, 3DoF edges; iSAM) &
 point cloud alignment (2D, 3DoF) &
-& x &
 x & & & x & &
 laser (2D) &
 scan-to-map matching &
@@ -134,7 +124,6 @@ Bacca~\etal\hspace{0pt}
 (2013)~\cite{bacca:ras:2013} &
 keyframe (graph; TORO) &
 Bayesian (2D, 3DoF) &
-& x &
 x & & & x & &
 camera (omni), laser (2D) &
 k-means clustering &
@@ -147,7 +136,6 @@ Einhorn and Gross
 (2013)~\cite{einhorn-gross:ecmr:2013} &
 pose graph (graph, 2D/3D NDT; $g^2o$) &
 odometry &
-& x &
 x & & & x & &
 camera (mono, RGBD), laser (2D) &
 explicit free space mapping &
@@ -156,7 +144,17 @@ explicit free space mapping &
 -- &
 explicit free space mapping\\
 \hline
-\cite{tipaldi:ijrr:2013}\\
+Tipaldi~\etal\hspace{0pt}
+(2013)~\cite{tipaldi:ijrr:2013} &
+grid (occupancy, 2D) &
+particle filter (2D, 3DoF) &
+x & & & x & &
+laser (2D) &
+hidden Markov model (HMM) &
+-- &
+mixing time of Markov chain &
+-- &
+--\\
 \hline
 \cite{saarinen:ijrr:2013}\\
 \hline
