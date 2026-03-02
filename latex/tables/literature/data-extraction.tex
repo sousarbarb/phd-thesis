@@ -102,7 +102,7 @@ keyframe (graph, 6DoF edges) &
 feature matching (location) &
 x & & & x & &
 camera (omni) &
--- &
+scan-to-map matching &
 sensory + short + long-term memory (SM, STM, LTM) &
 hit + miss observations &
 -- &
@@ -156,37 +156,204 @@ mixing time of Markov chain &
 -- &
 --\\
 \hline
-\cite{saarinen:ijrr:2013}\\
+Saarinen~\etal\hspace{0pt}
+(2013)~\cite{saarinen:ijrr:2013}&
+3D NDT, grid (occupancy, 3D) &
+-- &
+x & & & x & &
+camera (RGBD), laser (3D) &
+ray tracing, scan-to-map matching (NDT-based) &
+-- &
+-- &
+-- &
+--\\
 \hline
-\cite{pomerleau:icra:2014}\\
+Pomerleau~\etal\hspace{0pt}
+(2014)~\cite{pomerleau:icra:2014} &
+point cloud (laser, 3D) &
+point cloud alignment (3D, 3DoF) &
+& x & & x & &
+wheel odometry, laser (3D) &
+ray tracing approximation (sparse map cloud, kd-tree w/ spherical coordinates) &
+-- &
+Bayesian (visibility, points proximity, motion patterns) &
+-- &
+--\\
 \hline
-\cite{einhorn-gross:ras:2015}\\
+Einhorn and Gross
+(2015)~\cite{einhorn-gross:ras:2015} &
+pose graph (graph, 2D/3D NDT) &
+odometry &
+x & & & x & &
+camera (mono, RGBD), laser (2D) &
+occupancy probability (short vs static / long-term) &
+dynamic cell clusters &
+static occupancy probability &
+-- &
+--\\
 \hline
-\cite{rapp:itsc:2015}\\
+Rapp~\etal\hspace{0pt}
+(2015)~\cite{rapp:itsc:2015} &
+grid (occupancy, 2D) &
+particle filter (2D, 3DoF) &
+& x & & x & &
+odometry, radar &
+semi-Markov chain extension &
+-- &
+cell reliability (Lévy process) &
+expected retention time on cell state &
+--\\
 \hline
-\cite{santos:ral:2016}\\
+Santos~\etal\hspace{0pt}
+(2016)~\cite{santos:ral:2016} &
+spatio-temporal grid (occupancy, 3D) &
+-- &
+x & & & x & &
+camera (RGBD) &
+fast Fourier transform (FFT, FreMEn) (static vs periodic changes) &
+-- &
+mean value, dominant frequencies &
+fast Fourier transform (FFT, FreMEn) (periodic changes) &
+--\\
 \hline
-\cite{an:as:2016}\\
+An~\etal\hspace{0pt}
+(2016)~\cite{an:as:2016} &
+pose graph (graph) &
+EKF (2D, 3DoF) &
+x & & & x & &
+wheel odometry, camera (gray, mono), laser (2D) &
+feature matching &
+-- &
+edge weight (dynamic edge link) &
+-- &
+nodes removal (average edge weight threshold)\\
 \hline
-\cite{biswas-veloso:ras:2017}\\
+Biswas and Veloso
+(2017)~\cite{biswas-veloso:ras:2017} &
+feature (2D line segments), varying graphical network (VGN, Ceres) &
+maximum likelihood estimation (MLE) &
+x & x & & x & &
+wheel odometry, laser (2D), camera (RGBD) &
+feature ray tracing &
+dynamic (only for obstacle avoidance) + short (movable) + long-term features
+(DF, STF, LTF) &
+-- &
+-- &
+--\\
 \hline
-\cite{krajnik:tro:2017}\\
+Krajník~\etal\hspace{0pt}
+(2017)~\cite{krajnik:tro:2017} &
+grid (occupancy, 2D/3D) &
+-- &
+x & x & & x & &
+camera (RGBD), laser (2D) &
+fast Fourier transform (FFT, FreMEn) (static vs periodic changes) &
+-- &
+mean value, dominant frequencies &
+fast Fourier transform (FFT, FreMEn) (periodic changes) &
+--\\
 \hline
-\cite{bescos:ral:2018}\\
+Bescos~\etal\hspace{0pt}
+(2018)~\cite{bescos:ral:2018} &
+keyframe (graph) &
+bundle adjustment (3D, 6DoF) &
+x & x & & x & &
+camera (color, mono, stereo, RGBD) &
+pixel segmentation (Mask R-CNN), multi-view geometry changes (depth) &
+dynamic or movable classes
+(person, bicycle, car, motorcycle, airplane, bus, train, truck, boat, bird,
+cat, dog, horse, sheep, cow, elephant, bear, zebra and giraffe) &
+-- &
+-- &
+background inpainting\\
 \hline
-\cite{sun:ral:2018}\\
+Sun~\etal\hspace{0pt}
+(2018)~\cite{sun:ral:2018} &
+grid (occupancy, 3D) &
+point cloud alignment (3D, 6DoF) &
+& x & & x & &
+laser (3D) &
+recurrent neural network (LSTM RNN) for cell semantic state transition &
+-- &
+-- &
+-- &
+--\\
 \hline
-\cite{lazaro:iros:2018}\\
+Lázaro~\etal\hspace{0pt}
+(2018)~\cite{lazaro:iros:2018} &
+submap (2D point cloud, graph, 3DoF edges; $g^2o$) &
+point cloud alignment (2D, 3DoF) &
+x & & & x & &
+wheel odometry, laser (2D) &
+ray tracing, scan-to-scan matching &
+-- &
+-- &
+-- &
+cloud merging, outdated nodes removal\\
 \hline
-\cite{boniardi:ras:2019}\\
+Boniardi~\etal\hspace{0pt}
+(2019)~\cite{boniardi:ras:2019} &
+pose graph (graph, 2D point clouds, 3DoF edges), CAD floor plans &
+point cloud alignment (2D, 3DoF) &
+x & & & x & &
+laser (2D) &
+scan-to-map matching &
+-- &
+-- &
+-- &
+outdated nodes removal\\
 \hline
-\cite{wang:icra:2019}\\
+Wang~\etal\hspace{0pt}
+(2019)~\cite{wang:icra:2019} &
+keyframe (graph) &
+bundle adjustment (3D, 6DoF) &
+x & x & & x & &
+camera (RGBD) &
+semantic segmentation (FCIS), feature motion consistency check &
+static background, moveable class (person, vehicles, cup, chair, etc.) &
+-- &
+-- &
+--\\
 \hline
-\cite{zhang:acc:2019}\\
+Zhang~\etal\hspace{0pt}
+(2019)~\cite{zhang:acc:2019} &
+grid (signed distance field, 2D) &
+point cloud alignment (2D, 3DoF) &
+x & & & x & &
+laser (2D) &
+ray tracing (Bresenham algorithm), scan-to-map matching &
+static + semi-static + dynamic objects &
+-- &
+-- &
+--\\
 \hline
-\cite{ganti-waslander:crv:2019}\\
+Ganti and Waslander
+(2019)~\cite{ganti-waslander:crv:2019} &
+keyframe (graph) &
+bundle adjustment (3D, 6DoF) &
+& x & & x & &
+camera (stereo) &
+semantic segmentation (Bayesian SegNet) &
+static (road, sidewalk, building, wall/fence, pole, traffic light, traffic sign,
+vegetation, terrain) + dynamic (sky, person/rider, car, truck/bus,
+motorcycle/bicycle, void) classes &
+-- &
+-- &
+--\\
 \hline
-\cite{song:iros:2019}\\
+Song~\etal\hspace{0pt}
+(2019)~\cite{song:iros:2019} &
+keyframe (graph) &
+odometry (3D, 6DoF) &
+& x & & x & &
+camera, IMU &
+pixel-wise motion attribute segmentation (unstable vs moving vs static, MD-Net) &
+unstable (sky, vegetation, terrain) + moving (human, vehicle, traffic light) +
+static (ground, flat, building, wall, fence, guard rail, bridge, tunnel, pole,
+pole group, traffic sign) &
+-- &
+-- &
+--\\
 \hline
 \cite{pan:sensors:2019}\\
 \hline
