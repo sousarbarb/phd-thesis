@@ -355,25 +355,126 @@ pole group, traffic sign) &
 -- &
 --\\
 \hline
-\cite{pan:sensors:2019}\\
+Pan~\etal\hspace{0pt}
+(2019)~\cite{pan:sensors:2019} &
+feature (point clusters) &
+odometry, reprojection minimization (3D, 6DoF) &
+& x & & x & &
+camera (mono), laser (3D) &
+point clusters registration &
+-- &
+clusters occurrence &
+-- &
+--\\
 \hline
-\cite{wang:iros:2020}\\
+Wang~\etal\hspace{0pt}
+(2020)~\cite{wang:iros:2020} &
+grid (occupancy, 2D) &
+particle filter (2D, 3DoF) &
+x & & & x & &
+wheel odometry, laser (2D) &
+time series modelling &
+-- &
+autoregressive moving average (ARMA) &
+autoregressive moving average (ARMA; static + periodic + aperiodic changes) &
+--\\
 \hline
-\cite{yang:sensors:2020}\\
+Yang~\etal\hspace{0pt}
+(2020)~\cite{yang:sensors:2020} &
+keyframe (graph) &
+visual odometry (3D, 6DoF) &
+x & & & x & &
+camera (RGBD) &
+object detection (YOLOv3), geometry constraints &
+dynamic class (people) &
+-- &
+-- &
+--\\
 \hline
-\cite{ding:tits:2020}\\
+Ding~\etal\hspace{0pt}
+(2020)~\cite{ding:tits:2020} &
+point cloud (3D) &
+bundle adjustment (3D, 6DoF) &
+& x & & x & &
+camera (color, stereo), laser (3D) &
+multi-session consistency, point clustering &
+-- &
+observations count &
+-- &
+--\\
 \hline
-\cite{yue:icra:2020}\\
+Yue~\etal\hspace{0pt}
+(2020)~\cite{yue:icra:2020} &
+point cloud (3D), grid (occupancy, 3D) &
+-- &
+& x & & x & &
+camera (color, mono, thermal), laser (3D) &
+object detection (YOLOv3), 3D point cloud projection &
+dynamic class (people) &
+-- &
+-- &
+--\\
 \hline
-\cite{singh:itsc:2021}\\
+Singh~\etal\hspace{0pt}
+(2021)~\cite{singh:itsc:2021} &
+topological (BoW) &
+feature matching (location) &
+& x & & x & &
+camera (stereo, RGBD) &
+pixel segmentation &
+dynamic class (sky, person, car, etc.) &
+down-weight dynamic class &
+-- &
+--\\
 \hline
-\cite{thomas:icra:2021}\\
+Zhu~\etal\hspace{0pt}
+(2021)~\cite{zhu:icra:2021} &
+grid (occupancy, 2D) &
+particle filter (2D, 3DoF) &
+x & & & x & &
+wheel odometry, camera, laser (3D) &
+object detection (YOLOv3) &
+static + semi-dynamic (chairs, parked cars) + dynamic (moving people / cars)
+objects, static + semi-dynamic maps &
+down-weight semi-dynamic class &
+-- &
+--\\
 \hline
-\cite{zhu:icra:2021}\\
+Thomas~\etal\hspace{0pt}
+(2022)~\cite{thomas:icra:2022} &
+sparse grid (hashmap, occupancy, 2D) &
+point cloud alignment (3D, 6DoF) &
+x & & & x & &
+wheel odometry, laser (3D) &
+ray tracing (NN training), feature semantic labelling (KPConv) &
+feature semantic labelling (ground, permanent, movable, dynamic) &
+-- &
+dynamic motion label (KPConv) &
+--\\
 \hline
-\cite{du:tvcg:2022}\\
+Du~\etal\hspace{0pt}
+(2022)~\cite{du:tvcg:2022} &
+keyframe (graph) &
+reprojection minimization (3D, 6DoF) &
+x & & & x & &
+camera (RGBD) &
+long-term consistent conditional random field (LC-CRF) &
+-- &
+observations count, average reprojection error, symmetric epipolar distance &
+-- &
+--\\
 \hline
-\cite{xing:jfr:2022}\\
+Xing~\etal\hspace{0pt}
+(2022)~\cite{xing:jfr:2022} &
+keyframe (graph) &
+feature matching (3D, 6DoF) &
+x & x & x & x & &
+camera (gray, stereo), IMU &
+object detection (MobileNet V2 SSD), feature motion consistency check &
+short + long-term dynamics (STD, LTD) &
+-- &
+-- &
+--\\
 \hline
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% ------------------------- added works after SLR -------------------------- %%
