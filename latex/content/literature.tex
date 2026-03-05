@@ -630,7 +630,9 @@ leaving 411~eligible works for quality assessment.
 \begin{figure}[t]
 \centering
 \includegraphics[height=10cm]{literature/selection.pdf}
-\caption[\glsentryfull{prisma} flow diagram for the selection process]{\glslink{prisma}{\glsentryfull{prisma}} flow diagram for the selection process~\cite{sousa:jfr:2023}}
+\caption[\glsentryfull{prisma} flow diagram for the selection process]{%
+\glslink{prisma}{\glsentryfull{prisma}} flow diagram
+for the selection process~\cite{sousa:jfr:2023}}
 \label{fig:literature:systematic:method:prisma-flow}
 \end{figure}
 
@@ -739,7 +741,16 @@ to the scientific community.
 \begin{figure}[t]
 \centering
 \includegraphics[height=8.5cm]{literature/year_included-review.eps}
-\caption[Evolution of published records per year considering the 142 included records in the systematic literature review on long-term localization and mapping]{Evolution of published records per year considering the 142 included records in the systematic literature review on long-term localization and mapping. The time interval is between the smallest publication year found in the included records~(2002) and the year of last full inquiry's date~(2022). The latter is with a diagonal hatch pattern due to the fact that the last full inquiry did not consider the whole year~\cite{sousa:jfr:2023}}
+\caption[Evolution of published records per year considering the
+142~included records in the systematic literature review on long-term
+localization and mapping]{%
+Evolution of published records per year considering the
+142~included records in the systematic literature review on long-term
+localization and mapping.
+The time interval is between the smallest publication year found in
+the included records~(2002) and the year of last full inquiry's date~(2022).
+The latter is with a diagonal hatch pattern due to the fact that
+the last full inquiry did not consider the whole year~\cite{sousa:jfr:2023}}
 \label{fig:literature:systematic:results:year}
 \end{figure}
 
@@ -820,23 +831,17 @@ underscores the relevance of this PhD~Thesis.
 
 \input{tables/literature/data-extraction.tex}
 
-\cite{adkins:iros:2022}
 \cite{chen:itsc:2022}
-\cite{du:iros:2022}
 \cite{kim:icra:2022}
 \cite{wu:cvci:2022}
 \cite{deng:ram:2023}
 \cite{nielsen-hendeby:tiv:2023}
 \cite{soares:jint:2023}
 \cite{stefanini:sensors:2023}
-\cite{vodisch:isrr:2022}
-\cite{yin:tro:2023}
 \cite{yu:acait:2023}
 \cite{hroob:ras:2024}
 \cite{hroob:ral:2024}
 \cite{li:tii:2024}
-\cite{li:aaai:2024}
-\cite{pekkanen:mfi:2024}
 \cite{wang:ras:2024}
 \cite{yang:ral:2024}
 \cite{cheng:ral:2025}
@@ -845,21 +850,20 @@ underscores the relevance of this PhD~Thesis.
 \cite{li:tim:2025}
 \cite{wang:tim:2025}
 \cite{zhu:tim:2025}
-\cite{vintr:ras:2026}
 
 \todo{review this fucking section based on TRP!!! + new works from scopus and web of science}
 
+\todo{note that should be clear the structure on the following sections!}
+
 In terms of works in the literature for long-term \gls{slam}, as previously mentioned, Appendix~\ref{ap:slr} includes a systematic literature review on that topic following the \gls{prisma}~\cite{methodology:prisma} guidelines. The literature review goes over several challenges related to long-term autonomy having the date of the last full inquiry for identifying records in the data sources considered in the study on May 17, 2022.
 Given the focus of this research proposal on the challenge for performing \gls{slam} in dynamic environments, this section focus on the included works of the review study categorized as dynamic in the data extraction phase of the methodology. Furthermore, another full inquiry was performed on October 25, 2022, to include more recent works published or made available online between the date considered in the review up to the latter one.
-As a result, after executing all stages of the review methodology described in Appendix~\ref{ap:slr} and focusing only on dynamic-related works, another five records were found in the literature (\cite{liu:scic:2022,nielsen-hendeby:fusion:2022,guo-liu:robio:2021,thomas:icra:2022,fu:ral:2022}). However, given that the work \cite{thomas:icra:2022} is an extension of \cite{thomas:icra:2021}, as assumed in the review, only the extended version will be considered for the discussion.
+As a result, after executing all stages of the review methodology described in Appendix~\ref{ap:slr} and focusing only on dynamic-related works, another five records were found in the literature (\cite{liu:scic:2022,nielsen-hendeby:tiv:2023,guo-liu:robio:2021,thomas:icra:2022,fu:ral:2022}). However, given that the work \cite{thomas:icra:2022} is an extension of \cite{thomas:icra:2021}, as assumed in the review, only the extended version will be considered for the discussion.
 
 So, next, this section analyzes literature works focused on modeling and identifying dynamic elements in the environment within the scope of long-term \gls{slam}, \ie, how the methods identify these elements and handle them for long-term localization and mapping.
 The discussion on dynamics modeling is organized into the following topics: specific map representations used to model or deal with dynamic elements in the scene, identification of dynamic elements matching the current observation to the current map, future prediction of dynamic properties of scene elements, and semantic identification of dynamic objects.
 
 \subsection{Map representation}
 
-\cite{yin:tro:2023}
-\cite{pekkanen:mfi:2024}
 \cite{cheng:ral:2025}
 \cite{li:tim:2025}
 
@@ -885,8 +889,10 @@ In the experiments, the approach \cite{walcott-bryant:iros:2012} showed that the
 The method \cite{wang:icra:2019} improved the \gls{ate} in a dynamic environment over ORB-SLAM2~\cite{mur-artal-tardos:tro:2017} and DynaSLAM~\cite{bescos:ral:2018}.
 As for Zhu~\etal~\cite{zhu:icra:2021}, its \gls{mcl} framework (equivalent to particle filter-based localization) reduces the weight corresponding to observations of moved semi-dynamic objects. The method improved the localization in a parking lot compared to a standard \gls{mcl}.
 
-As for a multi-hypothesis representation, Nielsen and Hendeby~\cite{nielsen-hendeby:fusion:2022} propose a framework for tracking the landmarks positions using Markov chains to model the transition between positions. The method~\cite{nielsen-hendeby:fusion:2022} groups the positions hypotheses based on the landmark's signature, where the position with the highest probability within a group according to incoming observations is selected as the active one. The hypothesis likelihood depends on the matched measurements to the landmark in the map and also on the number of missed detections, \ie, landmarks with a probability of being seen in the current pose but not represented in the observations.
-Although the method \cite{nielsen-hendeby:fusion:2022} maintained an up-to-date representation of the actual landmark positions in simulated experiments, the experiments assumed always uniquely identifiable landmarks.
+As for a multi-hypothesis representation, Nielsen and Hendeby~\cite{nielsen-hendeby:tiv:2023} propose a framework for tracking the landmarks positions using Markov chains to model the transition between positions. The method~\cite{nielsen-hendeby:tiv:2023} groups the positions hypotheses based on the landmark's signature, where the position with the highest probability within a group according to incoming observations is selected as the active one. The hypothesis likelihood depends on the matched measurements to the landmark in the map and also on the number of missed detections, \ie, landmarks with a probability of being seen in the current pose but not represented in the observations.
+Although the method \cite{nielsen-hendeby:tiv:2023} maintained an up-to-date representation of the actual landmark positions in simulated experiments, the experiments assumed always uniquely identifiable landmarks.
+
+\todo{maybe add an overall map representation here for each method?}
 
 \subsection{Map matching}
 
@@ -927,11 +933,9 @@ The works \cite{einhorn-gross:ecmr:2013} and \cite{einhorn-gross:ras:2015} were 
 \cite{wu:cvci:2022}
 \cite{deng:ram:2023} (or prediction?...)
 \cite{soares:jint:2023}
-\cite{vodisch:isrr:2022}
 \cite{yu:acait:2023}
 \cite{hroob:ras:2024}
 \cite{hroob:ral:2024}
-\cite{li:aaai:2024}
 \cite{cheng:ral:2025}
 \cite{hu:tcsvt:2025}
 \cite{wang:tim:2025}
@@ -957,11 +961,8 @@ All of these methods using geometric constraints to improve semantic labeling on
 
 \subsection{Prediction modeling}
 
-\cite{adkins:iros:2022}
-\cite{du:iros:2022}
 \cite{deng:ram:2023}? (probably not... check it)
 \cite{wang:ras:2024}
-\cite{vintr:ras:2026}
 
 In the included works, Markov processes are used to predict the dynamics of the environment.
 Tipaldi~\etal~\cite{tipaldi:ijrr:2013} uses a dynamic occupancy grid and exploits the stationary distribution and the state holding time associated with \glspl{hmm} on a 2D grid. The method uses past observations for each run to learn the state transition probabilities iteratively to estimate the \gls{hmm} parameters. Then, the localization can infer how often is expected to see a dynamic object in the environment and for how long. Comparing the proposed \gls{hmm}-based localization to \gls{mcl} using a standard grid, the former had a lower localization failure rate than \gls{mcl}, capable of dealing with high dynamics (moving cars) and lower ones (parked cars).

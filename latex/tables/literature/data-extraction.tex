@@ -441,7 +441,17 @@ down-weight semi-dynamic class &
 --\\
 \hline
 Guo and Liu
-(2021)~\cite{guo-liu:robio:2021}\\
+(2021)~\cite{guo-liu:robio:2021} &
+keyframe (graph) &
+feature matching (3D, 6DoF) &
+x & & & x & &
+camera (RGBD) &
+pixel segmentation (Mask R-CNN, depth region growing refinement),
+multi-view geometry segmentation (depth) &
+dynamic vs static / ground class &
+-- &
+-- &
+background inpainting\\
 \hline
 Thomas~\etal\hspace{0pt}
 (2022)~\cite{thomas:icra:2022} &
@@ -482,89 +492,263 @@ short + long-term dynamics (STD, LTD) &
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% ------------------------- added works after SLR -------------------------- %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Adkins~\etal\hfill
-(2022)~\cite{adkins:iros:2022}\\
-\hline
 Chen~\etal\hspace{0pt}
-(2022)~\cite{chen:itsc:2022}\\
-\hline
-Du~\etal\hspace{0pt}
-(2022)~\cite{du:iros:2022}\\
+(2022)~\cite{chen:itsc:2022} &
+point cloud (3D) &
+odometry (3D, 6DoF) &
+& x & & x & &
+laser (3D) &
+object detection (PointPillars) &
+dynamic points (vehicles, pedestrians, cyclists, etc.) &
+-- &
+-- &
+--\\
 \hline
 Kim and Kim
-(2022)~\cite{kim:icra:2022}\\
+(2022)~\cite{kim:icra:2022} &
+keyframe (graph; iSAM2, GTSAM) &
+point cloud alignment (3D, 6DoF) &
+& x & & x & &
+laser (3D), IMU &
+scan-to-map matching, multi-session consistency &
+high + low dynamic (HD, LD), positive (new points) +
+negative (disappeared) difference (PD, ND) &
+-- &
+-- &
+positive + negative difference maps (PD, ND)\\
 \hline
 Wu~\etal\hspace{0pt}
-(2022)~\cite{wu:cvci:2022}\\
+(2022)~\cite{wu:cvci:2022} &
+keyframe (graph) &
+feature matching (3D, 6DoF) &
+x & & & x & &
+camera (RGBD) &
+reprojection error (Student's t-distribution modelling),
+conditional random field (CRF) minimization &
+-- &
+static score (Student's t-distribution &
+-- &
+--\\
 \hline
 Fu~\etal\hspace{0pt}
-(2022)~\cite{fu:ral:2022}\\
+(2022)~\cite{fu:ral:2022} &
+feature (plane, SDF) &
+-- &
+x & & & x & &
+camera (RGBD) &
+planes 2D height map comparison, planes SDF 3D validation &
+2D ternary change mask (changed, unchanged, unexplored) &
+-- &
+-- &
+--\\
 \hline
 Liu~\etal\hspace{0pt}
-(2022)~\cite{liu:scic:2022}\\
+(2022)~\cite{liu:scic:2022} &
+keyframe (graph) &
+bundle adjustment (3D, 6DoF) &
+x & & & x & &
+camera (RGBD) &
+motion consistency, reprojection error &
+-- &
+static probability (reprojection error) &
+-- &
+--\\
 \hline
 Deng~\etal\hspace{0pt}
-(2023)~\cite{deng:ram:2023}\\
+(2023)~\cite{deng:ram:2023} &
+keyframe (graph) &
+bundle adjustment (3D, 6DoF) &
+x & & & x & &
+camera (stereo, RGBD) &
+scan-to-map matching &
+dynamic + semi-static (periodic, abrupt changes) + static points &
+observations count, survival time, point persistence &
+Bayesian persistence filter (persistence probability), time series modeling (semi-static points) &
+--\\
 \hline
 Nielsen and Hendeby
-(2023)~\cite{nielsen-hendeby:tiv:2023}\\
+(2023)~\cite{nielsen-hendeby:tiv:2023} &
+feature (multi-hypotheses tree) &
+-- &
+& x & & x & &
+wheel odometry, laser (2D) &
+multi-hypotheses testing &
+-- &
+negative information (missed detections) + new landmark observations +
+false measurements + landmark entering FOV &
+-- &
+hypotheses pruning / merging\\
 \hline
 Soares~\etal\hspace{0pt}
-(2023)~\cite{soares:jint:2023}\\
+(2023)~\cite{soares:jint:2023} &
+keyframe (graph) &
+bundle adjustment (3D, 6DoF) &
+x & & & x & &
+camera (RGBD) &
+object detection (YOLOv4), feature repopulation (back vs foreground) &
+dynamic (person) + movable (chair) + static objects &
+-- &
+-- &
+covariance static < movable < dynamic measurements\\
 \hline
 Stefanini~\etal\hspace{0pt}
-(2023)~\cite{stefanini:sensors:2023}\\
-\hline
-V{\"o}disch~\etal\hspace{0pt}
-(2023)~\cite{vodisch:isrr:2022}\\
-\hline
-Yin~\etal\hspace{0pt}
-(2023)~\cite{yin:tro:2023}\\
+(2023)~\cite{stefanini:sensors:2023} &
+grid (occupancy, 2D) &
+-- &
+x & & & x & &
+wheel odometry, laser (2D) &
+scan-to-map matching, ray tracing &
+-- &
+cells changed flag count &
+-- &
+--\\
 \hline
 Yu~\etal\hspace{0pt}
-(2023)~\cite{yu:acait:2023}\\
+(2023)~\cite{yu:acait:2023} &
+keyframe (graph) &
+bundle adjustment (3D, 6DoF) &
+x & & & x & &
+camera (RGBD) &
+semantic segmentation (lightweight Mask R-CNN + MobileNetV2),
+motion probability model &
+dynamic class (humans, animals, cars) &
+motion probability model (semantic mask + optical flow) &
+-- &
+--\\
 \hline
 Hroob~\etal\hspace{0pt}
-(2024)~\cite{hroob:ras:2024}\\
+(2024)~\cite{hroob:ras:2024} &
+grid (occupancy, 3D), point cloud (3D) &
+point cloud alignment (3D, 6DoF) &
+& x & & x & &
+laser (3D), IMU &
+scan-to-map matching,
+long-term stability network (LTS-NET, PointNet++-based) &
+-- &
+point spatiotemporal stability score (LTS-NET) &
+-- &
+--\\
 \hline
 Hroob~\etal\hspace{0pt}
-(2024)~\cite{hroob:ral:2024}\\
+(2024)~\cite{hroob:ral:2024} &
+grid (occupancy, 3D), point cloud (3D) &
+point cloud alignment (3D, 6DoF) &
+& x & & x & &
+laser (3D) &
+scan-to-map matching, stability score inference (modified MinkUNet14), scan-map discrepancy segmentation &
+stable vs unstable points &
+stability score (modified MinkUNet14) &
+-- &
+--\\
 \hline
 Li and Li
-(2024)~\cite{li:tii:2024}\\
-\hline
-Li~\etal\hspace{0pt}
-(2024)~\cite{li:aaai:2024}\\
-\hline
-Pekkanen~\etal\hspace{0pt}
-(2024)~\cite{pekkanen:mfi:2024}\\
+(2024)~\cite{li:tii:2024} &
+pose graph (graph), submap (occupancy, 2D) &
+point cloud alignment (2D, 3DoF) &
+x & & & x & &
+wheel odometry, laser (2D), IMU &
+submap overlap rate, submap observation gain &
+-- &
+-- &
+-- &
+outdated + redundant submap pruning\\
 \hline
 Wang~\etal\hspace{0pt}
-(2024)~\cite{wang:ras:2024}\\
+(2024)~\cite{wang:ras:2024} &
+grid (occupancy, 2D) &
+particle filter (2D, 3DoF) &
+x & & & x & &
+wheel odometry, laser (2D) &
+object clustering (k-means), time series modelling &
+semi-static vs dynamic map &
+autoregressive moving average (ARMA), dynamic object density &
+autoregressive moving average (ARMA; static + periodic + aperiodic changes) &
+--\\
 \hline
 Yang~\etal\hspace{0pt}
-(2024)~\cite{yang:ral:2024}\\
+(2024)~\cite{yang:ral:2024} &
+point cloud (3D) &
+-- &
+& x & & x & &
+laser (3D) &
+multi-scan consistency (OctoMap), multi-session consistency (k-NN spatial filter) &
+-- &
+-- &
+-- &
+--\\
 \hline
 Cheng~\etal\hspace{0pt}
-(2025)~\cite{cheng:ral:2025}\\
+(2025)~\cite{cheng:ral:2025} &
+3D Gaussian splatting &
+gradient-based optimization (rendered RGB + depth + semantic maps) &
+& x & & x & &
+camera (RGBD), laser (3D) &
+object segmentation (SegmentAnything), motion + temporal consistency &
+entering + vanishing + full observation &
+-- &
+-- &
+--\\
 \hline
 Hu~\etal\hspace{0pt}
-(2025)~\cite{hu:tcsvt:2025}\\
+(2025)~\cite{hu:tcsvt:2025} &
+object map (3D point cloud, color histogram, semantic category) &
+feature matching (3D, 6DoF) &
+x & & & x & &
+camera (RGBD) &
+motion consistency, foreground vs background clustering (DBSCAN) &
+-- &
+object static probability &
+-- &
+--\\
 \hline
 Jia~\etal\hspace{0pt}
-(2025)~\cite{jia:tcsvt:2025}\\
+(2025)~\cite{jia:tcsvt:2025} &
+3D Gaussian splatting &
+feature matching (3D, 6DoF) &
+x & & & x & &
+camera (RGBD) &
+semantic segmentation (FastInst), motion consistency &
+-- &
+-- &
+-- &
+--\\
 \hline
 Li~\etal\hspace{0pt}
-(2025)~\cite{li:tim:2025}\\
+(2025)~\cite{li:tim:2025} &
+grid (hashmap, dynamic i-Octree) &
+point cloud alignment (3D, 6DoF) &
+& x & & x & &
+laser (3D), IMU &
+scan-to-map matching &
+prior (multi-session) + temporary (short-term) + static map points &
+-- &
+-- &
+--\\
 \hline
 Wang~\etal\hspace{0pt}
-(2025)~\cite{wang:tim:2025}\\
+(2025)~\cite{wang:tim:2025} &
+feature (point, line, plane) &
+bundle adjustment (3D, 6DoF) &
+x & & & x & &
+camera (RGBD), IMU &
+semantic segmentation (DeepLab v3), motion consistency (optical flow),
+structural regularity check (Manhattan world) &
+-- &
+dynamic probability (dynamic filter) &
+-- &
+--\\
 \hline
 Zhu~\etal\hspace{0pt}
-(2025)~\cite{zhu:tim:2025}\\
-\hline
-Vintr~\etal\hspace{0pt}
-(2026)~\cite{vintr:ras:2026}\\
+(2025)~\cite{zhu:tim:2025} &
+sparse grid (hashmap, 2D+3D, i-Octree) &
+odometry (3D, 6DoF) &
+& x & & x & &
+laser (3D), IMU &
+scan-to-map matching, object clustering (region growing) &
+-- &
+-- &
+-- &
+ghost trails retroactive removal (i-Octree seach)\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \end{longtable}
