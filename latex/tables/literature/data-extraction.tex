@@ -92,9 +92,9 @@ wheel odometry, laser (2D) &
 ray tracing, 1D robust statistics over dynamic sample sets
 (median, median of absolute differences), timescales &
 -- &
+timescale (update policy) &
 -- &
--- &
--- \\
+dynamic sample set (timescale-based probability) \\
 \hline
 Dayoub~\etal\hspace{0pt}
 (2011)~\cite{dayoub:ras:2011} &
@@ -127,7 +127,7 @@ Bayesian (2D, 3DoF) &
 x & & & x & &
 camera (omni), laser (2D) &
 k-means clustering &
-short + long-term memory (STM, LTM) &
+sensory + short + long-term memory (SM, STM, LTM) &
 feature stability histogram &
 -- &
 STM pruning\\
@@ -313,7 +313,7 @@ semantic segmentation (FCIS), feature motion consistency check &
 static background, moveable class (person, vehicles, cup, chair, etc.) &
 -- &
 -- &
---\\
+moveable points removal\\
 \hline
 Zhang~\etal\hspace{0pt}
 (2019)~\cite{zhang:acc:2019} &
@@ -438,7 +438,7 @@ static + semi-dynamic (chairs, parked cars) + dynamic (moving people / cars)
 objects, static + semi-dynamic maps &
 down-weight semi-dynamic class &
 -- &
---\\
+semi-dynamic objects removal\\
 \hline
 Guo and Liu
 (2021)~\cite{guo-liu:robio:2021} &
@@ -463,7 +463,7 @@ ray tracing (NN training), feature semantic labelling (KPConv) &
 feature semantic labelling (ground, permanent, movable, dynamic) &
 -- &
 dynamic motion label (KPConv) &
---\\
+movable (localization) + dynamic (localization, mapping) points removal\\
 \hline
 Du~\etal\hspace{0pt}
 (2022)~\cite{du:tvcg:2022} &
@@ -687,7 +687,7 @@ object segmentation (SegmentAnything), motion + temporal consistency &
 entering + vanishing + full observation &
 -- &
 -- &
---\\
+3D Gaussian-based encoding (dynamic objects)\\
 \hline
 Hu~\etal\hspace{0pt}
 (2025)~\cite{hu:tcsvt:2025} &
@@ -699,7 +699,7 @@ motion consistency, foreground vs background clustering (DBSCAN) &
 -- &
 object static probability &
 -- &
---\\
+dynamic points weighting (pose optimization)\\
 \hline
 Jia~\etal\hspace{0pt}
 (2025)~\cite{jia:tcsvt:2025} &
@@ -711,7 +711,7 @@ semantic segmentation (FastInst), motion consistency &
 -- &
 -- &
 -- &
---\\
+dynamic objects removal (3DGS model)\\
 \hline
 Li~\etal\hspace{0pt}
 (2025)~\cite{li:tim:2025} &
@@ -748,6 +748,7 @@ scan-to-map matching, object clustering (region growing) &
 -- &
 -- &
 -- &
+dynamic objects removal (scan filtering),
 ghost trails retroactive removal (i-Octree seach)\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

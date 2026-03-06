@@ -964,8 +964,22 @@ representation of the actual landmark positions in simulated and real
 experiments, the proposed approach always assume
 uniquely identifiable landmarks.
 
-\cite{cheng:ral:2025}
-\cite{li:tim:2025}
+Li~\etal~\cite{li:tim:2025} leverage a map representation based on
+voxelized maps and octree structures to handle environmental dynamics.
+The work~\cite{li:tim:2025} organizes prior, temporary, and static map points
+within hashed voxel blocks, each containing a
+Dynamic~i-Octree~\cite{zhu:icra:2024} for efficient local map loading,
+radius-neighbor search, and incremental map updates.
+The octree representation is not only a storage/indexing structure
+but also a mechanism that allows the system to adapt when the robot
+moves between mapped and unmapped areas or when the environment changes.
+This mechanism promotes temporary observations into the static map
+only when sufficient evidence accumulates.
+Experiments demonstrated the effectiveness of the method,
+in which a prior map was dynamically updated to reflect changes
+caused by parked vehicles and growing trees,
+while minimizing the inclusion of dynamic objects,
+such as passing vehicles and pedestrians.
 
 \subsection{Map matching}
 
@@ -1013,6 +1027,8 @@ The works \cite{einhorn-gross:ecmr:2013} and \cite{einhorn-gross:ras:2015} were 
 \cite{hu:tcsvt:2025}
 \cite{wang:tim:2025}
 \cite{zhu:tim:2025}
+\cite{jia:tcsvt:2025}
+\cite{cheng:ral:2025}
 
 In terms of detecting dynamic objects, Yue~\etal~\cite{yue:icra:2020} proposes a collaborative dynamic mapping for detecting humans using visual and thermal images and a 3D \gls{lidar}. The YOLOv3 algorithm extracts the bounding boxes from the images relative to humans. The 3D point cloud projection onto the images allows the creation of a static point cloud for localization and mapping of each robot by filtering out the points corresponding to humans. In the experiments, the dynamic objects removal generated a more accurate relative transformation of the collaborative maps compared to not removing those objects.
 Zhu~\etal~\cite{zhu:icra:2021} also uses YOLOv3 to extract bounding boxes of dynamic classes (parked cars) from a RGB image, and the projection of 3D \gls{lidar} points allows the creation of the static and semi-dynamic maps required for localization. Even though the method \cite{zhu:icra:2021} does not discard the dynamic objects, the localization module reduce the importance of weight of the corresponding observations.
