@@ -864,35 +864,108 @@ The discussion on dynamics modeling is organized into the following topics: spec
 
 \subsection{Map representation}
 
+Inspired by the human memory, Dayoub~\etal~\cite{dayoub:ras:2011} and
+Bacca~\etal~\cite{bacca:ras:2013} adapt the multi-store model of
+Atkinson~and~Shiffrin~\cite{atkinson-shiffrin:inbook:1968} for mapping.
+This model divides memory into three stores: \gls{sm}, which stores the most
+recent information from the sensors; \gls{stm}; and \gls{ltm}.
+Three mechanisms move information between memories:
+selective attention from \gls{sm} to \gls{stm},
+rehearsal from \gls{stm} to \gls{ltm}, and the retrieval mechanism to move
+unused information from \gls{ltm} back to \gls{stm}.
+Dayoub~\etal~\cite{dayoub:ras:2011} implement two types of state machines
+for rehearsal and retrieval mechanisms of the \gls{stm} and \gls{ltm}.
+In rehearsal, an \gls{stm} feature moves closer to \gls{ltm}
+or moves back to the initial state (or is forgotten if already in that state),
+depending on whether it is observed consecutively or not.
+Similar for retrieval, where a feature in \gls{ltm} moves to the initial state
+or closer to being forgotten if it is not observed in the current view.
+Consequently, \gls{ltm} and \gls{stm} retain
+the most static and dynamic features, respectively,
+based on their observability in the current view.
+In a changing environment, the method reduced localization failure rates
+compared to a static view. Instead of using a state machine,
+Bacca~\etal~\cite{bacca:ras:2013} implement a \gls{fsh}
+depending on the feature observability to distinguish between
+\gls{stm} and \gls{ltm} features using k-means clustering.
+This modification allows an input feature in \gls{sm} to bypass \gls{stm}
+and become part of \gls{ltm}, depending on the feature strength.
+The method was able to filter out pedestrians from 2D~laser and camera data
+and achieved a more accurate representation of the environment
+compared to a static approach.
+
+Although Biber and Duckett~\cite{biber-duckett:ijrr:2009}
+do not adopt specific memory mechanisms,
+they implement \gls{stm} and \gls{ltm} maps.
+The method implements a dynamic map as a set of local maps,
+each containing submaps that represent different timescales.
+The timescale parameter for each submap determines when to add samples
+from 2D~laser scans probabilistically.
+The dynamics of the environment are represented by using 5~different timescales,
+where the smallest one ($\sim$3.1 s) represents an \gls{stm} map
+updated at every instant, and the other 4~timescales
+($\sim$0.43 runs, 0.43 days, 3.1 days, and 13.5 days) are \gls{ltm} submaps
+updated after each session or daily.
+Instead of focusing only on the \gls{ltm} maps as in
+Dayoub~\etal~\cite{dayoub:ras:2011} and Bacca~\etal~\cite{bacca:ras:2013},
+Biber and Duckett~\cite{biber-duckett:ijrr:2009} select the best representation
+of both \gls{stm} and \gls{ltm} maps that best explains the sensor data.
+In a 5-week experiment, localization improved with a dynamic map,
+in contrast to the degradation observed when only considering
+a static representation of the environment.
+Indeed, the usage of timescales led to static parts emerging as walls
+in \gls{ltm} and dynamic elements disappearing from \gls{stm} maps.
+
+Similar to the works \cite{dayoub:ras:2011} and \cite{bacca:ras:2013}, two maps
+can provide a more stable and dynamic representation of the environment.
+In Walcott-Bryant~\etal~\cite{walcott-bryant:iros:2012},
+an active map represents the most current state of the environment,
+including parts that did not change from previous passes
+and objects added to the environment.
+A dynamic map only saves the points of a 2D~laser scan that changed over time.
+Wang~\etal~\cite{wang:icra:2019} use a tracking map with
+short-term static points and a long-term map containing
+only long-term static points, identified by a semantic segmentation module,
+with ORB-SLAM2~\cite{mur-artal-tardos:tro:2017}.
+Also, Zhu~\etal~\cite{zhu:icra:2021} create offline a semi-dynamic map
+and a static one, where the former has semi-dynamic objects
+(parked cars in a parking lot environment),
+and the latter has both static and semi-dynamic objects.
+The main goal of representing two different dynamics is to favor
+the more stable one in the long term.
+Walcott-Bryant~\etal~\cite{walcott-bryant:iros:2012} and
+Wang~\etal~\cite{wang:icra:2019} use only static parts of the current
+environment representation (active and long-term maps, respectively)
+for localization. In the experiments,
+the approach \cite{walcott-bryant:iros:2012} showed that
+it could identify static parts, though it was affected by false positives
+and negatives and by the blur effect in the 2D~grid map.
+The method \cite{wang:icra:2019} improved the \gls{ate} in a dynamic environment
+over ORB-SLAM2~\cite{mur-artal-tardos:tro:2017} and
+DynaSLAM~\cite{bescos:ral:2018}.
+As for Zhu~\etal~\cite{zhu:icra:2021}, their \gls{mcl} framework
+(equivalent to particle-filter-based localization)
+reduces the weight assigned to observations of moved semi-dynamic objects.
+The method improved the localization in a parking lot
+compared to a standard \gls{mcl}.
+
+As for a multi-hypothesis representation,
+Nielsen and Hendeby~\cite{nielsen-hendeby:tiv:2023} propose a framework to track
+landmark positions using Markov chains to model transitions between positions.
+The method~\cite{nielsen-hendeby:tiv:2023} groups position hypotheses
+by landmark signature, and selects, according to incoming observations,
+the position within each group with the highest probability as the active one.
+The hypothesis likelihood depends on the match between the landmark measurements
+and the landmark in the map, as well as on the number of missed detections, \ie,
+landmarks with a probability of being seen in the current pose
+but not represented in the observations.
+Although the work~\cite{nielsen-hendeby:tiv:2023} maintained an up-to-date
+representation of the actual landmark positions in simulated and real
+experiments, the proposed approach always assume
+uniquely identifiable landmarks.
+
 \cite{cheng:ral:2025}
 \cite{li:tim:2025}
-
-Inspired by the human memory, Dayoub~\etal~\cite{dayoub:ras:2011} and Bacca~\etal~\cite{bacca:ras:2013} adapt the multi-store model of Atkinson~and~Shiffrin~\cite{atkinson-shiffrin:inbook:1968} for robot mapping. This model divides the memory into three stores: \gls{sm} to save the perceived information, \gls{stm}, and \gls{ltm}.
-Three mechanisms move information between memories: selective attention for \gls{sm} to \gls{stm}, rehearsal to commit information from \gls{stm} to \gls{ltm} or which one is forgotten, and the retrieval mechanism to move unused information from \gls{ltm} back to \gls{stm}.
-Dayoub~\etal~\cite{dayoub:ras:2011} implements two types of state machines for rehearsal and retrieval mechanisms of the \gls{stm} and \gls{ltm}. In rehearsal, a \gls{stm} feature moves closer to \gls{ltm} or moves back to the initial state (or forgotten if already in that state) when observed consecutively or if not, respectively. Similar for retrieval, where a feature in \gls{ltm} moves to the initial state or closer to forget if observed in the current view or not.
-Consequently, \gls{ltm} and \gls{stm} save the most static and dynamic features based on their observability in the current view, respectively.
-In a changing environment, the method decreased the localization failure rate compared to a static view.
-Instead of using a state machine, Bacca~\etal~\cite{bacca:ras:2013} implements a \gls{fsh} depending on the feature observability to distinguish between \gls{stm} and \gls{ltm} features using $k$-means clustering. This modification allows that an input feature in \gls{sm} can bypass \gls{stm} and become part of \gls{ltm} depending on the feature strength.
-The method was able to filter out pedestrians from 2D laser and camera data and achieved a more accurate representation of the environment compared to a static approach.
-
-Although Biber and Duckett~\cite{biber-duckett:ijrr:2009} does not adopt specific memory mechanisms, they implement \gls{stm} and \gls{ltm} maps. The method implements a dynamic map as a set of local maps, each maintaining submaps representing different timescales. The timescale parameter of each submap determines probabilistically when to add samples from 2D laser scans.
-The dynamics of the environment are represented by using 5 different timescales, where the smaller one ($\sim$3.1s) represents an \gls{stm} map updated at every instant and the other 4 timescales ($\sim$0.43runs, 0.43days, 3.1days, and 13.5day) are \gls{ltm} submaps updated after each session or daily. Instead of only localizing on the \gls{ltm} maps as Dayoub~\etal~\cite{dayoub:ras:2011} and Bacca~\etal~\cite{bacca:ras:2013}, Biber and Duckett~\cite{biber-duckett:ijrr:2009} selects the best representation of both \gls{stm} and \gls{ltm} maps that best explain the sensor data.
-In a 5 weeks experiment, the localization with a dynamic map improved while a static representation degraded over time, while the timescales led to static parts as walls emerging in \gls{ltm} and dynamic elements disappearing from \gls{stm} maps.
-
-Similar to the works \cite{dayoub:ras:2011} and \cite{bacca:ras:2013}, two maps can represent a more stable and a more dynamic representations of the environment.
-In Walcott-Bryant~\etal~\cite{walcott-bryant:iros:2012}, an active map represents the most current state of the environment, including parts that did not change from previous passes and objects added to the environment. A dynamic map only saves the points of a 2D laser scan that changed over time.
-Wang~\etal~\cite{wang:icra:2019} uses a tracking map with short-term static points and a long-term map only containing long-term static points identified by a semantic segmentation module with ORB-SLAM2~\cite{mur-artal-tardos:tro:2017}.
-Also, Zhu~\etal~\cite{zhu:icra:2021} creates offline a semi-dynamic map and a static one, where the former has semi-dynamic objects (parked cars in a parking lot environment) and the latter has both static and semi-dynamic objects.
-The main goal of representing two different dynamics is usually to favor the most stable one in the long-term.
-Walcott-Bryant~\etal~\cite{walcott-bryant:iros:2012} and Wang~\etal~\cite{wang:icra:2019} only use static parts in the most current representation of the environment (active and the long-term maps, respectively) for localization.
-In the experiments, the approach \cite{walcott-bryant:iros:2012} showed that their method was able to identify static parts, although it was affected by false positives and negatives, and by the blur effect in the 2D grid map.
-The method \cite{wang:icra:2019} improved the \gls{ate} in a dynamic environment over ORB-SLAM2~\cite{mur-artal-tardos:tro:2017} and DynaSLAM~\cite{bescos:ral:2018}.
-As for Zhu~\etal~\cite{zhu:icra:2021}, its \gls{mcl} framework (equivalent to particle filter-based localization) reduces the weight corresponding to observations of moved semi-dynamic objects. The method improved the localization in a parking lot compared to a standard \gls{mcl}.
-
-As for a multi-hypothesis representation, Nielsen and Hendeby~\cite{nielsen-hendeby:tiv:2023} propose a framework for tracking the landmarks positions using Markov chains to model the transition between positions. The method~\cite{nielsen-hendeby:tiv:2023} groups the positions hypotheses based on the landmark's signature, where the position with the highest probability within a group according to incoming observations is selected as the active one. The hypothesis likelihood depends on the matched measurements to the landmark in the map and also on the number of missed detections, \ie, landmarks with a probability of being seen in the current pose but not represented in the observations.
-Although the method \cite{nielsen-hendeby:tiv:2023} maintained an up-to-date representation of the actual landmark positions in simulated experiments, the experiments assumed always uniquely identifiable landmarks.
-
-\todo{maybe add an overall map representation here for each method?}
 
 \subsection{Map matching}
 
