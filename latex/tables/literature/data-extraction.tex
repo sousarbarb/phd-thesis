@@ -153,7 +153,7 @@ laser (2D) &
 hidden Markov model (HMM) &
 -- &
 mixing time of Markov chain &
--- &
+dynamic cells transition &
 --\\
 \hline
 Saarinen~\etal\hspace{0pt}
@@ -166,7 +166,7 @@ ray tracing, scan-to-map matching (NDT-based) &
 -- &
 -- &
 -- &
---\\
+ad-hoc sensor model\\
 \hline
 Pomerleau~\etal\hspace{0pt}
 (2014)~\cite{pomerleau:icra:2014} &
@@ -178,7 +178,7 @@ ray tracing approximation (sparse map cloud, kd-tree w/ spherical coordinates) &
 -- &
 Bayesian (visibility, points proximity, motion patterns) &
 -- &
---\\
+down-weight dynamic points\\
 \hline
 Einhorn and Gross
 (2015)~\cite{einhorn-gross:ras:2015} &
@@ -239,7 +239,7 @@ dynamic (only for obstacle avoidance) + short (movable) + long-term features
 (DF, STF, LTF) &
 -- &
 -- &
---\\
+dynamic features removal (localization)\\
 \hline
 Krajník~\etal\hspace{0pt}
 (2017)~\cite{krajnik:tro:2017} &
@@ -325,7 +325,7 @@ ray tracing (Bresenham algorithm), scan-to-map matching &
 static + semi-static + dynamic objects &
 -- &
 -- &
---\\
+dynamic objects removal\\
 \hline
 Ganti and Waslander
 (2019)~\cite{ganti-waslander:crv:2019} &
@@ -365,7 +365,7 @@ point clusters registration &
 -- &
 clusters occurrence &
 -- &
---\\
+dynamic point clusters removal\\
 \hline
 Wang~\etal\hspace{0pt}
 (2020)~\cite{wang:iros:2020} &
@@ -401,7 +401,8 @@ multi-session consistency, point clustering &
 -- &
 observations count &
 -- &
---\\
+intra (RANSAC, ray tracing) + inter-session (map matching)
+dynamic points removal\\
 \hline
 Yue~\etal\hspace{0pt}
 (2020)~\cite{yue:icra:2020} &
@@ -475,7 +476,7 @@ long-term consistent conditional random field (LC-CRF) &
 -- &
 observations count, average reprojection error, symmetric epipolar distance &
 -- &
---\\
+dynamic features removal\\
 \hline
 Xing~\etal\hspace{0pt}
 (2022)~\cite{xing:jfr:2022} &
@@ -552,7 +553,7 @@ motion consistency, reprojection error &
 -- &
 static probability (reprojection error) &
 -- &
---\\
+dynamic features removal\\
 \hline
 Deng~\etal\hspace{0pt}
 (2023)~\cite{deng:ram:2023} &
@@ -675,7 +676,7 @@ multi-scan consistency (OctoMap), multi-session consistency (k-NN spatial filter
 -- &
 -- &
 -- &
---\\
+positive + negative difference maps (PD, ND)\\
 \hline
 Cheng~\etal\hspace{0pt}
 (2025)~\cite{cheng:ral:2025} &

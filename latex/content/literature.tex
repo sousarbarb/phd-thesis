@@ -841,7 +841,6 @@ underscores the relevance of this PhD~Thesis.
 \cite{yu:acait:2023}
 \cite{hroob:ras:2024}
 \cite{hroob:ral:2024}
-\cite{li:tii:2024}
 \cite{wang:ras:2024}
 \cite{yang:ral:2024}
 \cite{cheng:ral:2025}
@@ -983,40 +982,181 @@ such as passing vehicles and pedestrians.
 
 \subsection{Map matching}
 
-\cite{kim:icra:2022} session alignment + low dynamics detection and removal?
-\cite{stefanini:sensors:2023}
-\cite{li:tii:2024}
-\cite{yang:ral:2024}
-\cite{li:tim:2025}
+Another trend in the literature is the identification of the scene dynamics
+by comparing the current observation to the map.
+Assuming a prior vector map as a permanent map,
+Biswas and Veloso~\cite{biswas-veloso:ras:2017} determine
+the probability of long-term observed features
+by the 2D laser scan-to-map matching distance.
+Short-term features are identified by the scan-to-scan matching distance, while
+the remaining features are considered dynamic and not used for localization.
+Compared to \gls{mcl} with a static map
+and to Tipaldi~\etal~\cite{tipaldi:ijrr:2013},
+Biswas and Veloso~\cite{biswas-veloso:ras:2017} obtained lower localization
+error in a parking-lot environment. However, the method would not handle
+semi-static changes. Instead of using a permanent map,
+Zhang~\etal~\cite{zhang:acc:2019} maintain an \gls{sdf} representation
+based on a prior occupancy map. The proposed approach rejects
+dynamic points identified by range flow and updates the \gls{sdf}-based map
+with semi-static changes observed in the scan-to-map difference.
+Compared to \gls{mcl} in a semi-static environment,
+Zhang~\etal~\cite{zhang:acc:2019} had lower pose errors
+and an improved representation of the environment.
 
-Environment dynamics can be identified by comparing the current observation to the map.
-Assuming a prior vector map as a permanent map, the work of Biswas and Veloso~\cite{biswas-veloso:ras:2017} determines the probability of observed features being long-term ones by the 2D laser scan-to-map matching distance. Short-term features are determined by the scan-to-scan matching distance, while the remaining ones are considered dynamic features and not considered for localization. Compared to \gls{mcl} with a static map and to Tipaldi~\etal~\cite{tipaldi:ijrr:2013}, Biswas and Veloso~\cite{biswas-veloso:ras:2017} obtained lower localization error in a parking-lot environment. However, the method \cite{biswas-veloso:ras:2017} would not handle semi-static changes.
-Instead of using a permanent map, Zhang~\etal~\cite{zhang:acc:2019} maintains a \gls{sdf} representation based on a prior occupancy map. The proposed approach \cite{zhang:acc:2019} rejects dynamic points identified by range flow and updates the \gls{sdf}-based map with semi-static changes observed in the scan-to-map difference. Compared to \gls{mcl} in a semi-static environment, Zhang~\etal~\cite{zhang:acc:2019} had lower pose errors and an improved representation of the environment.
-Similarly, Fu~\etal~\cite{fu:ral:2022} uses \glspl{sdf} in the mapping process, proposing the PlaneSDF representation where a scene is a set of planes and each one has associated a \gls{sdf} volume. This volume describes the geometric details of the objects attached to its associated plane. Then, a change detection algorithm performs a 2D height map comparison and a 3D geometric validation between two PlaneSDF-based maps to compute a change mask. However, the method \cite{fu:ral:2022} failed to detect changes in ambiguous situations such as object occlusions in the height comparison direction.
-Boniardi~\etal~\cite{boniardi:ras:2019} detects semi-static changes leveraging the \gls{icp} scan-to-map consistency and a \gls{cad} prior of the environment, and updates the map accordingly. The method \cite{boniardi:ras:2019} was capable of maintaining a consistent map when dealing with substantial reconfiguration of the environment.
-Du~\etal~\cite{du:tvcg:2022} minimizes the Gibbs energy defined on the proposed \gls{lc-crf} for detecting dynamic points, considering that these points have often a large reprojection error in frame-to-map matching and points tend to have the same dynamic properties as the neighbor ones. In a dynamic scene, \gls{lc-crf}~\cite{du:tvcg:2022} achieved lower \gls{ate} than ORB-SLAM~\cite{mur-artal:tro:2015}.
-Unlike \gls{lc-crf}~\cite{du:tvcg:2022}, the \gls{dfr-slam} proposed by Liu~\etal~\cite{liu:scic:2022} does not look for similar dynamic properties in the features neighbor. Instead, the method \cite{liu:scic:2022} assumes that static features have consistent motion over long time and dynamic ones have different motion patterns, labeling them using the proposed motion consensus filtering algorithm. \gls{dfr-slam}~\cite{liu:scic:2022} formulates binary classification problem based on a graph-cut optimization framework, assigning penalties to connected visual features between different instants that do not share the same label. The method \cite{liu:scic:2022} had lower \gls{ate} than ORB-SLAM2~\cite{mur-artal-tardos:tro:2017} in dynamic scenarios.
+Similarly, Fu~\etal~\cite{fu:ral:2022} use \glspl{sdf} in mapping,
+proposing the PlaneSDF representation, in which a scene is a set of planes,
+each with an associated \gls{sdf} volume.
+This volume describes geometric details of the objects
+attached to their associated plane. Then, a change detection algorithm compares
+2D~height maps and performs 3D~geometric validation between
+two PlaneSDF-based maps to compute a change mask.
+However, the method~\cite{fu:ral:2022} failed to detect changes in ambiguous
+situations, such as object occlusions.
+Boniardi~\etal~\cite{boniardi:ras:2019} detect semi-static changes
+by leveraging \gls{icp} scan-to-map consistency and a \gls{cad} model
+of the environment, and update the map accordingly.
+The proposed approach~\cite{boniardi:ras:2019} was capable of maintaining
+a consistent map even with substantial environmental reconfiguration.
+Du~\etal~\cite{du:tvcg:2022} minimize the Gibbs energy defined on
+the proposed \gls{lc-crf} to detect dynamic points,
+assuming that these points often exhibit large reprojection errors
+in frame-to-map matching and that points tend to share dynamic properties
+with their neighbors. In a dynamic scene, \gls{lc-crf}~\cite{du:tvcg:2022}
+achieved lower \gls{ate} than ORB-SLAM~\cite{mur-artal:tro:2015}.
+Unlike \gls{lc-crf}~\cite{du:tvcg:2022}, the \gls{dfr-slam} proposed by
+Liu~\etal~\cite{liu:scic:2022} does not look for similar dynamic properties
+in the features' neighbors. Instead, the method~\cite{liu:scic:2022}
+assumes that static features exhibit consistent motion over a long time
+and that dynamic features exhibit distinct motion patterns,
+labeling them using the proposed motion-consensus filtering algorithm.
+\gls{dfr-slam}~\cite{liu:scic:2022} formulates a binary classification problem
+using a graph-cut optimization framework, assigning penalties
+to connected visual features across instances that do not share the same label.
+The method~\cite{liu:scic:2022} had a lower \gls{ate} than
+ORB-SLAM2~\cite{mur-artal-tardos:tro:2017} in dynamic scenarios.
 
-Furthermore, Pan~\etal~\cite{pan:sensors:2019} and Ding~\etal~\cite{ding:tits:2020} leverage clustering properties of the observations evaluating the observations count.
-The approach \cite{pan:sensors:2019} segments the points of a 3D \gls{lidar} point cloud into different clusters assuming that dynamic points do not appear frequently in the same place. The map only considers clusters that appear in same location more than 10 times.
-As for Ding~\etal~\cite{ding:tits:2020}, the method builds on the assumption that dynamic and static parts of the environment have a clustering property relative to its neighbors (similar to Du~\etal~\cite{du:tvcg:2022}). The number of observations in different sessions combined with its consistency relative to its neighbors determine if a map point is static throughout the sessions.
-Both representations of the environment in Pan~\etal~\cite{pan:sensors:2019} and Ding~\etal~\cite{ding:tits:2020} were stable to structural changes in the environment.
+Furthermore, Pan~\etal~\cite{pan:sensors:2019} and
+Ding~\etal~\cite{ding:tits:2020} leverage clustering properties
+of the observations, evaluating the observation count
+when matching the scan with the map. The proposed approach segments
+the points of a 3D~\gls{lidar} point cloud into clusters, assuming that
+dynamic points do not appear frequently at the same location. The map only
+considers clusters that appear in the same location more than 10 times.
+As for Ding~\etal~\cite{ding:tits:2020}, the method builds on the assumption
+that the dynamic and static parts of the environment exhibit
+clustering properties relative to their neighbors
+(similar to Du~\etal~\cite{du:tvcg:2022}).
+The number of observations across multiple mapping sessions,
+combined with their consistency relative to neighbors,
+determines whether a map point is static throughout the sessions.
+Both representations of the environment in
+Pan~\etal~\cite{pan:sensors:2019} and Ding~\etal~\cite{ding:tits:2020}
+were stable to structural changes in the environment.
 
-The concept of ray tracing is also used by the included works to handle dynamic changes.
-Lázaro~\etal~\cite{lazaro:iros:2018} uses ray tracing to exploit the free space information. When comparing two 2D point clouds from a viewpoint, the ray tracing evaluation identifies new objects added to the scene (observed point closer to viewpoint than the old one) and outdated information (observed point further way), allowing the identification of dynamic changes and having an up-to-date representation for localization.
-Given that ray tracing in 3D is expensive in terms of memory and requires dense map representations, Pomerleau~\etal~\cite{pomerleau:icra:2014} uses directly the sparse point cloud from a 3D laser. The map points are associated with each single reading in small conical apertures in spherical coordinates, updating the observed points closer than the mapped ones and the further ones are left untouched. The approximation of ray tracing results are used to update the probability of points in the map to be dynamic, based on a Bayesian approach. The probability of being dynamic can be used in \gls{icp} to not trust dynamic points and indeed, in the experiments, the work \cite{pomerleau:icra:2014} had a more precise and cleaner map of the environment than using a standard \gls{icp} matching.
-Instead of weighting the map points, An~\etal~\cite{an:as:2016} proposes the \gls{del} to model the dynamics in the edges of a pose graph instead on the data itself. The observation of moving obstacles between two poses change the weight of the respective edge, decrease gradually the weight until not detecting the obstacle. Integrating \gls{del} in an exploration scheme, nodes with a edge weight average lower than a certain threshold, meaning frequent moving obstacles or changed structure near that node, are not considered for exploration due to the robot may be unable to move to that position.
+Building on multi-session consistency,
+Kim and Kim~\cite{kim:icra:2022} classify dynamic points into
+high- and low-dynamic categories. An initial processing step
+removes high-dynamic range points using a range-image-based discrepancy.
+This step is followed by a multi-session consistency check
+in which aligned sessions are compared via kd-tree searches
+to identify low-dynamic points. By parsing negative
+(removed data between consecutive sessions) and positive differences
+(new data appearing in the environment between sessions)
+instead of saving the whole mapping sessions,
+their representation achieves a 60\% reduction in memory usage
+compared to maintaining full session histories.
+Similarly, Yang~\etal~\cite{yang:ral:2024} utilize a clean initial base map and
+identify changes in incoming sessions using a k-\gls{nn}-based spatial filter.
+The proposed approach segments points into base-difference, coexist,
+and session-difference categories, while implementing a map version-control
+system based on positive and negative differences
+to maintain the environment representation throughout time.
+To accelerate this process, Yang~\etal~\cite{yang:ral:2024} employ
+2D~\gls{bev} descriptors to pinpoint intensity differences in 3D~data.
+A similar memory reduction compared to Kim and Kim~\cite{kim:icra:2022}
+was observed in the experiments, increasing memory efficiency
+by 40.1\%--94.2\% across datasets, while retaining
+at least 5--7\% more static points compared to \cite{kim:icra:2022}.
 
-Although the standard \gls{ndt} representation does not model free space, the works of Einhorn and Gross~\cite{einhorn-gross:ecmr:2013,einhorn-gross:ras:2015} and Saarinen~\etal~\cite{saarinen:ijrr:2013} use \gls{ndt} with occupancy maps to model explicitly the free space and adopt exponential weighted moving average and covariance for new measurements having an higher influence than old ones.
-Einhorn and Gross~\cite{einhorn-gross:ecmr:2013} proposes a generic 2D/3D mapping using \gls{ndt} and occupancy maps. The hit cells considering the current observation are updated incrementally with exponential weighting. The other cells along the sensor beam potentially empty are updated using the standard update rule of occupancy maps based on the log-odds of the occupancy value and on the inverse range sensor model.
-Instead of using the standard occupancy map update, the sensor model in Saarinen~\etal~\cite{saarinen:ijrr:2013} depends on the inconsistency between observation and map. Also, the occupancy value describes the confidence of the \gls{ndt} based on past observations.
-As for Einhorn and Gross~\cite{einhorn-gross:ras:2015}, the method defines two probabilities for the occupancy map: occupancy and statically occupied, where the first is updated based on the sensor model (2D/3D generic beam sensor), and the second one is adapted slowly to high probability for static objects in the environment. The statically occupancy probability follows the proposed ad-hoc model that is parameterized to control how fast the static occupancy probabilities are adapted, depending also on the occupancy probability itself.
-The works \cite{einhorn-gross:ecmr:2013} and \cite{einhorn-gross:ras:2015} were able to handle semi-static and dynamic changes having a consistent and up-to-date representation of the environment, while the approach \cite{saarinen:ijrr:2013} favored long-term static structures in dynamic environments.
+The concept of ray tracing is also used by the included works
+to handle dynamic changes. Lázaro~\etal~\cite{lazaro:iros:2018}
+use ray tracing to exploit free space information.
+When comparing two 2D~point clouds from a viewpoint,
+ray tracing identifies new objects added to the scene
+(observed points closer to the viewpoint than the old ones)
+and outdated information (observed points farther away), allowing dynamic
+change detection and providing an up-to-date representation for localization.
+Also, Lázaro~\etal~\cite{lazaro:iros:2018} merge points on the same ray
+that are close to each other into a new point based on
+the weighted average of their covariances. Experiments showed
+improvements in map definition and removal of non-static obstacles.
+Stefanini~\etal~\cite{stefanini:sensors:2023} adopt a 1-to-N ray-casting
+strategy to improve map merging in the face of environmental dynamics.
+Rather than a standard point-to-point comparison,
+the method~\cite{stefanini:sensors:2023} compares measurement points against
+a set of expected hit points along virtual neighboring range measurements
+to detect environmental changes more robustly.
+
+Given that 3D~ray tracing is memory-intensive and requires
+dense map representations, Pomerleau~\etal~\cite{pomerleau:icra:2014}
+use the sparse point cloud from a 3D~laser directly.
+The map points are associated with every single reading
+via small conical apertures in spherical coordinates,
+updating the observed points closer than the mapped ones,
+and leaving the farther ones untouched.
+The approximation of ray-tracing results is used to update
+the probability that points in the map are dynamic,
+using a Bayesian approach. The probability of being dynamic can be used
+in \gls{icp} to avoid trusting dynamic points.
+In the experiments, the method~\cite{pomerleau:icra:2014} produced a more
+precise and cleaner map than standard \gls{icp} matching.
+Instead of weighting the map points, An~\etal~\cite{an:as:2016} propose the
+\gls{del} to model the dynamics of a pose graph's edges
+rather than the data itself. The observation of moving obstacles
+between two poses gradually decreases the weight of the respective edge
+until it no longer detects the obstacle.
+Integrating \gls{del} in an exploration scheme,
+nodes with an edge weight average lower than a certain threshold,
+meaning frequent moving obstacles or changed structure near that node,
+are not considered for exploration because the robot may be
+unable to move to that position.
+
+Although the standard \gls{ndt} representation does not model free space,
+the works of
+Einhorn and Gross~\cite{einhorn-gross:ecmr:2013,einhorn-gross:ras:2015} and
+Saarinen~\etal~\cite{saarinen:ijrr:2013} use \gls{ndt} with occupancy maps
+to explicitly model free space and adopt
+an exponential weighted moving average and covariance for new measurements,
+giving them stronger influence than old ones.
+Einhorn and Gross~\cite{einhorn-gross:ecmr:2013} propose
+a generic 2D/3D mapping using \gls{ndt} and occupancy maps.
+The hit cells from scan-to-map alignment are updated incrementally
+with exponential weighting, based on the current observation.
+The other cells along the sensor beam, potentially empty,
+are updated using the standard update rule for occupancy maps, based on
+the log-odds of the occupancy value and the inverse range sensor model.
+Instead of using the standard occupancy map update,
+the sensor model in Saarinen~\etal~\cite{saarinen:ijrr:2013} relies on
+the inconsistency between observations and the map.
+Also, the occupancy value describes the confidence of the \gls{ndt}
+based on past observations.
+As for Einhorn and Gross~\cite{einhorn-gross:ras:2015},
+the proposed approach defines two occupancy map probabilities:
+occupancy and statically occupied. The former is updated based on
+the sensor model (2D/3D generic beam sensor) and scan-to-map alignment, and the
+latter slowly adapts to high-probability static objects in the environment.
+The static occupancy probability follows the proposed ad-hoc model,
+which is parameterized to control how quickly the static occupancy
+probabilities are adapted, depending also on the occupancy probability itself.
+The works \cite{einhorn-gross:ecmr:2013} and \cite{einhorn-gross:ras:2015}
+handled both semi-static and dynamic changes, maintaining a consistent,
+up-to-date representation of the environment. In contrast,
+the method~\cite{saarinen:ijrr:2013} favored
+long-term static structures in dynamic environments.
 
 \subsection{Dynamic objects detection}
 
 \cite{chen:itsc:2022}
-\cite{kim:icra:2022} (from kimkim2018 to remove high dynamic pts)
 \cite{wu:cvci:2022}
 \cite{deng:ram:2023} (or prediction?...)
 \cite{soares:jint:2023}
