@@ -503,7 +503,7 @@ object detection (PointPillars) &
 dynamic points (vehicles, pedestrians, cyclists, etc.) &
 -- &
 -- &
---\\
+dynamic objects removal\\
 \hline
 Kim and Kim
 (2022)~\cite{kim:icra:2022} &
@@ -529,7 +529,7 @@ conditional random field (CRF) minimization &
 -- &
 static score (Student's t-distribution &
 -- &
---\\
+dynamic features removal\\
 \hline
 Fu~\etal\hspace{0pt}
 (2022)~\cite{fu:ral:2022} &
@@ -565,7 +565,7 @@ scan-to-map matching &
 dynamic + semi-static (periodic, abrupt changes) + static points &
 observations count, survival time, point persistence &
 Bayesian persistence filter (persistence probability), time series modeling (semi-static points) &
---\\
+dynamic points removal\\
 \hline
 Nielsen and Hendeby
 (2023)~\cite{nielsen-hendeby:tiv:2023} &
@@ -615,7 +615,7 @@ motion probability model &
 dynamic class (humans, animals, cars) &
 motion probability model (semantic mask + optical flow) &
 -- &
---\\
+dynamic features removal\\
 \hline
 Hroob~\etal\hspace{0pt}
 (2024)~\cite{hroob:ras:2024} &
@@ -625,10 +625,10 @@ point cloud alignment (3D, 6DoF) &
 laser (3D), IMU &
 scan-to-map matching,
 long-term stability network (LTS-NET, PointNet++-based) &
--- &
+stable vs unstable points &
 point spatiotemporal stability score (LTS-NET) &
--- &
---\\
+point stability score (unsupervised learning, based on recorded sessions) &
+stability score threshold removal (localization)\\
 \hline
 Hroob~\etal\hspace{0pt}
 (2024)~\cite{hroob:ral:2024} &
@@ -636,11 +636,12 @@ grid (occupancy, 3D), point cloud (3D) &
 point cloud alignment (3D, 6DoF) &
 & x & & x & &
 laser (3D) &
-scan-to-map matching, stability score inference (modified MinkUNet14), scan-map discrepancy segmentation &
+scan-to-map matching, stability score inference (modified MinkUNet14),
+scan-map discrepancy segmentation &
 stable vs unstable points &
-stability score (modified MinkUNet14) &
--- &
---\\
+point spatiotemporal stability score (modified MinkUNet14) &
+point stability score (unsupervised learning, based on recorded sessions) &
+stability score threshold removal (localization)\\
 \hline
 Li and Li
 (2024)~\cite{li:tii:2024} &
@@ -696,7 +697,8 @@ object map (3D point cloud, color histogram, semantic category) &
 feature matching (3D, 6DoF) &
 x & & & x & &
 camera (RGBD) &
-motion consistency, foreground vs background clustering (DBSCAN) &
+object detection (YOLOX), motion consistency,
+foreground vs background clustering (DBSCAN) &
 -- &
 object static probability &
 -- &
@@ -737,7 +739,7 @@ structural regularity check (Manhattan world) &
 -- &
 dynamic probability (dynamic filter) &
 -- &
---\\
+dynamic features removal (dynamic probability threshold)\\
 \hline
 Zhu~\etal\hspace{0pt}
 (2025)~\cite{zhu:tim:2025} &
