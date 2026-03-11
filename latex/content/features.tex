@@ -6,8 +6,133 @@ TBC
 
 TBC (background / literature analysis specific to the topic of this chapter)
 
-\subsection{Line fitting intersection}
-\subsection{Curvature-based detection}
+\subsection{Line fitting intersection}\label{sec:features:background:line-fitting}
+
+A trend in the literature is to extract corners at the intersections of
+line segments detected in the 2D~laser
+scan~\cite{castellanos:mfi:1996,roumeliotis-bekey:iros:2000,jung:tits:2008,falomir:prl:2013,fernandez-moral:ijrr:2015,mohamed:isprs-arxiv:2016,zhao:icsess:2016,lin:yac:2017,qu:robio:2018,liu:electronics:2022,liu:sensors:2023}.
+First, the laser data may be filtered to remove invalid values
+(zero range values~\cite{jung:tits:2008}) and possible noise
+(\eg, considering the minimum distance to the two neighbors of
+a certain point to remove isolated data~\cite{jung:tits:2008},
+mean average filtering~\cite{liu:electronics:2022}, or bilateral filters
+to remove non-linear noise~\cite{liu:sensors:2023}).
+Next, a segmentation step extracts sets of continuous points
+in the environment for line fitting estimation.
+Castellanos~\etal~\cite{castellanos:mfi:1996} segment the scan into
+polygonal lines and subsequently divide them into
+segments using an iterative method.
+Falomir~\etal~\cite{falomir:prl:2013} search for discontinuities
+in the data to form point subsets and use a recursive line-fitting
+algorithm~\cite{xavier:icra:2005} to obtain line segments.
+Fernández-Moral~\etal~\cite{fernandez-moral:ijrr:2015} search for
+parameters of a 2D~line that maximize the number of points
+supporting the line model using the \gls{ransac}
+algorithm~\cite{fischler-bolles:cacm:1981}.
+Mohamed~\etal~\cite{mohamed:isprs-arxiv:2016} use the line tracking
+algorithm~\cite{munoz:ropec:2013} to iteratively segment lines
+in the scan and perform \gls{pca} to compute the lines' parameters.
+Then, the intersection points between consecutive line segments
+define a corner feature in the environment.
+
+Furthermore, Lin~\etal~\cite{lin:yac:2017} and
+Liu~\etal~\cite{liu:electronics:2022,liu:sensors:2023} use adaptive threshold
+segmentation to cluster range data into continuous spatial subsets.
+Although Lin~\etal~\cite{lin:yac:2017} state that an adaptive segmentation
+was used due to the non-uniform distribution of the 2D~laser data,
+the authors do not specify the threshold used in their work.
+In Liu~\etal~\cite{liu:electronics:2022} work, the threshold is based on
+the laser's angular resolution and the distance to
+the current point under analysis.
+Liu~\etal~\cite{liu:sensors:2023} also establish a threshold depending on
+the angular resolution. Instead of considering only the distance of
+the point under analysis, the proposed approach~\cite{liu:sensors:2023} selects
+the larger distance between adjacent points.
+Even though Roumeliotis and Bekey~\cite{roumeliotis-bekey:iros:2000} do not use
+a specific adaptive threshold, the proposed SEGMENTS algorithm with two-level
+\gls{ekf} exhibits adaptive behavior. A stricter filter,
+in terms of the system's noise covariance, attempts to follow a straight line,
+while a more flexible \gls{ekf} tries to follow a new segment during each scan.
+The four methods~\cite{lin:yac:2017,liu:electronics:2022,liu:sensors:2023,roumeliotis-bekey:iros:2000}
+also define a corner feature as the intersection
+between consecutive line segments.
+
+A specific application of corner detection with 2D~laser data in the literature
+is vehicle detection~\cite{jung:tits:2008,qu:robio:2018}.
+Jung~\etal~\cite{jung:tits:2008} cluster laser data using a fixed threshold
+between consecutive range values. Then, the method performs template matching
+for every point under analysis, assuming the point is
+the vertex of the L-shape of a vehicle in the scan.
+Jung~\etal~\cite{jung:tits:2008} use \gls{svd} to estimate the L-shape's
+line parameters and decompose the problem into line-curve estimation
+when the vehicle has a curved corner in the data.
+In contrast, Qu~\etal~\cite{qu:robio:2018} segment the data using
+\gls{dbscan}~\cite{ester:kdd:1996}.
+The method performs L-shape fitting in two steps:
+searching for the L-shape vertices and corner-point localization,
+the latter based on \gls{ransac}~\cite{fischler-bolles:cacm:1981}.
+
+However, corner detection algorithms that rely on global search during
+line segment scanning may be limited to well-structured environments.
+Thus, we propose a corner-like detection method based on local line fitting,
+without requiring global line detection or recursive data search.
+Also, the experiments presented in \secref{sec:features:results} demonstrate
+the ability of the proposed detector to extract more points of interest
+from the scan in addition to environment corners.
+
+\subsection{Curvature-based detection}\label{sec:features:background:curvature}
+
+Other approaches to detecting corners in 2D~laser data estimate the curvature.
+N\'{u}\~{n}ez~\etal~\cite{nunez:icra:2006} propose an adaptive curvature
+estimator that compares the $k$-nearest points on
+both sides of the point being evaluated.
+The $k$ size is adjusted based on the distance between possible corners.
+A segmentation step precedes the curvature estimation to detect breakpoints
+using the adaptive breakpoint detector proposed by
+Borges~and~Aldon~\cite{borges-aldon:jint:2004}.
+Then, N\'{u}\~{n}ez~\etal~\cite{nunez:icra:2006} extract corner, line, and
+curve segment features from the scan data by analyzing whether
+there are peaks in curvature, flat segments with zero average curvature,
+and flat segments with non-zero average curvature, respectively.
+V\'{a}zquez-Mart\'{i}n~\etal~\cite{vazquez-martin:sensors:2009} use
+the adaptive curvature estimator of N\'{u}\~{n}ez~\etal~\cite{nunez:icra:2006}
+to segment the scan into clusters of homogeneous curvature.
+Even though the existence of a corner is determined from the curvature function,
+its keypoint definition is based on the intersection of the two line features
+that generate the corner, to improve robustness to noise.
+Also, Certad~\etal~\cite{certad:andescon:2012} modify the work of
+N\'{u}\~{n}ez~\etal~\cite{nunez:icra:2006} to consider
+two curvature estimations based on different noise-related thresholds,
+thereby improving the rate of true detection for
+corner and edge features in the experiments.
+
+Moreover, Feng~\etal~\cite{feng:aici:2009} and
+Zhao~\etal~\cite{zhao:icsess:2016} report a correlation between
+the angle difference between the two fitted lines on
+both sides of a scan point and the curvature value.
+Feng~\etal~\cite{feng:aici:2009} introduce the micro-tangent line function
+as the variance between the tangents at two consecutive points in the scan.
+Similarly to N\'{u}\~{n}ez~\etal~\cite{nunez:icra:2006},
+line and curve segments are extracted from consecutive range readings
+with variance close to zero and with constant value larger than a threshold,
+respectively, and corner features are extracted from peaks in the variance
+function. Instead of only considering two consecutive points,
+Zhao~\etal~\cite{zhao:icsess:2016} define two distance-based regions on
+both sides of a point to estimate direction vectors and,
+consequently, the angle difference between those vectors.
+Candidate corner points are selected based on a fixed threshold
+for the angle difference. Then, the corner point is estimated
+via non-minimal suppression.
+
+Still, most curvature-based methods for corner feature extraction associate
+the keypoint with a laser reading. Given the discrete, radial nature
+of 2D~laser, the estimated corner may vary farther away.
+Also, there is the question of whether the curvature estimators
+are invariant to scale, angular resolution, and different viewpoints.
+We propose a detector based on the stability of intersection points
+from fitted lines at different distance-based scales.
+The experiments in \secref{sec:features:results} focus
+on evaluating the invariance of the proposed corner-like features.
 
 \section{Corner-Like Feature Detector}
 
