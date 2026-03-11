@@ -134,12 +134,224 @@ from fitted lines at different distance-based scales.
 The experiments in \secref{sec:features:results} focus
 on evaluating the invariance of the proposed corner-like features.
 
-\section{Corner-Like Feature Detector}
+\section{Corner-Like Feature Detector}\label{sec:features:method}
 
-TBC
+The proposed methodology for feature extraction on 2D~laser data performs
+local line fitting to detect corner-like points in the scan.
+In summary, first, the scan data is transformed from polar to Cartesian
+coordinates. This transformation maintains the data's angular coordinate order.
+For each point in the scan, multiple distance-based scales are used
+to extract arrival and departure neighborhoods,
+depending on whether the latter are in the negative or positive directions
+relative to the point's angular coordinate, respectively.
+Next, a linear regression algorithm fits lines to each neighborhood.
+The intersection point between the arrival and departure neighborhoods
+is a candidate feature keypoint at a given scale.
+Then, the following indicators are estimated to determine
+if the candidate keypoint is a corner-line feature or not:
+minimum number of points to fit a line,
+angle between arrival and departure lines,
+maximum \gls{rmse} allowed for the line fitting procedure, maximum distance
+of the candidate point to the intersection centroid on the multiple scales,
+and maximum distance to the laser point on analysis.
+The candidate feature keypoint is validated if it passes
+all previous indicators over a minimum number of consecutive scales,
+thereby improving robustness to noise in the laser data.
 
-\subsection{Linear least-squares regression}
-\subsection{Feature extraction}
+\subsection{Linear least-squares regression}\label{sec:features:method:linear-regression}
+
+A generic definition for the 2D~line model is presented in
+\eqref{eq:feature:line-models:generic}, where $\left(x,y\right)$ are
+the 2D~point coordinates and $\gamma_0$, $\gamma_1$, and $\gamma_2$
+are the model parameters. However, the solution for the generic definition
+estimated with a linear least-squares formulation
+from a set of 2D~points would be a null vector.
+\begin{equation}\label{eq:feature:line-models:generic}
+\gamma_0 + \gamma_1 x + \gamma_2 y = 0
+\end{equation}
+
+An alternative formulation is to characterize the 2D~line relative to one
+of the point coordinates, reducing from three to two parameters in the model.
+The 2D~line formulation illustrated in \eqref{eq:feature:line-models:ymxb}
+is relative to the $y$ coordinate with respect to $x$, where $\beta_1$ is
+the line slope and $\beta_0$ is the line intersection on the y-axis.
+The least-squares solution for the parameters $\beta_1$ and $\beta_0$
+from a set of points $\left(x_i,y_i\right),i=1,\dots,N$ is formulated
+in \eqref{eq:feature:line-models:ymxb:m} and
+\eqref{eq:feature:line-models:ymxb:b}, where $\left(\bar{x},\bar{y}\right)$ is
+the centroid point of the data~\cite{kenney-keeping:book:1962}.
+Still, this model would not be valid when
+$\sum_{i=1}^{n} \left(x_i - \bar{x}\right)^2=0$,
+given the indeterminate form caused in the parameter $\hat{\beta}_1$ (\eg,
+all the data points with the same $x$ coordinate and different $y$ values).
+\begin{equation}\label{eq:feature:line-models:ymxb}
+y = \beta_0 + \beta_1 x
+\end{equation}
+\begin{equation}\label{eq:feature:line-models:ymxb:m}
+\hat{\beta}_1 = \frac{\sum_{i=1}^{n} \left(x_i - \bar{x}\right)\left(y_i - \bar{y}\right)}{\sum_{i=1}^{n} \left(x_i - \bar{x}\right)^2}
+\end{equation}
+\begin{equation}\label{eq:feature:line-models:ymxb:b}
+\hat{\beta}_0 = \bar{y} - \hat{\beta}_1 \bar{x}
+\end{equation}
+
+The 2D~line can be defined relative to $x$ with respect to the $y$ coordinate,
+as formulated in \eqref{eq:feature:line-models:xnya}.
+The parameters of this model are the line slope
+($\alpha_1$) and the line intersection on the x-axis ($\alpha_0$).
+Nevertheless, this model has also a undetermined form
+when $\sum_{i=1}^{n} \left(y_i - \bar{y}\right)^2=0$
+(\eg, all the data points with the same $y$ coordinate and different $x$ values).
+\begin{equation}\label{eq:feature:line-models:xnya}
+x = \alpha_0 + \alpha_1 y
+\end{equation}
+\begin{equation}\label{eq:feature:line-models:xnya:n}
+\hat{\alpha}_1 = \frac{\sum_{i=1}^{n} \left(x_i - \bar{x}\right)\left(y_i - \bar{y}\right)}{\sum_{i=1}^{n} \left(y_i - \bar{y}\right)^2}
+\end{equation}
+\begin{equation}\label{eq:feature:line-models:xnya:a}
+\hat{\alpha}_0 = \bar{x} - \hat{\alpha}_1 \bar{y}
+\end{equation}
+
+Instead of only considering a single line model for data fitting,
+we select the best line model that fits the laser data.
+This selection is based on which model has the lower fitting \gls{rmse},
+$\varepsilon_{RMSE}$. \eqref{eq:feature:line-models:ymxb:error} and
+\eqref{eq:feature:line-models:xnya:error} represent the fitting \gls{rmse} of
+the 2D~line models formulated in \eqref{eq:feature:line-models:ymxb} and
+\eqref{eq:feature:line-models:xnya}, respectively.
+The validation of the proposed selection approach for the line models is shown
+in Figure~\ref{fig:feature:model-error-analysis}, where selecting the model
+with the lowest \gls{rmse} achieves the best fitting line estimation.
+\begin{equation}\label{eq:feature:line-models:ymxb:error}
+\varepsilon_{RMSE,\{\hat{\beta}_0,\hat{\beta}_1\}} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} \left( y_i - \hat{\beta}_0 - \hat{\beta}_1 x_i \right)^2}
+\end{equation}
+\begin{equation}\label{eq:feature:line-models:xnya:error}
+\varepsilon_{RMSE,\{\hat{\alpha}_0,\hat{\alpha}_1\}} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} \left( x_i - \hat{\alpha}_0 - \hat{\alpha}_1 y_i \right)^2}
+\end{equation}
+
+\begin{figure}[!t]
+\centering
+\centerline{\includegraphics[height=0.45\columnwidth]{features/model-error-analysis.eps}}
+\caption[Error analysis of simple line regression models evaluating the fitting
+\glsentryfull{rmse}]{Error analysis of simple line regression models evaluating
+the fitting \glslink{rmse}{\glsentryfull{rmse}}, $\varepsilon_{RMSE}$,
+for lines with an inclination angle between -90º and 90º and a simulation step
+of 0.25º, a set of 100 data points equally distributed along each line,
+a distance Gaussian noise added to the data point coordinates of zero mean
+and 0.03~m standard deviation, and 1000 simulation samples per line}
+\label{fig:feature:model-error-analysis}
+\end{figure}
+
+Other models and fitting algorithms could have been considered to fit a line to
+the 2D~laser data, such as formulating a line as the vector to the normal of
+the infinite line and the position of the weighted mean of the contributing
+points~\cite{pfister:icra:2003}, or using \gls{ransac} to estimate
+the line parameters of the generic line model~\cite{fischler-bolles:cacm:1981}.
+However, these models and fitting algorithms may require
+iterative-based optimization procedures and matrices inversions.
+In contrast, our methodology has the advantage of having closed-form equations
+for both the line parameters and the fitting error.
+
+\subsection{Feature extraction}\label{sec:features:extraction}
+
+In terms of extracting features from 2D~laser data, first, we need
+to transform the scan data from polar to cartesian coordinates.
+This transformation preserves the data ordering by its angular coordinate
+to speed up the search for the closest consecutive laser points
+in the angular direction at a given distance-based neighborhood.
+
+Next, we evaluate each of the laser points $\left(x_i,y_i\right),i=1,\dots,N$
+as a possible feature keypoint.
+\figref{fig:feature:feature-extraction} presents an example of the clustering
+and line fitting results following the proposed methodology on a laser point
+$(x_j,y_j)$ at a distance scale $R_k=0.15$~m, where this scale defines
+the distance-based neighborhood around the scan point.
+These results illustrate the clustering of the arrival
+($\left(x_i,y_i\right) \in \{(x_j,y_j)_{\text{arr},k}\}$) and departure
+($\left(x_i,y_i\right) \in \{(x_j,y_j)_{\text{dep},k}\}$) neighborhoods,
+representing the closest consecutive laser points at the negative and positive
+sides of the point $(x_j,y_j)$ in the laser angular direction, respectively.
+The intersection point between the fitted lines $line_{\text{arr},k}$ and
+$line_{\text{dep},k}$ is considered a candidature feature keypoint
+($(x_j,y_j)_{\text{cand},k}$). This intersection point is the result of
+the lines intersection depending on which line model
+is selected for each neighborhood:
+\begin{itemize}
+\item $y=\beta_0^{\text{arr},k} + \beta_1^{\text{arr},k} x \enspace$;$\enspace y = \beta_0^{\text{dep},k} + \beta_1^{\text{dep},k} x$
+\end{itemize}
+\begin{equation}
+\left\{
+\begin{smallmatrix}
+x_{j,\text{cand},k} = \left(\hat{\beta}_{0}^{\text{dep},k}-\hat{\beta}_{0}^{\text{arr},k}\right) / \left(\hat{\beta}_{1}^{\text{arr},k}-\hat{\beta}_{1}^{\text{dep},k}\right)\\
+y_{j,\text{cand},k} = \hat{\beta}_{0}^{\text{arr},k} + \hat{\beta}_{1}^{\text{arr},k} \cdot x_{j,\text{cand},k}
+\end{smallmatrix}
+\right.
+\end{equation}
+\begin{itemize}
+\item $x=\alpha_0^{\text{arr},k} + \alpha_1^{\text{arr},k} y \enspace$;$\enspace y = \beta_0^{\text{dep},k} + \beta_1^{\text{dep},k} x$
+\end{itemize}
+\begin{equation}
+\left\{
+\begin{smallmatrix}
+y_{j,\text{cand},k} = \left(\hat{\alpha}_{0}^{\text{arr},k}\hat{\beta}_{1}^{\text{dep},k}+\hat{\beta}_{0}^{\text{dep},k} \right) / \left(1-\hat{\alpha}_{1}^{\text{arr},k}\hat{\beta}_{1}^{\text{dep},k} \right)\\
+x_{j,\text{cand},k} = \hat{\alpha}_{0}^{\text{arr},k} + \hat{\alpha}_{1}^{\text{arr},k} \cdot y_{j,\text{cand},k}
+\end{smallmatrix}
+\right.
+\end{equation}
+\begin{itemize}
+\item $y=\beta_0^{\text{arr},k} + \beta_1^{\text{arr},k} x \enspace$;$\enspace x=\alpha_0^{\text{dep},k} + \alpha_1^{\text{dep},k} y$
+\end{itemize}
+\begin{equation}
+\left\{
+\begin{smallmatrix}
+y_{j,\text{cand},k} = \left(\hat{\alpha}_{0}^{\text{dep},k}\hat{\beta}_{1}^{\text{arr},k}+\hat{\beta}_{0}^{\text{arr},k} \right) / \left(1-\hat{\alpha}_{1}^{\text{dep},k}\hat{\beta}_{1}^{\text{arr},k}\right)\\
+x_{j,\text{cand},k} = \hat{\alpha}_{0}^{\text{dep},k} + \hat{\alpha}_{1}^{\text{dep},k} \cdot y_{j,\text{cand},k}
+\end{smallmatrix}
+\right.
+\end{equation}
+\begin{itemize}
+\item $x=\alpha_0^{\text{arr},k} + \alpha_1^{\text{arr},k} y \enspace$;$\enspace x=\alpha_0^{\text{dep},k} + \alpha_1^{\text{dep},k} y$
+\end{itemize}
+\begin{equation}
+\left\{
+\begin{smallmatrix}
+y_{j,\text{cand},k} = \left(\hat{\alpha}_{0}^{\text{dep},k}-\hat{\alpha}_{0}^{\text{arr},k}\right) / \left(\hat{\alpha}_{1}^{\text{arr},k}-\hat{\alpha}_{1}^{\text{dep},k}\right)\\
+x_{j,\text{cand},k} = \hat{\alpha}_{0}^{\text{arr},k} + \hat{\alpha}_{1}^{\text{arr},k}\cdot y_{j,\text{cand},k}
+\end{smallmatrix}
+\right.
+\end{equation}
+
+\begin{figure}[!t]
+\centering
+\centerline{\includegraphics[height=0.5\columnwidth]{features/feature-extraction.eps}}
+\caption[Example of the proposed corner-like feature extraction methodology
+on a laser point $(x_j,y_j)$ at a distance scale $R_k=0.15$~m]{Example of the
+proposed corner-like feature extraction methodology on a laser point $(x_j,y_j)$
+at a distance scale $R_k=0.15$~m. Scan points $\left(x,y\right)$ simulated
+considering a 2D~laser scanner with 0.25º angular resolution,
+0.06--10.0~m range, and Gaussian noise with zero mean and 0.03~m
+standard deviation (same specifications as the Hokuyo UST-10LX sensor)}
+\label{fig:feature:feature-extraction}
+\end{figure}
+
+The following indicators determine if a candidate keypoint
+is a corner-like feature or not:
+minimum of 5 points in each neighborhood,
+an absolute angle between arrival and departure fitted lines in the range of
+$\left[45\text{º},135\text{º}\right]$,
+maximum $\varepsilon_{RMSE}$ in line fitting of 0.025~m,
+maximum distance of the lines intersection points on the multiple scales to
+the intersection centroid of 0.025~m,
+and maximum distance of the intersection point to the scan point
+being evaluated of 0.05~m.
+The latter indicator avoids having features not representing physical points.
+Then, the candidate keypoint is validated if the point passes
+all previous indicators in a minimum number of 3 consecutive scales,
+to improve robustness to noise on the laser data. The scales considered in the
+experiments presented in this chapter are the following ones:
+$\left[0.05, 0.075, 0.1, 0.125, 0.15, 0.175, 0.2, 0.225, 0.25\right]$~m.
+However, the indicators' thresholds and the scale may be parametrized in
+run-time. The feature keypoint definition is
+the lines intersection centroid on the multiple scales.
 
 \section{Experimental Results and Discussion}\label{sec:features:results}
 
