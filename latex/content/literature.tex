@@ -1156,37 +1156,253 @@ long-term static structures in dynamic environments.
 
 \subsection{Dynamic objects detection}
 
-\cite{chen:itsc:2022}
-\cite{wu:cvci:2022}
-\cite{deng:ram:2023} (or prediction?...)
-\cite{soares:jint:2023}
-\cite{yu:acait:2023}
-\cite{hroob:ras:2024}
-\cite{hroob:ral:2024}
-\cite{cheng:ral:2025}
-\cite{hu:tcsvt:2025}
-\cite{wang:tim:2025}
-\cite{zhu:tim:2025}
-\cite{jia:tcsvt:2025}
-\cite{cheng:ral:2025}
+In order to detect dynamic objects, Yue~\etal~\cite{yue:icra:2020}
+propose a collaborative dynamic-mapping approach for human detection
+using visual and thermal images and a 3D~\gls{lidar}.
+The YOLOv3 object detection algorithm extracts the bounding boxes
+from the images relative to humans.
+Projecting the 3D~point cloud onto images creates a static point cloud
+for localization and mapping of each robot,
+filtering out points corresponding to humans.
+In the experiments, removing dynamic objects produced a more accurate relative
+transformation of the collaborative maps than not removing them.
+Zhu~\etal~\cite{zhu:icra:2021} also use YOLOv3 to extract bounding boxes
+of dynamic classes (parked cars) from an RGB image,
+and the projection of 3D~\gls{lidar} points allows the creation of
+the static and semi-dynamic maps required for localization.
+Even though the method~\cite{zhu:icra:2021} does not discard dynamic objects,
+the localization module reduces the weight of the corresponding observations.
 
-In terms of detecting dynamic objects, Yue~\etal~\cite{yue:icra:2020} proposes a collaborative dynamic mapping for detecting humans using visual and thermal images and a 3D \gls{lidar}. The YOLOv3 algorithm extracts the bounding boxes from the images relative to humans. The 3D point cloud projection onto the images allows the creation of a static point cloud for localization and mapping of each robot by filtering out the points corresponding to humans. In the experiments, the dynamic objects removal generated a more accurate relative transformation of the collaborative maps compared to not removing those objects.
-Zhu~\etal~\cite{zhu:icra:2021} also uses YOLOv3 to extract bounding boxes of dynamic classes (parked cars) from a RGB image, and the projection of 3D \gls{lidar} points allows the creation of the static and semi-dynamic maps required for localization. Even though the method \cite{zhu:icra:2021} does not discard the dynamic objects, the localization module reduce the importance of weight of the corresponding observations.
-Instead of using visual data, Sun~\etal~\cite{sun:ral:2018} adapts the PointNet network for object recognition (pedestrian, cyclist, car, or background) to classify the scan points of a 3D \gls{lidar}. The proposed Recurrent-OctoMap maintains the occupancy and semantic information, where the latter information specifies the cell semantic state and the probability of the prediction. The transition between states is learned by a \gls{ltm} \gls{rnn}. In a long-term experiment, the method \cite{sun:ral:2018} was able to improve its 3D semantic map compared to a standard Bayes update.
+Furthermore, Sun~\etal~\cite{sun:ral:2018} adapt the PointNet network
+for object recognition (pedestrian, cyclist, car, or background)
+to classify 3D~\gls{lidar} scan points.
+The proposed Recurrent-OctoMap maintains occupancy and semantic information,
+where the latter specifies the cell's semantic state
+and the prediction's probability.
+An \gls{ltm} \gls{rnn} learns the transition between cell states.
+In a long-term experiment, the method improved its 3D~semantic map
+compared to a standard Bayes update.
+In contrast, Chen~\etal~\cite{chen:itsc:2022} use PointPillars for dynamic
+object removal within a \gls{lidar} \gls{slam} system
+employing \gls{loam}~\cite{zhang-singh:rss:2014}.
+Given the bounding boxes predicted by PointPillars,
+the proposed approach crops all points from the 3D~point cloud
+within those bounding boxes for later use in localization and mapping.
+Comparing localization and mapping errors before and after
+introducing dynamic object removal, localization accuracy remained similar in
+the experiments, though the maps created were much cleaner and sharper.
+However, localization performance sometimes decreased with
+dynamic object removal due to feature loss caused by
+false detections and a possible lack of features after removal.
 
-Moreover, pixel-wise semantic segmentation is another way to identify dynamic objects.
-Additionally to the semantic-descriptor proposed by Singh~\etal~\cite{singh:itsc:2021} describing the spatial distribution of semantic entities in the scene, the method sets lower weights to features detected on sky and dynamic classes (person, car, \etc) from the semantic segmentation of images using EdgeNet. The proposed approach \cite{singh:itsc:2021} obtained higher accuracy when compared to SeqSLAM~\cite{milford-wyeth:icra:2012}, FAB-MAP~\cite{cummins-newman:ijrr:2008}, and \gls{bow}~\cite{sivic-zisserman:iccv:2003}-based place recognition methods in a highly dynamic outdoor experiment.
-Instead of identifying object classes, Song~\etal~\cite{song:iros:2019} proposes the MD-Net \gls{cnn} to segment a grayscale image into unstable, static, and moving pixel points, only using static points for localization. The localization error was reduced compared to not estimated the pixel dynamic attribute.
-Ganti and Waslander~\cite{ganti-waslander:crv:2019} proposes the \gls{sivo} to improve the performance of ORB-SLAM2~\cite{mur-artal-tardos:tro:2017} by using the Bayesian neural network SegNet for segmentation and computation of the network uncertainty. SegNet is trained to distinguish different object classes for identifying dynamic objects (sky, car, truck/bus, person/rider, motorcycle/bicycle, and void) from static ones (road, traffic sign, building, wall/fence, pole, vegetation, sidewalk, traffic light, and terrain). Only static keypoints that reduce the most of the state's uncertainty (considering the network uncertainty) are considered as input for ORB-SLAM2~\cite{mur-artal-tardos:tro:2017}.
-\gls{sivo}~\cite{ganti-waslander:crv:2019} was able to remove uninformative and dynamic keypoints from the current frame. However, the rejection of potential dynamic objects without verifying if they are moving reduced the localization performance of the module in certain scenarios.
+Pixel-wise semantic segmentation is another way to identify dynamic objects.
+In addition to the semantic-descriptor proposed by
+Singh~\etal~\cite{singh:itsc:2021}, which describes the spatial distribution
+of semantic entities in the scene, the method assigns lower weights
+to features detected in the sky and in dynamic classes (\eg, person, car, \etc)
+from EdgeNet semantic segmentation.
+The proposed approach~\cite{singh:itsc:2021} achieved higher accuracy
+than SeqSLAM~\cite{milford-wyeth:icra:2012},
+FAB-MAP~\cite{cummins-newman:ijrr:2008}, and
+\gls{bow}~\cite{sivic-zisserman:iccv:2003}-based place recognition methods
+in a highly dynamic outdoor experiment.
+Similarly, Yu~\etal~\cite{yu:acait:2023} implement
+a lightweight pixel-wise semantic segmentation network
+using MobileNetV2 as a backbone and building upon
+the ORB-SLAM2~\cite{mur-artal-tardos:tro:2017} framework,
+also focusing on dynamic object classes such as humans, animals, and cars.
+Instead of down-weighting dynamic classes, all dynamic visual features are
+removed from the image using semantic annotations
+to obtain a 3D~static semantic map.
+Compared to base ORB-SLAM2~\cite{mur-artal-tardos:tro:2017},
+localization accuracy improved significantly in dynamic scenes, with an average \gls{rmse} reduction of 95\%.
 
-Dynamic objects identification can be improved by verifying geometric constraints.
-Bescos~\etal~\cite{bescos:ral:2018} proposes DynaSLAM, using multi-view geometry verification for improving semantic labeling of potential dynamic classes obtained from a Mask \gls{rnn}. Although DynaSLAM~\cite{bescos:ral:2018} outperformed ORB-SLAM2~\cite{mur-artal-tardos:tro:2017} in highly dynamic scenarios, its performance reduces in slower dynamics.
-Similarly, Wang~\etal~\cite{wang:icra:2019} also uses a geometric verification for improving labeling of dynamic objects, the latter obtained by a ResNet-based network. The verification is based on the reprojection error. The method \cite{wang:icra:2019} improved the \gls{ate} over DynaSLAM~\cite{bescos:ral:2018} and ORB-SLAM2~\cite{mur-artal-tardos:tro:2017} in a scenario with movable objects.
-Guo and Liu~\cite{guo-liu:robio:2021} also uses a Mask \gls{rnn} network for pixel-wise segmentation and object instance labels, similar to DynaSLAM~\cite{bescos:ral:2018}. Rather than using multi-view geometry verification just for improving semantic labeling, this verification is used in \cite{guo-liu:robio:2021} also for detecting untrained moving objects. The approached \cite{guo-liu:robio:2021} outperformed DynaSLAM~\cite{bescos:ral:2018} in terms of \gls{ate} in dynamic scenes.
-Instead of using semantic segmentation, the \gls{sgc-vslam}~\cite{yang:sensors:2020} proposed by Yang~\etal\  uses YOLOv3 to extract bounding boxes of dynamic objects for also improving ORB-SLAM2~\cite{mur-artal-tardos:tro:2017}. A constraint based on epipolar geometry improves the labeling. \gls{sgc-vslam} decrease the \gls{rmse} of the \gls{ate} by 96\% compared to ORB-SLAM2~\cite{mur-artal-tardos:tro:2017} in highly dynamic environments. However, similar to DynaSLAM~\cite{bescos:ral:2018}, its performance decreased in lower dynamics.
-Finally, Xing~\etal~\cite{xing:jfr:2022} proposes the DE-SLAM to deal with \gls{std} and \gls{ltd} at the same time. A MobileNetv2 identifies bounding boxes of movable objects (cars, persons, \etc) classified as \gls{std}. A motion check of \gls{std} elements recognizes all moving objects in the current keyframe. As for \gls{ltd}, DE-SLAM uses \gls{hog} features extracted from ORB keypoints to improve its invariance to illumination changes. In the experiments, DE-SLAM~\cite{xing:jfr:2022} improved the localization over ORB-SLAM2~\cite{mur-artal-tardos:tro:2017} in a changing environment.
-All of these methods using geometric constraints to improve semantic labeling only use static features for localization and mapping.
+Instead of identifying object classes, Song~\etal~\cite{song:iros:2019}
+propose the MD-Net \gls{cnn} to segment a grayscale image into
+unstable, static, and moving pixel points,
+only using static points for localization.
+The localization error was reduced compared to
+not estimating the pixel dynamic attribute.
+Ganti and Waslander~\cite{ganti-waslander:crv:2019} propose the \gls{sivo}
+to improve the performance of ORB-SLAM2~\cite{mur-artal-tardos:tro:2017}
+by using the Bayesian neural network SegNet for
+segmentation and for computing network uncertainty.
+SegNet is trained to distinguish different object classes
+for identifying dynamic objects
+(sky, car, truck/bus, person/rider, motorcycle/bicycle, and void)
+from static ones
+(road, traffic sign, building, wall/fence, pole, vegetation, sidewalk,
+traffic light, and terrain).
+The proposed method considers only static keypoints as input to
+ORB-SLAM2~\cite{mur-artal-tardos:tro:2017}, thereby reducing most of
+the state's uncertainty (including network uncertainty).
+\gls{sivo} removed uninformative and dynamic keypoints from the current frame.
+However, rejecting potential dynamic objects without verifying
+their motion reduced the module's localization performance in certain scenarios.
+Soares~\etal~\cite{soares:jint:2023} propose Changing-SLAM built on
+ORB-SLAM3~\cite{campos:tro:2021}. Each feature keypoint
+is initially classified as dynamic, movable, or static
+by the object detection thread (YOLOv4) based on semantic information,
+and two keypoints belonging to the same object
+cannot have different classifications.
+Then, the proposed method employs feature repopulation
+to correctly classify features within a bounding box that are not dynamic.
+Experiments validate the feature repopulation technique,
+which keeps keypoints belonging to the background
+but within the dynamic object class.
+Comparing the proposed method to DynaSLAM~\cite{bescos:ral:2018} and
+ORB-SLAM3~\cite{campos:tro:2021}, even though DynaSLAM~\cite{bescos:ral:2018}
+had overall the best results, Changing-SLAM offered a good trade-off
+between accuracy and speed in dynamic environments.
+
+Spatial consistency can improve the identification of moving objects.
+Bescos~\etal~\cite{bescos:ral:2018} propose DynaSLAM,
+which uses multi-view geometry verification to improve the
+semantic labeling of potential dynamic classes generated by a Mask~\gls{rnn}.
+Although DynaSLAM~\cite{bescos:ral:2018} outperformed
+ORB-SLAM2~\cite{mur-artal-tardos:tro:2017} in highly dynamic scenarios,
+its performance reduces in slower dynamics.
+Similarly, Wang~\etal~\cite{wang:icra:2019} also use geometric verification
+to improve the labeling of dynamic objects, which are obtained using
+a ResNet-based network. Verification is based on reprojection error.
+The method~\cite{wang:icra:2019} improved the \gls{ate} over
+DynaSLAM~\cite{bescos:ral:2018} and ORB-SLAM2~\cite{mur-artal-tardos:tro:2017}
+in a scenario with movable objects.
+Guo and Liu~\cite{guo-liu:robio:2021} also use a
+Mask \gls{rnn} network for pixel-wise segmentation and object instance labels,
+similar to DynaSLAM~\cite{bescos:ral:2018}.
+Rather than using multi-view geometry verification solely to improve
+semantic labeling, it is also used to detect untrained moving objects.
+The approach~\cite{guo-liu:robio:2021} outperformed
+DynaSLAM~\cite{bescos:ral:2018} in terms of \gls{ate} in dynamic scenes.
+
+Instead of using semantic segmentation, the \gls{sgc-vslam} proposed by
+Yang~\etal~\cite{yang:sensors:2020} uses YOLOv3 to extract bounding boxes
+for dynamic objects, thereby also improving
+ORB-SLAM2~\cite{mur-artal-tardos:tro:2017}.
+A constraint based on epipolar geometry improves the labeling.
+\gls{sgc-vslam} decreases the \gls{rmse} of the \gls{ate} by 96\%
+compared to ORB-SLAM2~\cite{mur-artal-tardos:tro:2017}
+in highly dynamic environments.
+However, like DynaSLAM~\cite{bescos:ral:2018},
+its performance decreased at lower dynamics.
+Also, Xing~\etal~\cite{xing:jfr:2022} propose the DE-SLAM to deal with
+\gls{std} and \gls{ltd} at the same time.
+A MobileNetV2 identifies bounding boxes for movable objects
+(cars, persons, etc.) and classifies them as \gls{std}.
+A motion check of \gls{std} elements recognizes all moving objects
+in the current keyframe. As for \gls{ltd}, DE-SLAM uses \gls{hog} features
+extracted from \gls{orb} keypoints to improve
+its invariance to illumination changes.
+In the experiments, DE-SLAM improved the localization over
+ORB-SLAM2~\cite{mur-artal-tardos:tro:2017} in a changing environment.
+All of these methods, which use geometric constraints
+to improve semantic labeling, rely solely on static features
+for localization and mapping.
+
+Moreover, Wang~\etal~\cite{wang:tim:2025} formulate a dynamic filter
+on top of ORB-SLAM3~\cite{campos:tro:2021} that fuses information
+from semantic segmentation and structural constraints (a Manhattan-world
+assumption with structure constraints between planar features)
+to identify both semantically identifiable and unidentifiable dynamic objects.
+The authors use the DeepLab semantic segmentation algorithm,
+capable of identifying 20 objects, including people and chairs,
+and leverage optical flow to detect abnormal dynamic features.
+Then, the dynamic filter computes long-term dynamic object probabilities
+considering structure regularity (related to the distance error of
+feature points to the epipolar line constraint), \gls{imu} measurements
+(reprojection error of feature points from \gls{imu} pose estimation),
+and forward/backward projection (reprojection error of co-visible features
+onto the current frame). In experiments,
+compared to ORB-SLAM3~\cite{campos:tro:2021},
+it achieved up to 92\% average \gls{rmse} improvements.
+Omitting structural regularity from the proposed approach~\cite{wang:tim:2025}
+led to a marginal reduction in localization accuracy,
+whereas excluding the dynamic filter module altogether
+resulted in notable trajectory deviation.
+Zhu~\etal~\cite{zhu:tim:2025} introduce the \gls{isdor} module
+to detect and suppress moving objects in real time from 3D~\gls{lidar} data.
+The module leverages static structures (\eg, ground)
+to identify points lying above static regions,
+vertically suspended points with significant height,
+or points adjacent to previously flagged dynamic areas.
+Once a portion of a dynamic object is identified
+with high confidence, the complete object is recovered
+via region growing and clustering.
+In experiments, \gls{isdor} segmented dynamic objects visually align
+with the ground-truth, accurately isolating dynamic points while
+preserving static structure, including removing ghost trails in the datasets.
+
+Another common approach is to formulate static scores based on
+spatiotemporal consistency to identify and handle dynamic elements in the scene.
+Wu~\etal~\cite{wu:cvci:2022} formulate a static score estimation of
+the landmark to obtain initial static-dynamic labelling,
+and a \gls{crf} is constructed to refine the labels.
+Based on ORB-SLAM2~\cite{mur-artal-tardos:tro:2017},
+the static score is estimated from the statistical properties of
+the reprojection error and then propagated to subsequent frames.
+Similar to Du~\etal~\cite{du:tvcg:2022}, the authors consider that adjacent
+landmarks in 3D~space or 2D~images tend to have the same dynamic-static label.
+A \gls{crf} that considers neighbor motion and historical observations
+is built on a fully connected graph of all landmarks,
+improving spatiotemporal consistency of static-dynamic labels.
+Comparing the accuracy and efficiency to the base
+ORB-SLAM2~\cite{mur-artal-tardos:tro:2017} and to
+Du~\etal~\cite{du:tvcg:2022}, improved \gls{ate} and \gls{rpe} by 80--90\%
+over ORB-SLAM2~\cite{mur-artal-tardos:tro:2017}.
+Although Du~\etal~\cite{du:tvcg:2022} reported the lowest
+\gls{rmse} for \gls{ate} and \gls{rpe},
+the proposed work~\cite{wu:cvci:2022} achieved similar accuracy
+with only a few centimeters of disadvantage,
+while taking 5~times less computing time for dynamic landmark removal
+than Du~\etal~\cite{du:tvcg:2022}.
+Hu~\etal~\cite{hu:tcsvt:2025} employ YOLOX for object detection on input images,
+while compensating for missed detections using an \gls{ekf}
+(predict the state of the bounding box of a certain object already mapped)
+and the Hungarian algorithm (associate \gls{ekf}-predicted bounding boxes
+with those detected in the current frame).
+Authors formulate a static probability distribution over keypoints
+based on motion consistency (via projection and epipolar constraints).
+This static probability is used as a weight in
+camera pose estimation and optimization.
+Experiments compare the proposed approach~\cite{hu:tcsvt:2025} with
+several state-of-the-art algorithms, including DynaSLAM~\cite{bescos:ral:2018}
+and ORB-SLAM2~\cite{mur-artal-tardos:tro:2017}.
+The proposed approach~\cite{hu:tcsvt:2025} achieved
+competitive localization accuracy while offering a good balance
+between real-time performance and localization accuracy.
+
+More recently, the literature has explored dense environment
+representations and methods for handling moving elements.
+Cheng~\etal~\cite{cheng:ral:2025} render the environment
+through a \gls{3dgs} model. The authors use the SegmentAnything model
+to generate a pixel-wise semantic image,
+allowing correspondence between the features and their respective object labels.
+The objects are also classified into entering (objects entering the frame),
+vanishing (objects leaving the frame), and
+full (objects fully visible within the frame).
+A weighting factor accounts for the temporal decay of feature relevance
+(older features having less influence). Semantic data from the SegmentAnything
+model is integrated and rendered using a \gls{3dgs} formula.
+Then, the method~\cite{cheng:ral:2025} uses Gaussian-based encoding
+to represent dynamic objects, considering semantic attributes, pose, and
+motion velocity information, to avoid generating noisy Gaussian points
+from dynamic objects that can affect model convergence.
+The proposed approach~\cite{cheng:ral:2025} accurately rendered
+dynamic objects in experiments.
+Similarly, Jia~\etal~\cite{jia:tcsvt:2025} propose the DGS-SLAM
+to reconstruct a static, consistent, and dense representation of
+the surroundings by excluding dynamic objects from the \gls{3dgs} model.
+The proposed approach~\cite{jia:tcsvt:2025} identifies dynamic objects
+using motion consistency (a dynamic projection threshold
+to evaluate the motion state of feature points) and object segmentation,
+with FastInst instance segmentation to obtain pixel masks of objects.
+When generating new Gaussian points from keyframes,
+each point is assigned a label indicating whether it belongs to an object
+or a static background, enabling 3D-2D association.
+DGS-SLAM achieved the best pose estimation results across most experiments,
+including tracking, compared to other
+\gls{3dgs}-based and \gls{nerf}-based \gls{slam} systems.
 
 \subsection{Prediction modeling}
 

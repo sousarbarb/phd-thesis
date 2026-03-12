@@ -424,9 +424,9 @@ feature matching (location) &
 camera (stereo, RGBD) &
 pixel segmentation &
 dynamic class (sky, person, car, etc.) &
-down-weight dynamic class &
 -- &
---\\
+-- &
+down-weight dynamic class\\
 \hline
 Zhu~\etal\hspace{0pt}
 (2021)~\cite{zhu:icra:2021} &
@@ -437,9 +437,9 @@ wheel odometry, camera, laser (3D) &
 object detection (YOLOv3) &
 static + semi-dynamic (chairs, parked cars) + dynamic (moving people / cars)
 objects, static + semi-dynamic maps &
-down-weight semi-dynamic class &
 -- &
-semi-dynamic objects removal\\
+-- &
+down-weight semi-dynamic objects removal\\
 \hline
 Guo and Liu
 (2021)~\cite{guo-liu:robio:2021} &
@@ -642,18 +642,6 @@ stable vs unstable points &
 point spatiotemporal stability score (modified MinkUNet14) &
 point stability score (unsupervised learning, based on recorded sessions) &
 stability score threshold removal (localization)\\
-\hline
-Li and Li
-(2024)~\cite{li:tii:2024} &
-pose graph (graph), submap (occupancy, 2D) &
-point cloud alignment (2D, 3DoF) &
-x & & & x & &
-wheel odometry, laser (2D), IMU &
-submap overlap rate, submap observation gain &
--- &
--- &
--- &
-outdated + redundant submap pruning\\
 \hline
 Wang~\etal\hspace{0pt}
 (2024)~\cite{wang:ras:2024} &
