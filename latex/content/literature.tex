@@ -964,7 +964,7 @@ experiments, the proposed approach always assume
 uniquely identifiable landmarks.
 
 Li~\etal~\cite{li:tim:2025} leverage a map representation based on
-voxelized maps and octree structures to handle environmental dynamics.
+voxelized maps and octree structures to handle environment dynamics.
 The work~\cite{li:tim:2025} organizes prior, temporary, and static map points
 within hashed voxel blocks, each containing a
 Dynamic~i-Octree~\cite{zhu:icra:2024} for efficient local map loading,
@@ -1016,7 +1016,7 @@ Boniardi~\etal~\cite{boniardi:ras:2019} detect semi-static changes
 by leveraging \gls{icp} scan-to-map consistency and a \gls{cad} model
 of the environment, and update the map accordingly.
 The proposed approach~\cite{boniardi:ras:2019} was capable of maintaining
-a consistent map even with substantial environmental reconfiguration.
+a consistent map even with substantial environment reconfiguration.
 Du~\etal~\cite{du:tvcg:2022} minimize the Gibbs energy defined on
 the proposed \gls{lc-crf} to detect dynamic points,
 assuming that these points often exhibit large reprojection errors
@@ -1091,11 +1091,11 @@ that are close to each other into a new point based on
 the weighted average of their covariances. Experiments showed
 improvements in map definition and removal of non-static obstacles.
 Stefanini~\etal~\cite{stefanini:sensors:2023} adopt a 1-to-N ray-casting
-strategy to improve map merging in the face of environmental dynamics.
+strategy to improve map merging in the face of environment dynamics.
 Rather than a standard point-to-point comparison,
 the method~\cite{stefanini:sensors:2023} compares measurement points against
 a set of expected hit points along virtual neighboring range measurements
-to detect environmental changes more robustly.
+to detect scene changes more robustly.
 
 Given that 3D~ray tracing is memory-intensive and requires
 dense map representations, Pomerleau~\etal~\cite{pomerleau:icra:2014}
@@ -1215,7 +1215,8 @@ Instead of down-weighting dynamic classes, all dynamic visual features are
 removed from the image using semantic annotations
 to obtain a 3D~static semantic map.
 Compared to base ORB-SLAM2~\cite{mur-artal-tardos:tro:2017},
-localization accuracy improved significantly in dynamic scenes, with an average \gls{rmse} reduction of 95\%.
+localization accuracy improved significantly in dynamic scenes,
+with an average \gls{rmse} reduction of 95\%.
 
 Instead of identifying object classes, Song~\etal~\cite{song:iros:2019}
 propose the MD-Net \gls{cnn} to segment a grayscale image into
@@ -1406,21 +1407,147 @@ including tracking, compared to other
 
 \subsection{Prediction modeling}
 
-\cite{deng:ram:2023}? (probably not... check it)
-\cite{wang:ras:2024}
+In the included works, Markov processes are used to predict
+the dynamics of the environment.
+Tipaldi~\etal~\cite{tipaldi:ijrr:2013} use a dynamic occupancy grid and
+exploit the stationary distribution and the state holding time
+associated with \glspl{hmm} on a 2D~grid.
+The method~\cite{tipaldi:ijrr:2013} uses past observations from each run
+to learn the state transition probabilities iteratively and
+estimate the \gls{hmm} parameters. Then, localization can infer how often a
+dynamic object is expected to be seen in the environment and for how long.
+Comparing the proposed \gls{hmm}-based localization to \gls{mcl} using a
+standard grid, the former had a lower localization failure rate than \gls{mcl}.
+Indeed, work~\cite{tipaldi:ijrr:2013} could handle both high-dynamics
+(moving cars) and low-dynamics (parked cars).
+Rapp~\etal~\cite{rapp:itsc:2015} implement a semi-Markov process extended by a
+Levy process to model time dependence in the state-holding time of Markov
+processes, also predicting, as in Tipaldi~\etal~\cite{tipaldi:ijrr:2013},
+the expected retention time for each cell in a specific state.
+In the experiments, the proposed model by Rapp~\etal~\cite{rapp:itsc:2015},
+integrated into \gls{mcl}, improved the classic \gls{mcl} in a dynamic environment.
 
-In the included works, Markov processes are used to predict the dynamics of the environment.
-Tipaldi~\etal~\cite{tipaldi:ijrr:2013} uses a dynamic occupancy grid and exploits the stationary distribution and the state holding time associated with \glspl{hmm} on a 2D grid. The method uses past observations for each run to learn the state transition probabilities iteratively to estimate the \gls{hmm} parameters. Then, the localization can infer how often is expected to see a dynamic object in the environment and for how long. Comparing the proposed \gls{hmm}-based localization to \gls{mcl} using a standard grid, the former had a lower localization failure rate than \gls{mcl}, capable of dealing with high dynamics (moving cars) and lower ones (parked cars).
-Rapp~\etal~\cite{rapp:itsc:2015} implements a semi-Markov process extended by a Levy process to model a time dependency on the state holding time of Markov processes, also predicting as Tipaldi~\etal~\cite{tipaldi:ijrr:2013} the expected retention time for each cell being in a specific state. In the experiments, the proposed model \cite{rapp:itsc:2015} integrated in \gls{mcl} improved the classic \gls{mcl} in a dynamic environment.
+Environment dynamics may exhibit periodic patterns.
+Assuming periodic change patterns, Krajník~\etal~\cite{krajnik:tro:2017}
+propose \gls{fremen} to model the probability of occupancy or feature visibility
+in a grid as a combination of harmonic functions associated with periodic
+processes. \gls{fremen}~\cite{krajnik:tro:2017} uses spectral analysis
+(Fourier transform) to compute the harmonic functions and predict
+the future state with a given confidence. In a changing environment,
+\gls{fremen}~\cite{krajnik:tro:2017} outperformed a static map in terms of
+localization error by selecting the most likely visible features at each location.
+Santos~\etal~\cite{santos:ral:2016} adopt \gls{fremen}~\cite{krajnik:tro:2017}
+within an exploration scheme, where the planner predicts which areas
+are more likely to change at a certain time and
+generates the subsequent locations to explore.
+The experimental results showed that accounting for environment dynamics
+increases the amount of information gathered compared to static models.
 
-The environment dynamics can have periodic patterns associated with them.
-Assuming periodic changing patterns, Krajník~\etal~\cite{krajnik:tro:2017} proposes \gls{fremen} to model the probability of occupancy or feature visibility in a grid as a combination of harmonic functions related to periodic processes. \gls{fremen}~\cite{krajnik:tro:2017} uses spectral analysis (Fourier transform) to compute the harmonic functions and predict future state with a given confidence. In a changing environment, \gls{fremen}~\cite{krajnik:tro:2017} outperformed a static map in terms of localization error by selecting the most likely visible features at each location for localization.
-Santos~\etal~\cite{santos:ral:2016} adopts \gls{fremen}~\cite{krajnik:tro:2017} within an exploration scheme, where the planner predicts which areas are more likely to change at a certain time and generate the subsequent locations to explore. The experimental results showed that considering the environment dynamics increases the amount of information gathered compared to static models.
-Unlike \gls{fremen}~\cite{krajnik:tro:2017}, Wang~\etal~\cite{wang:iros:2020} models both aperiodic and periodic changes by an \gls{arma} model. This model describes time series as stationary stochastic processes in terms of polynomials. While \gls{fremen}~\cite{krajnik:tro:2017} is able to update recursively its model online, \gls{arma}~\cite{wang:iros:2020} only is updated once a day based on past observations. However, the model \cite{wang:iros:2020} achieved a higher prediction accuracy than \gls{fremen}~\cite{krajnik:tro:2017} and a lower localization failure rate than both \gls{fremen}~\cite{krajnik:tro:2017} and Tipaldi~\etal~\cite{tipaldi:ijrr:2013}.
+Unlike \gls{fremen}~\cite{krajnik:tro:2017}, Wang~\etal~\cite{wang:iros:2020}
+model both aperiodic and periodic changes using
+an \gls{arma} model~\cite{hassler:inbook:2016}.
+This model describes time series as stationary stochastic processes
+in terms of polynomials. While \gls{fremen}~\cite{krajnik:tro:2017} can update
+its model recursively online, \gls{arma}~\cite{wang:iros:2020} is updated only
+once a day based on past observations.
+However, the model by Wang~\etal~\cite{wang:iros:2020} achieved
+higher prediction accuracy than \gls{fremen}~\cite{krajnik:tro:2017}
+and a lower localization failure rate than both
+\gls{fremen}~\cite{krajnik:tro:2017} and Tipaldi~\etal~\cite{tipaldi:ijrr:2013}.
+Wang~\etal~\cite{wang:ras:2024} extend the original work of
+Wang~\etal~\cite{wang:iros:2020} by adding long-term path planning
+to generate feasible paths with low localization uncertainty
+and fewer dynamic objects, while introducing new spatial representation models
+(semi-static vs dynamic density maps) and improving parameter calculation.
+In the experiments, the authors simulate a large-scale parking lot
+with periodic and aperiodic changing car patterns.
+As already shown in Wang~\etal~\cite{wang:iros:2020},
+since \gls{fremen}~\cite{krajnik:tro:2017} is based on a spectral model,
+it cannot effectively handle non-periodic growth patterns compared to \gls{arma}
+models~\cite{wang:iros:2020,wang:ras:2024}.
+Also, when evaluated in a real parking lot,
+the system proposed by Wang~\etal~\cite{wang:ras:2024} was able
+to predict more accurately for most parking spaces than
+\gls{fremen}~\cite{krajnik:tro:2017},
+being more stable across various real-world change patterns.
 
-Instead of modeling the dynamics in the map, Thomas~\etal~\cite{thomas:icra:2022} uses a KPConv network to predict online dynamic motion labels of points with single 3D laser scans as input. The method \cite{thomas:icra:2022} is a self-supervised learning approach with two main modules: PointMap and PointRay. PointMap is an \gls{icp}-based \gls{slam} algorithm to provide a point cloud map for the annotation process. PointRay uses a similar approach to Pomerleau~\etal~\cite{pomerleau:icra:2014} to approximate ray tracing using spherical coordinates for obtaining the training annotation of dynamic labels: permanent (static points over all sessions), ground (to avoid ray tracing ground samples), and long-term (still objects in single sessions but relocated between sessions) and short-term (dynamic objects) movables, with the localization not considering the latter two. In the simulation experiments, PointMap with the proposed prediction module led to lower localization pose errors than the standard \gls{mcl} algorithm.
+Den~\etal~\cite{deng:ram:2023} build a time series for each map point
+to predict their future states. The proposed approach uses a \gls{bpf}
+and survival analysis to estimate the likelihood that each map point
+will still exist at a future time.
+The system classifies the map points as static or semistatic
+based on its persistence probability,
+in which points with a persistence probability lower than a certain threshold
+are considered dynamic ones and removed from the map.
+In the experiments, the authors compared the proposed prediction
+algorithm~\cite{deng:ram:2023} to \gls{fremen}~\cite{krajnik:tro:2017} and
+\gls{arma}~\cite{hassler:inbook:2016} models in terms of predictive capabilities.
+The proposed method outperformed other prediction methods.
+As for localization accuracy, \gls{bpf}-based localization had lower \gls{ate}
+in low-dynamic environments compared to
+ORB-SLAM2~\cite{mur-artal-tardos:tro:2017},
+ORB-SLAM3~\cite{campos:tro:2021}, and DynaSLAM~\cite{bescos:ral:2018}.
+In high-dynamic scenes, although the proposed method improved accuracy over
+ORB-SLAM2~\cite{mur-artal-tardos:tro:2017} and ORB-SLAM3~\cite{campos:tro:2021},
+DynaSLAM~\cite{bescos:ral:2018} had lower \gls{ate} metrics.
 
+Instead of modeling the dynamics in the map,
+Thomas~\etal~\cite{thomas:icra:2022} use a KPConv network to predict
+online dynamic motion labels for points given a single 3D \gls{lidar} as input.
+The method~\cite{thomas:icra:2022} is a self-supervised learning approach
+with two main modules: PointMap and PointRay.
+PointMap is an \gls{icp}-based \gls{slam} algorithm to provide
+a point cloud map for the annotation process.
+PointRay uses a similar approach to Pomerleau~\etal~\cite{pomerleau:icra:2014}
+to approximate ray tracing using spherical coordinates
+for obtaining the training annotation of dynamic labels:
+permanent (static points over all sessions),
+ground (to avoid ray tracing ground samples), and
+long-term (still objects in single sessions but relocated between sessions) and
+short-term (dynamic objects) movables,
+with the localization not considering the latter two.
+In simulation experiments, PointMap with the proposed prediction module
+yielded lower localization pose errors than the standard \gls{mcl} algorithm.
+
+Moreover, Hroob~\etal~\cite{hroob:ras:2024} propose the \gls{lts-net}.
+This regression network estimates a stability value for each point in a
+3D~\gls{lidar} point cloud, thereby providing a spatiotemporal stability measure.
+\gls{lts-net} is built on PointNet++ and uses labels generated unsupervised
+from previous observations and the map,
+with the \gls{ndt} employed for scan matching.
+Once trained, the network is applied online to identify stable points
+in the current \gls{lidar} session, filtering out unstable observations.
+Experiments showed that filtering scans based on long-term stable features
+significantly enhances localization performance and robustness
+in dynamic environments, enabling the network to identify and filter long-term
+stable objects. These experimental results led to improved localization
+performance compared to not using network inference on stability scores.
+As for Hroob~\etal~\cite{hroob:ral:2024},
+the authors formulate a more advanced method that also relies on \gls{ndt}
+for scan matching, but replaces PointNet++ with a modified MinkUNet14
+to process sparse 4D~tensors containing spatial coordinates and time data.
+Rather than inferring stability primarily from training data,
+this method explicitly models the spatio-temporal discrepancy between
+the current \gls{lidar} scan and the point cloud map.
+Scan and map tensors are merged into a unified sparse 4D~representation, after
+which Hroob~\etal~\cite{hroob:ral:2024} prune voxels containing only map
+timestamps, since the goal is to infer stability scores only for scan points.
+By directly exploiting scan-map discrepancies, the method~\cite{hroob:ral:2024}
+achieved stronger generalization in the experiments.
+Indeed, it outperformed \gls{lts-net}~\cite{hroob:ras:2024} in segmenting
+unstable elements such as humans, vegetation, parked cars, and pedestrians,
+cases in which \gls{lts-net}~\cite{hroob:ras:2024} was less effective,
+likely due to its stronger dependence on object shapes observed during training.
 
 \section{Summary and Conclusions}\label{sec:literature:conclusions}
 
 TBC
+
+Trends:
+- dynamics removal completely
+- static vs dynamic representations
+- pose graph
+
+Limitations: ?
+
+Motivation to this PhD Thesis!
