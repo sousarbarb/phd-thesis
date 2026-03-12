@@ -355,12 +355,167 @@ the lines intersection centroid on the multiple scales.
 
 \section{Experimental Results and Discussion}\label{sec:features:results}
 
-TBC
+The experiments were performed using a three-wheeled omnidirectional robot
+developed by the 5dpo robotics team\footnote{\url{https://5dpo.github.io/}}.
+This platform was adapted to have a 2D~laser scanner, namely,
+the Hokuyo UST-10LX with 270º~\gls{fov}, 0.25º angular resolution,
+and 40~Hz sampling rate.
+The sensor is aligned with the geometric center of the robot,
+and the wheel odometry parameters were estimated using the
+OptiOdom~\cite{sousa:jint:2022} calibration method.
+The implementation of the feature extraction algorithm is in C++ and \gls{ros}.
+The algorithm ran on a computer with a processor Intel Core i7-6700HQ
+with 8GB of RAM, and a Nvidia GPU GeForce GTX~960M.
+
+In terms of the experimental methodology, first, a map of the scene
+was retrieved using the \gls{slam}~Toolbox~\cite{macenski-jambrecic:joss:2021}
+algorithm with a resolution of 0.03~m.
+Although this algorithm already estimates the robot pose relative to the map
+being created, this estimation may be improved
+if the whole map is used to localize the robot.
+So, the \gls{amcl}~\cite{thrun:book:2005} algorithm available in \gls{ros}
+was used to estimate the robot's localization relative to the map obtained
+from the \gls{slam} process.
+With this localization estimation, the point clouds from the 2D~laser scanner
+can be transformed to the map coordinate frame that is a static one,
+instead of being referenced to the moving laser frame.
+All parameters of the algorithms, launch configuration files,
+and scripts used in the experiments are also available in this paper's
+public GitHub repository\footref{footnote:repo}.
 
 \subsection{Feature extraction results}
+
+Figure~\ref{fig:features:example-results} is an example of the feature
+extraction results. This example represents the extracted features
+$\left(x,y\right)^{t=t_i}$ at a certain time instant $t_i$,
+where the blue circle is the robot pose estimated by the
+\gls{amcl}~\cite{thrun:book:2005} algorithm and the orange dotted lines
+represent the \gls{fov} of the sensor.
+The points $\left(x,y\right)^{\text{persist}}$ represent the locations of the
+39~most persistent features in space extracted by the proposed methodology.
+These locations were found through manual selection of the features location
+considering their observability through the experiment
+(see \secref{sec:features:results:features-observability}).
+Further results relative to the features extraction with the proposed
+methodology are available in
+videos\footnote{\label{footnote:videos}\url{https://www.youtube.com/watch?v=desB9LX4hck&list=PLvp8fJUEPxYQjsuJAeiBVLEKuBU4Otu7e}}.
+
+\begin{figure}[!t]
+\centering
+\centerline{\includegraphics[height=0.8\columnwidth]{features/example-feature-extraction.eps}}
+\caption[Example results for the proposed corner-like feature extraction
+methodology]{Example results for the proposed corner-like feature extraction
+methodology. Occupancy grid map obtained by using the
+SLAM Toolbox~\cite{macenski-jambrecic:joss:2021} algorithm,
+considering a map resolution of 0.03~m/px.}
+\label{fig:features:example-results}
+\end{figure}
+
+When analyzing visually the example results,
+the persistent features correspond not only to well-defined 90º~corners
+but also to other corner-like points of interest.
+This observation is shown both in \figref{fig:features:example-results}
+and in the videos\footref{footnote:videos}, even detecting stable features
+in legs of passing people through the environment.
+As for the difference between the features detection at a certain time instant
+and the most persistent ones, this different may be due to noise
+in the distance measures of the 2D~laser.
+
 \subsection{Features observability}
+
+Next, the observability of the features extracted when moving the robot through
+the scene shown in \figref{fig:features:example-results} was evaluated
+by processing the features location in the global map frame,
+using the experimental methodology explained previously.
+\figref{fig:features:features-observation-ratio} represents a color map
+of the features observability ratio, considering the \gls{fov} of the sensor
+and the robot pose throughout time. This color map considers
+the same resolution of 0.03~m/px as the one used to localize the robot.
+Also, the observability map allowed the manually selection of
+the 39~persistent features also shown in \figref{fig:features:example-results}.
+
+\begin{figure}[!t]
+\centering
+\centerline{\includegraphics[height=0.8\columnwidth]{figures/features-persistence.eps}}
+\caption{Evaluation of the features observation ratio, considering the robot pose along time, the Field-Of-View (FOV) of the 2D laser scanner, and a map resolution of 0.03~m/px.}
+\label{fig:features:features-observation-ratio}
+\end{figure}
+
+The first observation is the lower number of false positives.
+Other than the locations near the 39~most persistent features,
+the observability ratio of the other areas of the map is lower than 1.0\%.
+Furthermore, there is a blur in the observability ratio near the location
+of the 39~persistent features, instead of being concentrated in a single pixel.
+This blur is a consequence of the uncertainty of
+the location estimation of the robot,
+explaining why the maximum observability ratio
+when considering the resolution of 0.03~m/px of the map was only 42.23\%.
+Indeed, if the observability analysis considers
+the N8-neighborhood of each pixel,
+this maximum observability ratio increases to 100\% for 6~features.
+For the same consideration of the N8-neighborhood, 20 and 16~features
+have an observability ratio greater or equal to 50\% and 75\%, respectively.
+These results indicate the possible usefulness of
+the proposed corner-like feature detector for tasks
+such as localization and mapping using 2D~lasers.
+
 \subsection{Features association distance}
+
+\begin{figure*}[!t]
+  \centering
+  \subfloat[][]{\includegraphics[width=0.9\columnwidth]{features/standard-deviation.eps}%
+  \label{fig:features:standard-deviation:matrix}}
+  \hspace{1.5em}
+  \subfloat[][]{\includegraphics[width=0.9\columnwidth]{features/standard-deviation_hist.eps}%
+  \label{fig:features:standard-deviation:histogram}}
+  \caption{Standard deviation analysis of the distance between corresponding features: (a) association matrix; (b) histogram distribution.}
+  \label{fig:features:standard-deviation}
+\end{figure*}
+
+Even though the analysis on the features observability indicate
+if the features are consistently seen in space,
+this evaluation is highly dependent on the location estimator
+required to transform the point cloud to a static frame.
+Another possible analysis in the context of feature-based localization systems
+is to evaluate the distance between different features throughout time,
+assessing their relative position instead of the absolute one in space.
+So, \figref{fig:features:standard-deviation} presents the analysis
+on the feature association distance in terms of standard deviation
+to evaluate the uncertainty on the relative position between
+the 39~most persistent features selected previously
+(see \figref{fig:features:features-observation-ratio}).
+The estimation of the standard deviation only considers
+valid contributing measures, \ie, only consider the distance
+between two features if both are visible in the same time instant.
+This estimation was possible by associating the features
+observable in each time instant to one of the 39~persistent ones
+if the error distance to the location manually selected is lower than 0.06~m.
+The latter threshold was needed to account
+both the unknown uncertainty of the location estimator and
+the noise on the laser measures (zero mean and 0.03~m standard deviation
+according to the official specifications for the Hokuyo UST-10LX sensor).
+
+The maximum standard deviation of features association distance
+obtained in the experiments is 0.051~m.
+Although this value is greater than the one characteristic of the sensor,
+most of the associations have a non-zero standard deviation
+lower or equal to 0.03~m, representing 91.5\%
+of the possible associations between features.
+Note that only non-zero values must be considered because,
+due to the sensor not having a 360º~\gls{fov}
+and to possible physical obstructions on the laser view,
+not all associations are physically possible
+(in this case, 20 associations are not possible).
+Even when considering associations with a deviation lower or equal to 0.03~m,
+the proportion remains very significant at 59.3\%.
+Thus, these results on the feature association distance
+underline the usefulness of the proposed corner-like features detector
+for localization processes, given that the geometric relations
+between features remain consistent and invariant.
+
 \subsection{Integration with a line features extractor algorithm}
+
+TBC
 
 \section{Summary and Conclusions}\label{sec:features:conclusions}
 
