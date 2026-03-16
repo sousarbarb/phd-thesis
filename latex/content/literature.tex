@@ -1,11 +1,37 @@
 \chapter{Literature Review}\label{chap:literature}
 
-TBC
+This chapter discusses the current literature on \gls{slam} in
+dynamic environments. Our systematic literature review~\cite{sousa:jfr:2023}
+of the broader topic of long-term localization and mapping
+(see \appxref{appx:slr}) analyzes 142~works covering appearance invariance,
+modeling the environment dynamics, map size management, multi-session,
+and computational topics such as parallel computing and timing efficiency.
+The review article~\cite{sousa:jfr:2023} serves as the foundation for this
+chapter's discussion. While this chapter adopts a similar systematic
+methodology, the discussion focuses on the scope of this PhD~Thesis, namely,
+how the literature addresses scene dynamics in
+localization and mapping processes. As a result,
+this chapter extends the discussion of dynamics modelling presented in
+the review article~\cite{sousa:jfr:2023} and updates the results of the
+latest full search inquiry to scientific databases, yielding an analysis of
+52~studies, compared with the 32~originally covered in the review.
+
+Hence, this chapter is divided into four sections.
+First, \secref{sec:literature:slam} formulates the traditional \gls{slam}
+problem and presents three of its most common solutions:
+scan matching, particle filtering, and pose graph optimization.
+Next, \secref{sec:literature:systematic} contextualizes the elaboration of
+a systematic literature review on long-term localization and mapping
+within the scope of this PhD~Thesis, covering the main purpose of the study,
+the review methodology, and the results overview.
+\secref{sec:literature:dynamic} reviews the current literature on
+long-term localization and mapping in dynamic environments, focusing on how the
+literature addresses scene dynamics through map representation, map matching,
+dynamic object detection, and prediction modelling.
+Finally, \secref{sec:literature:conclusions} presents a summary of
+this chapter and the main conclusions.
 
 \section{Simultaneous Localization and Mapping (SLAM)}\label{sec:literature:slam}
-
-TBC
-
 \subsection{Problem introduction}\label{sec:literature:slam:problem}
 \gls{slam} is one of the most fundamental problems in robotics.
 This problem, also previously known as \gls{cml},
@@ -518,7 +544,7 @@ of the current state of the art in \gls{slam}.
 As a result, \textit{A systematic literature review on long-term localization
 and mapping for mobile robots}~\cite{sousa:jfr:2023}
 (see \appxref{appx:slr}) was written in the scope of
-this PhD~thesis. The review follows the \gls{prisma}~\cite{page:bmj:2021}
+this PhD~Thesis. The review follows the \gls{prisma}~\cite{page:bmj:2021}
 guidelines, defining a systematic methodology to ensure the repeatability of the
 selection and data extraction processes while allowing future updates
 over the discussion and the review's methodology.
@@ -854,9 +880,9 @@ underscores the relevance of this PhD~Thesis.
 
 \todo{note that should be clear the structure on the following sections!}
 
-In terms of works in the literature for long-term \gls{slam}, as previously mentioned, Appendix~\ref{ap:slr} includes a systematic literature review on that topic following the \gls{prisma}~\cite{methodology:prisma} guidelines. The literature review goes over several challenges related to long-term autonomy having the date of the last full inquiry for identifying records in the data sources considered in the study on May 17, 2022.
+In terms of works in the literature for long-term \gls{slam}, as previously mentioned, Appendix~\ref{appx:slr} includes a systematic literature review on that topic following the \gls{prisma}~\cite{page:bmj:2021} guidelines. The literature review goes over several challenges related to long-term autonomy having the date of the last full inquiry for identifying records in the data sources considered in the study on May 17, 2022.
 Given the focus of this research proposal on the challenge for performing \gls{slam} in dynamic environments, this section focus on the included works of the review study categorized as dynamic in the data extraction phase of the methodology. Furthermore, another full inquiry was performed on October 25, 2022, to include more recent works published or made available online between the date considered in the review up to the latter one.
-As a result, after executing all stages of the review methodology described in Appendix~\ref{ap:slr} and focusing only on dynamic-related works, another five records were found in the literature (\cite{liu:scic:2022,nielsen-hendeby:tiv:2023,guo-liu:robio:2021,thomas:icra:2022,fu:ral:2022}). However, given that the work \cite{thomas:icra:2022} is an extension of \cite{thomas:icra:2021}, as assumed in the review, only the extended version will be considered for the discussion.
+As a result, after executing all stages of the review methodology described in Appendix~\ref{appx:slr} and focusing only on dynamic-related works, another five records were found in the literature (\cite{liu:scic:2022,nielsen-hendeby:tiv:2023,guo-liu:robio:2021,thomas:icra:2022,fu:ral:2022}). However, given that the work \cite{thomas:icra:2022} is an extension of \cite{thomas:icra:2021}, as assumed in the review, only the extended version will be considered for the discussion.
 
 So, next, this section analyzes literature works focused on modeling and identifying dynamic elements in the environment within the scope of long-term \gls{slam}, \ie, how the methods identify these elements and handle them for long-term localization and mapping.
 The discussion on dynamics modeling is organized into the following topics: specific map representations used to model or deal with dynamic elements in the scene, identification of dynamic elements matching the current observation to the current map, future prediction of dynamic properties of scene elements, and semantic identification of dynamic objects.
@@ -1104,7 +1130,7 @@ The map points are associated with every single reading
 via small conical apertures in spherical coordinates,
 updating the observed points closer than the mapped ones,
 and leaving the farther ones untouched.
-The approximation of ray-tracing results is used to update
+The approximation of ray tracing results is used to update
 the probability that points in the map are dynamic,
 using a Bayesian approach. The probability of being dynamic can be used
 in \gls{icp} to avoid trusting dynamic points.
@@ -1721,13 +1747,13 @@ over time, even when the robot revisits known areas, introducing redundant data,
 increasing computational cost, and degrading map quality through
 accumulated noise and distortion. To address these limitations,
 this PhD~Thesis proposes a unified \gls{slam} framework for ground mobile robots
-in dynamic indoor environments that combines: online ray-tracing-based
+in dynamic indoor environments that combines: online ray tracing-based
 map updating to remove outdated or redundant observations;
 relocalization on existing graph structures to prevent
 unnecessary graph expansion; offline generation of cleaner static maps
 by removing dynamic points; and offline global refinement
 to correct accumulated distortions. In parallel,
-this PhD~thesis researches geometric features, distance-map-based registration
+this PhD~Thesis researches geometric features, distance-map-based registration
 with robust kernels, and continuously updated local maps. The final goal is to
 actively incorporated environment dynamics instead of just filtering them out,
 to provide a more stable, scalable, and accurate \gls{slam} solution
