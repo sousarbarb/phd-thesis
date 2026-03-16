@@ -777,7 +777,7 @@ uses the exact inquiry string used in our systematic review.
 \figref{fig:literature:systematic:results:year:scopus-wos:dyn}
 uses a different string to present the evolution of
 publications on the challenge of localization and mapping
-in dynamic environments, which aligns with the goals of this PhD Thesis.
+in dynamic environments, which aligns with the goals of this PhD~Thesis.
 This scope reduction is accomplished by using the following search string:
 \texttt{(robot* OR vehicle*) AND ((locali* AND map*) OR "slam") AND ("long term" OR "life long" OR lifelong) AND (dynamic* OR mov*)}.
 The part of the query added to the original one (\texttt{dynamic* OR mov*})
@@ -1541,13 +1541,194 @@ likely due to its stronger dependence on object shapes observed during training.
 
 \section{Summary and Conclusions}\label{sec:literature:conclusions}
 
-TBC
+\gls{slam} is one of the most fundamental problems in robotics.
+When a robot lacks prior knowledge of the environment and
+does not know its own pose, \gls{slam} enables an \gls{amr} to build
+a map of its surroundings while simultaneously localizing itself within it.
+A basic strategy for solving the \gls{slam} problem is to continuously
+align the latest sensor observation with the map up to the current instant, then
+integrate the new measurement into the map using the estimated alignment pose,
+as in scan-matching systems such as HectorSLAM~\cite{kohlbrecher:ssr:2011}.
+However, a pure scan-matching approach does not explicitly address loop closure,
+which limits the correction of accumulated drift when
+the robot revisits a previously mapped place.
+Another popular family of approaches is based on particle filters,
+specifically \glslink{rbpf}{\glsentryfull{rbpf}},
+as in GMapping~\cite{grisetti:tro:2007}
+(adaptation of \gls{rbpf} to 2D~occupancy grid mapping).
+In these methods, the posterior distribution over part of the state,
+such as the robot's trajectory, is represented using particles.
+At the same time, the remaining variables are modeled using Gaussians
+or other parametric distributions, resulting in higher computational efficiency
+than standard particle filters~\cite{thrun:book:2005}.
+More recently, pose-graph formulations have become a dominant paradigm
+for solving the \gls{slam} problem. In graph-based \gls{slam},
+the front-end identifies constraints, such as odometric relations
+between consecutive poses, loop closures with previously visited poses, and
+landmark observations from one or multiple viewpoints,
+by establishing correspondences between new observations and the current map.
+The back-end then refines the graph by jointly minimizing
+the inconsistency of all constraints~\cite{bresson:tiv:2017}.
+An implementation of this formulation for 2D~laser scanners and wheel odometry
+is \gls{slam}~Toolbox~\cite{macenski-jambrecic:joss:2021}.
+Because the pose-graph formulation retains access to
+the full set of measurements and constraints during map optimization,
+it allows the use of improved linearization, loop-closing, and
+data-association strategies, which is one of the main reasons
+why graph-based \gls{slam} often outperforms purely filter-based approaches.
+Nevertheless, pose-graph methods usually exhibit at least linear growth of
+the graph with the explored area, which makes graph sparsification,
+submapping, and map-maintenance strategies important
+for long-term operation~\cite{thrun:book:2005,sousa:jfr:2023}.
 
-Trends:
-- dynamics removal completely
-- static vs dynamic representations
-- pose graph
+In a static environment, the robot would only need to map it once,
+since the map and incoming sensor data would remain consistent over time.
+Nonetheless, real environments contain moving agents, temporary occlusions,
+furniture rearrangement, seasonal or illumination changes,
+and other sources of temporal variability.
+Long-term \gls{slam} addresses precisely these issues.
+In our previous work~\cite{sousa:jfr:2023}, we conduct a systematic literature
+review on long-term localization and mapping following
+the \glslink{prisma}{\glsentryfull{prisma}}~\cite{page:bmj:2021} guidelines.
+To the best of our knowledge,
+before that publication, no other work had reviewed the broader topic of
+long-term \gls{slam} in a unified way, covering appearance variation
+for localization and place recognition, the modeling and handling of
+scene dynamics, redundant data removal from maps, multi-session mapping,
+computational aspects of long-term operation, datasets, and evaluation metrics.
+Using a systematic methodology to ensure repeatability and reproducibility,
+we review 142~works across 6~scientific databases.
+Overall, the scientific community have shown increasing interest in
+long-term localization and mapping.
+The subtopic of \gls{slam} in dynamic environments, which is the focus of
+this PhD~Thesis, has also experienced clear growth over time.
 
-Limitations: ?
+Subsequently, this PhD~Thesis builds on the results of our systematic review,
+narrowing the discussion to long-term \gls{slam} in dynamic environments
+and updating the search date of the last full inquiry to February~13, 2026. This
+update results in 52~works analyzed in \secref{sec:literature:dynamic}.
+A trend in the literature is that most methods
+still rely on conventional \gls{slam} map representations, such as graphs,
+occupancy grids, point clouds, or feature maps, and then augment them
+with mechanisms to reason about dynamics. In other words, the map remains
+primarily a static structural representation, while dynamic behavior is encoded
+as an additional property of cells, points, features, or objects.
+A recurring strategy, especially in human memory-inspired works,
+is to organize information into \glslink{sm}{\glsentryfull{sm}},
+\glslink{stm}{\glsentryfull{stm}}, and/or
+\glslink{ltm}{\glsentryfull{ltm}}~\cite{dayoub:ras:2011,bacca:ras:2013,biber-duckett:ijrr:2009,xing:jfr:2022,biswas-veloso:ras:2017}.
+These works use selective attention, rehearsal, retrieval,
+and pruning policies to determine which observations should be included
+in the persistent map and which should remain temporary or ignored. Another
+common trend is to partition the map into static, semi-static, and/or dynamic
+components~\cite{walcott-bryant:iros:2012,zhang:acc:2019,ganti-waslander:crv:2019,zhu:icra:2021,guo-liu:robio:2021,deng:ram:2023,wang:ras:2024,li:tim:2025},
+or equivalently into permanent, movable, and dynamic
+layers~\cite{bescos:ral:2018,wang:icra:2019,soares:jint:2023}. In these formulations, static or permanent structures are expected to remain stable over long periods; semi-static or movable elements are objects that may persist for some time but can change between visits; and dynamic elements are objects currently moving or highly unstable in the sensor field of view.
 
-Motivation to this PhD Thesis!
+Furthermore, methods that exploit data consistency are common in the literature
+for identifying scene dynamics. One typical strategy is to align the current
+sensor observation with the current map or with previous observations and then
+detect mismatches. Depending on the sensing modality, these spatial
+inconsistencies manifest as scan-to-map or scan-to-scan mismatches with range
+sensors~\cite{dayoub:ras:2011,walcott-bryant:iros:2012,saarinen:ijrr:2013,lazaro:iros:2018,boniardi:ras:2019,zhang:acc:2019,kim:icra:2022,deng:ram:2023,stefanini:sensors:2023,hroob:ras:2024,hroob:ral:2024,li:tim:2025,zhu:tim:2025,yang:ral:2024},
+reprojection errors with visual
+modalities~\cite{wu:cvci:2022,liu:scic:2022,du:tvcg:2022,wang:icra:2019,wang:tim:2025},
+motion inconsistencies in tracked
+features~\cite{wang:icra:2019,xing:jfr:2022,liu:scic:2022,cheng:ral:2025,hu:tcsvt:2025,jia:tcsvt:2025,wang:tim:2025},
+ray-tracing discrepancies that reveal free-space discrepancies or newly added
+objects~\cite{biber-duckett:ijrr:2009,saarinen:ijrr:2013,pomerleau:icra:2014,biswas-veloso:ras:2017,lazaro:iros:2018,zhang:acc:2019,ding:tits:2020,thomas:icra:2022,stefanini:sensors:2023},
+and multi-session inconsistencies across repeated traversals of the same
+place~\cite{ding:tits:2020,kim:icra:2022,yang:ral:2024}.
+Clustering is often used as a complementary step to group nearby inconsistent
+observations and turn isolated outliers into more coherent dynamic
+hypotheses~\cite{bacca:ras:2013,einhorn-gross:ras:2015,pan:sensors:2019,ding:tits:2020,wang:ras:2024,hu:tcsvt:2025,zhu:tim:2025}.
+Also, semantic perception has become a central component of long-term \gls{slam}
+in dynamic environments, particularly in vision-based approaches.
+Object detection and semantic segmentation are frequently used to identify
+categories that are likely to be dynamic or movable, such as people, vehicles,
+bicycles, or animals~\cite{yang:sensors:2020,yue:icra:2020,zhu:icra:2021,xing:jfr:2022,chen:itsc:2022,soares:jint:2023,hu:tcsvt:2025}.
+Pixel-wise segmentation is also employed in the literature discriminate between
+dynamic and static image regions and avoid excessive feature depletion
+compared to bounding-box semantic
+segmentation~\cite{bescos:ral:2018,wang:icra:2019,ganti-waslander:crv:2019,song:iros:2019,singh:itsc:2021,guo-liu:robio:2021,yu:acait:2023,jia:tcsvt:2025,wang:tim:2025,cheng:ral:2025}.
+Indeed, bounding-box detectors
+often require additional geometric constraints, background/foreground refinement,
+or feature repopulation mechanisms to avoid incorrectly rejecting useful
+static features within coarse detections~\cite{soares:jint:2023}.
+
+Statistics are widely used in the literature to describe and, in some cases,
+predict scene dynamics. Early methods often relied on relatively
+simple quantities, such as
+hit-and-miss counts~\cite{dayoub:ras:2011},
+change scores~\cite{walcott-bryant:iros:2012},
+observation counts~\cite{ding:tits:2020,du:tvcg:2022,deng:ram:2023},
+or feature stability histograms~\cite{bacca:ras:2013},
+to estimate how often a cell, point, or feature was observed
+consistently over time. Later works introduced richer temporal models,
+including \gls{hmm}~\cite{tipaldi:ijrr:2013},
+semi-Markov processes~\cite{rapp:itsc:2015},
+\gls{arma} models~\cite{wang:iros:2020,wang:ras:2024},
+persistence filters~\cite{deng:ram:2023},
+and frequency-analytical models based on the
+\gls{fft}~\cite{santos:ral:2016,krajnik:tro:2017}.
+These models are typically not used to forecast detailed
+future trajectories of dynamic objects, but rather to estimate a persistence,
+reliability, or staticness score for map elements, or even to identify
+periodic temporal patterns. Possible uses of predicting dynamics
+include inferring whether a region of the environment is stable,
+periodically occupied, or likely to change. Such information can then support
+more robust localization systems, more selective map updates, and even planning
+strategies that avoid highly dynamic areas or
+unfavorable times for revisiting them.
+
+Most methods in the literature aim to protect localization
+from transient or unstable observations by relying primarily on static maps,
+or at most on static plus semi-static components, while excluding
+clearly dynamic elements from the pose-estimation process. In some approaches,
+dynamic and semi-static observations are removed before
+being inserted into the long-term
+map~\cite{an:as:2016,walcott-bryant:iros:2012,biswas-veloso:ras:2017,lazaro:iros:2018,boniardi:ras:2019,zhang:acc:2019,pan:sensors:2019,ding:tits:2020,thomas:icra:2022,du:tvcg:2022,chen:itsc:2022,wu:cvci:2022,liu:scic:2022,deng:ram:2023,yu:acait:2023,hroob:ras:2024,hroob:ral:2024,jia:tcsvt:2025,wang:tim:2025,zhu:tim:2025}.
+In contrast, other approaches
+do not discard those observations. Instead, dynamic observations
+and possibly semi-static ones are down-weighted during scan or feature matching,
+or are assigned larger covariance to reduce their influence
+on the pose estimate~\cite{pomerleau:icra:2014,singh:itsc:2021,zhu:icra:2021,soares:jint:2023}.
+Vision-based methods often use masking and
+background inpainting to remove dynamic image regions while preserving
+a usable visual observation for tracking and
+mapping~\cite{guo-liu:robio:2021,bescos:ral:2018}.
+Overall, the dominant trend is that long-term \gls{slam} systems in dynamic
+environments remain fundamentally static-map-oriented. Rather than building
+a fully dynamic world model, they estimate the stability of observations
+and decide whether to keep them, temporarily down-weighted, or remove them altogether. This trend makes the notion of persistence,
+rather than motion alone, one of the central concepts
+in the current long-term \gls{slam} literature for dynamic environments.
+
+In conclusion, the literature on long-term \gls{slam} in dynamic environments
+shows progress in modeling persistence, detecting dynamic elements, and
+improving localization robustness. Still, the literature also reveals
+several gaps that motivate this PhD~Thesis. Most existing approaches
+remain fundamentally static-map-oriented: they typically identify, mask,
+down-weight, or remove dynamic observations. However, current methods rarely
+maintain a continuously updated map representation that explicitly
+replaces outdated structure with the most recent consistent observations.
+In addition, the literature tends to treat mapping quality,
+localization robustness, and long-term map maintenance as partially
+separate problems, with limited integration between
+online dynamic-aware operation and offline global refinement.
+Another issue is scalability. Pose-graph and map representations often grow
+over time, even when the robot revisits known areas, introducing redundant data,
+increasing computational cost, and degrading map quality through
+accumulated noise and distortion. To address these limitations,
+this PhD~Thesis proposes a unified \gls{slam} framework for ground mobile robots
+in dynamic indoor environments that combines: online ray-tracing-based
+map updating to remove outdated or redundant observations;
+relocalization on existing graph structures to prevent
+unnecessary graph expansion; offline generation of cleaner static maps
+by removing dynamic points; and offline global refinement
+to correct accumulated distortions. In parallel,
+this PhD~thesis researches geometric features, distance-map-based registration
+with robust kernels, and continuously updated local maps. The final goal is to
+actively incorporated environment dynamics instead of just filtering them out,
+to provide a more stable, scalable, and accurate \gls{slam} solution
+in highly dynamic environments.
