@@ -14,12 +14,14 @@
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{amsthm,thmtools}
 \usepackage{array}
+\usepackage{color}
 \usepackage{enumitem}
 \usepackage{graphicx}
 \usepackage{lipsum}
 \usepackage{longtable}
 \usepackage{multirow}
 \usepackage{pdflscape}
+\usepackage{soul}
 \usepackage{subcaption}
 \usepackage[backend=biber,
             style=numeric-comp,
@@ -83,12 +85,26 @@ PhD}
 % Committee:
 % \committeetext{Approved by \ldots:}
 \committeetext{PhD Thesis submitted for the doctoral final oral examination \ldots:}
-\committeemember{President}{TBD}
+\committeemember{President}{%
+Doctor Lu\'{i}s Miguel Almeida \textcolor{red}{\textbf{\hl{(TBC)}}},
+Full Professor,\\
+Faculdade de Engenharia da Universidade do Porto,
+Portugal}
 \committeemember{Referee}{%
-Doctor Robert Deaves,
+Doctor Robert Deaves \textcolor{red}{\textbf{\hl{(TBC)}}},
 Honorary Professor,\\
 School of Engineering, University of Birmingham,
 United Kingdom}
+\committeemember{Referee}{%
+Doctor Carlos Cardeira \textcolor{red}{\textbf{\hl{(TBC)}}},
+Associate Professor,\\
+Instituto Superior T\'{e}cnico, Universidade de Lisboa,
+Portugal}
+\committeemember{Referee}{%
+Doctor Miguel Riem de Oliveira \textcolor{red}{\textbf{\hl{(TBC)}}},
+Assistant Professor,\\
+Department of Mechanical Engineering, Universidade de Aveiro,
+Portugal}
 \committeemember{Referee}{%
 Doctor Paulo G. Costa,
 Associate Professor,\\
@@ -103,7 +119,7 @@ Portugal}
 \signature
 
 \schoollogo{uporto-feup.pdf}
-\institutionlogo{inesctec.png}
+% \institutionlogo{inesctec.png}
 
 % \additionalfronttext{Thesis Research Plan}
 

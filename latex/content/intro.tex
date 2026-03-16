@@ -23,7 +23,7 @@ seeks to address.
 guided the research work.
 Then, \secref{sec:intro:scope} defines the scope and objectives of the
 PhD~Thesis.
-\secref{sec:intro:contributions} highlights the unique contributions the
+\secref{sec:intro:contributions} highlights the unique contributions this
 research makes to the literature, emphasizing its novelty and impact.
 Lastly, \secref{sec:intro:structure} outlines the document's organization.
 A final note is provided regarding the funding that supported the work carried
@@ -88,7 +88,38 @@ should be dependent on the environment area and not on the trajectory length of
 the mapping process nor operation time, only growing when the robot would
 explore unknown locations~\cite{kretzschmar-stachniss:ijrr:2012}.
 
-\todo{Brief literature analysis (only after finishing Literature Review chapter)}
+Currently, most methods rely on conventional \gls{slam} map representations
+and then augment them with mechanisms to reason about dynamics.
+A recurring strategy for handling scene dynamics is to organize information
+into \glslink{sm}{\glsentryfull{sm}},
+\glslink{stm}{\glsentryfull{stm}}, and/or
+\glslink{ltm}{\glsentryfull{ltm}}~\cite{dayoub:ras:2011,bacca:ras:2013,biber-duckett:ijrr:2009,xing:jfr:2022,biswas-veloso:ras:2017}.
+Another common trend is to partition the map into static or permanent,
+semi-static or movable, and dynamic layers, where static structures
+remain permanent over time, semi-static ones change only between visits
+at the same location, and dynamic layers represent sensor observations
+that move or are highly unstable in the
+environment~\cite{walcott-bryant:iros:2012,zhang:acc:2019,ganti-waslander:crv:2019,zhu:icra:2021,guo-liu:robio:2021,deng:ram:2023,wang:ras:2024,li:tim:2025,bescos:ral:2018,wang:icra:2019,soares:jint:2023}.
+Moreover, identification of scene dynamics is typically made through data
+consistency analysis, evaluating scan-to-map or scan-to-scan
+mismatches~\cite{dayoub:ras:2011,walcott-bryant:iros:2012,saarinen:ijrr:2013,lazaro:iros:2018,boniardi:ras:2019,zhang:acc:2019,kim:icra:2022,deng:ram:2023,stefanini:sensors:2023,hroob:ras:2024,hroob:ral:2024,li:tim:2025,zhu:tim:2025,yang:ral:2024},
+reprojection errors~\cite{wu:cvci:2022,liu:scic:2022,du:tvcg:2022,wang:icra:2019,wang:tim:2025},
+motion inconsistencies in tracked features~\cite{wang:icra:2019,xing:jfr:2022,liu:scic:2022,cheng:ral:2025,hu:tcsvt:2025,jia:tcsvt:2025,wang:tim:2025},
+ray-tracing discrepancies~\cite{biber-duckett:ijrr:2009,saarinen:ijrr:2013,pomerleau:icra:2014,biswas-veloso:ras:2017,lazaro:iros:2018,zhang:acc:2019,ding:tits:2020,thomas:icra:2022,stefanini:sensors:2023},
+and multi-session inconsistencies~\cite{ding:tits:2020,kim:icra:2022,yang:ral:2024}.
+Clustering may improve dynamics identification through grouping nearby dynamic
+observations~\cite{bacca:ras:2013,einhorn-gross:ras:2015,pan:sensors:2019,ding:tits:2020,wang:ras:2024,hu:tcsvt:2025,zhu:tim:2025}.
+Object detection and semantic segmentation, typically from visual or
+3D~\gls{lidar} data, may facilitate the identification of scene dynamics, especially when neural networks are used to classify objects in sensor
+observations, considering some of them dynamic, movable, or
+static~\cite{yang:sensors:2020,yue:icra:2020,zhu:icra:2021,xing:jfr:2022,chen:itsc:2022,soares:jint:2023,hu:tcsvt:2025,bescos:ral:2018,wang:icra:2019,ganti-waslander:crv:2019,song:iros:2019,singh:itsc:2021,guo-liu:robio:2021,yu:acait:2023,jia:tcsvt:2025,wang:tim:2025,cheng:ral:2025}.
+Also, dynamic prediction may infer whether a region of the environment is
+stable, periodically occupied, or likely to change, to support
+more robust localization systems or even path-planning approaches that avoid
+highly dynamic areas~\cite{tipaldi:ijrr:2013,rapp:itsc:2015,wang:iros:2020,wang:ras:2024,deng:ram:2023,santos:ral:2016,krajnik:tro:2017}.
+Still, most methods rely primarily on static maps, excluding dynamic elements
+from the pose estimation process, and rarely maintain
+a continuously updated map representation.
 
 \section{Motivation}\label{sec:intro:motivation}
 
@@ -178,11 +209,11 @@ However, most use cases for \glspl{amr} involve dynamic environments with moving
 elements or reconfigurations that affect the consistency of the map over time.
 Consequently, the system must determine how and when to update the map, a
 challenge known as the stability-plasticity dilemma. In this context, a
-long-term SLAM system must adapt to new changes while preserving older features,
+long-term \gls{slam} system must adapt to new changes while preserving older features,
 particularly when the environment reverts to previous
 states~\cite{biber-duckett:ijrr:2009}.
 
-This PhD thesis addresses the problem of localizing a mobile robot within
+This PhD~Thesis addresses the problem of localizing a mobile robot within
 dynamic indoor environments. This problem is directly related to \gls{slam},
 given the need to update the map concurrently with localization upon
 dynamic changes in the robot's surroundings.
@@ -195,17 +226,23 @@ dealing with highly dynamic elements (\eg, moving persons or objects).
 Instead, this thesis studies the detection of dynamic changes by comparing the
 current observation with a local reference map representation.
 
-In terms of the sensor setup, this PhD thesis assumes that the robot is equipped
+In terms of the sensor setup, this PhD~Thesis assumes that the robot is equipped
 with at least one 2D~laser scanner and, optionally, wheeled odometry data.
 This sensor setup is commonly found in \glspl{amr} within the logistics
 industry, where wheeled odometry is typically estimated by counting the ticks
 from the motor encoders while taking into account the robot's kinematic
 model~\cite{sousa:jint:2022}.
-In addition, \glspl{amr} often use 2D~laser scanners not only for navigation
+In addition, \glspl{amr} often use 2D~lasers not only for navigation
 but also as safety devices, in compliance with the
 ISO~10218-1:2025~\cite{iso-10218-1:2025} and
 ANSI/RIA~R15.06-2025~\cite{ansi/ria-r15.06:2025} standards, which ensure a
 safe stopping distance and help prevent collisions with obstacles.
+Also, the usage of 2D~lasers as safety devices allows \glspl{amr} to be
+compliant with ISO~3691-4:2023~\cite{iso-3691-4:2023}, where, \eg,
+an \gls{amr} must detect persons by passing on the two following
+tests: detecting a cylinder of 200~mm diameter and 600~mm length placed
+horizontally on the ground; and detect another cylinder of 70~mm diameter and
+400~mm length set vertically.
 Consequently, this thesis focuses solely on range data.
 
 \section{Research Questions and Hypotheses}\label{sec:intro:rq+h}
@@ -251,12 +288,16 @@ concurrently offline global bundle adjustment techniques
 to remove distortions from the global map.
 
 \begin{hypothesis}\label{hypothesis:mapping:ray-tracing}
-Exploring the application of ray tracing techniques to update map
-representations based on the latest sensor observations continuously.
+Exploring the application of ray tracing techniques to update local map
+representations online continuously, based on the latest sensor observations.
 These techniques can help determine whether a sensor observation corresponds
 to a new point or an update to an outdated one,
 depending on whether the latest ranging data is closer than the existing map
 point or if the sensor observation is passing through an existing feature.
+Also, the continuous online update of local maps based on the latest
+observations may improve the online estimation for the robot pose and
+its stability during \gls{slam}, by increasing the inliers ratio of
+the sensor observation alignment \gls{wrt} local map.
 \end{hypothesis}
 
 \begin{hypothesis}\label{hypothesis:mapping:relocalization}
@@ -271,8 +312,8 @@ without the graph size being dependent on the operation time.
 \begin{hypothesis}\label{hypothesis:mapping:clean-map}
 Investigating the offline removal of dynamic points using ray tracing techniques
 during the generation of the environment representation.
-This representation could be leveraged for more accurate mobile robot
-localization by excluding transient or moving objects from the map.
+This representation could be leveraged by other algorithms for more accurate
+mobile robot localization by excluding transient or moving objects from the map.
 \end{hypothesis}
 
 \begin{hypothesis}\label{hypothesis:mapping:ogba}
@@ -334,7 +375,7 @@ rather than scan-to-scan approaches that consider singular scans.
 Moreover, local maps can enhance the localization stability of mobile robots in
 highly dynamic environments, as they are continuously updated locally with the
 latest sensor observations, while allowing the incorporation of
-ray-tracing-based techniques to detect dynamic elements and update the local
+ray tracing-based techniques to detect dynamic elements and update the local
 representation accordingly.
 \end{hypothesis}
 
@@ -354,7 +395,7 @@ In order to achieve the thesis's main goal,
 the following efforts were undertaken:
 \begin{itemize}
 \item modifications to existing mobile platforms to enable data acquisition
-for the purposes of this PhD thesis;
+for the purposes of this PhD~Thesis;
 \item development of a line fitting-based corner-like feature extraction
 algorithm to capture corners geometric information from the environment on
 2D laser scanners data;
@@ -374,7 +415,7 @@ to try to remove distortions from the global map.
 \end{itemize}
 
 Furthermore, while the degree-granting institution is the \gls{feup},
-the host institution of this PhD thesis is \gls{inesctec}.
+the host institution of this PhD~Thesis is \gls{inesctec}.
 Specifically, all work conducted in this thesis was performed at
 \gls{iilab}, within \gls{criis} from \gls{inesctec}. Throughout the PhD journey,
 the research was executed alongside \gls{pps}18 -- \textit{3D~navigation system
@@ -478,14 +519,13 @@ The remaining of this document is organized as follows
 (\todo{update lated the following text}):
 \begin{itemize}
 \item \textbf{\chapref{chap:literature}}
-presents concepts and methodologies for the \gls{slam} problem,
-covering scan matching, \gls{ekf}-based \gls{slam}, particle filters,
-and pose graph formulations. The chapter also reviews the literature on
+presents the \gls{slam} problem, covering scan matching, particle filters,
+and pose graph formulations. The chapter also reviews literature on
 long-term \gls{slam} in dynamic environments,
 including map representation, map matching,
-dynamic object detection, and dynamics prediction modeling;
+dynamic object detection, and dynamics prediction;
 \item \textbf{\chapref{chap:datasets}}
-describes the various mobile platforms and datasets used in this PhD thesis,
+describes the various mobile platforms and datasets used in this PhD~Thesis,
 including robots such as the 5dpo omnidirectional robot,
 the Avantgarde tricycle and Flowbotics differential autonomous forklifts,
 and also details the IILABS~3D and other datasets from the literature;
@@ -497,7 +537,7 @@ explores the concept of using distance maps for data registration,
 discussing optimization algorithms, covariance estimation,
 and point-to-point and point-to-plane alignment error formulations;
 \item \textbf{\chapref{chap:slam}}
-presents the research conducted in this PhD thesis on
+presents the research conducted in this PhD~Thesis on
 \gls{slam} in dynamic environments,
 focusing on techniques such as online \gls{slam},
 dynamics removal, and offline global bundle adjustment;

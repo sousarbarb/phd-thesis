@@ -260,7 +260,7 @@ with the `report' document style}{}}{}
   {\unvbox\@vivatext
   \vskip 0.5\baselineskip%
   \par%
-  {\noindent\large #1: #2}}}
+  {\noindent\large \emph{#1}: #2}}}
 
 %% add a line for signature
 \def\signature{%
@@ -358,10 +358,10 @@ with the `report' document style}{}}{}
 \vfill\vfill
 \hbox to \textwidth{%
   \setbox\@crestbox=\vbox{%
-    %\includegraphics[width=70mm]{\@schoollogo}}
-    \raisebox{-0.5\height}{\includegraphics[height=20mm]{\@schoollogo}}%
-    \hspace{10mm}%
-    \raisebox{-0.5\height}{\includegraphics[height=20mm]{\@institutionlogo}}}%
+    \includegraphics[width=70mm]{\@schoollogo}}
+    % \raisebox{-0.5\height}{\includegraphics[height=20mm]{\@schoollogo}}%
+    % \hspace{10mm}%
+    % \raisebox{-0.5\height}{\includegraphics[height=20mm]{\@institutionlogo}}}%
 \box\@crestbox%
 }
 \vfill%
