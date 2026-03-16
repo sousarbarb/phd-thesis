@@ -355,7 +355,7 @@ of all the observations, seeking to solve the
 For exemplification purposes, two possible examples of virtual measurements
 are wheeled odometry and 2D~laser scan matching data. Both cases would define
 the prediction of the measurement as $\hat{z}_{ij}=x_j-x_i$.
-The virtual measurement would be $z_{ij}=x_j - g\left(x_i,u_{ij}\right)$
+The virtual measurement would be $z_{ij}=g\left(x_i,u_{ij}\right)$
 for wheeled odometry, where $g\left(x_i,u_{ij}\right)$ represents
 the relative transformation between $x_i$ and $x_j$ estimated by
 the odometry estimator, while using the wheeled odometry data $u_{ij}$
@@ -426,7 +426,33 @@ limit the computational resources required for continuously performing
 GraphSLAM~\cite{thrun:book:2005}.
 
 \section{Systematic Literature Review}\label{sec:literature:systematic}
-\todo{TBC}
+Next, our systematic literature review on long-term localization and mapping
+for mobile robots~\cite{sousa:jfr:2023} (see \appxref{appx:slr})
+analyzes 142~works, following the \gls{prisma}~\cite{page:bmj:2021} guidelines.
+Instead of focusing on a single challenge, the review~\cite{sousa:jfr:2023}
+covers several topics, including robustness to appearance changes,
+dynamics modelling, map sparsification to cope with
+the continuously increasing size of environment representations,
+multi-session mapping, and additional computational issues,
+such as parallel and distributed computing and memory management.
+The review~\cite{sousa:jfr:2023} further provides
+a comparative analysis of the public datasets and experimental data
+adopted in the selected studies, focusing on scene conditions,
+sensing modalities, and their spatial and temporal properties.
+In addition, we made available a public GitHub
+repository\footnote{\label{note:literature:slr}\url{https://github.com/sousarbarb/slr-ltlm-mr}}
+containing all the documentation and scripts used throughout the review process
+to enhance the repeatability and reproducibility of our review
+by the scientific community.
+
+Although our review~\cite{sousa:jfr:2023} covers a broader topic
+than the scope of this PhD~Thesis, this section presents
+the systematic methodology followed in the review that underpins
+the discussion in \secref{sec:literature:dynamic}.
+Lastly, this section examines the growing interest in
+long-term localization and mapping, based on the original search query
+used in the review, while adapting the query to investigate further
+the growing interest in handling scene dynamics.
 
 \subsection{Purpose of the study}\label{sec:literature:systematic:purpose}
 The main studies reviewing the \gls{slam} literature are presented in
@@ -467,8 +493,8 @@ observability (whether the problem is solvable),
 convergence (whether the state uncertainty converges to a finite value),
 and consistency (whether the estimated state is unbiased).
 Huang~and~Dissanayake~\cite{huang-dissanayake:ijars:2016}
-extend the previous work by providing an in-depth explanation of the
-fundamental properties and defining criteria for the
+extend the previous work~\cite{dissanayake:iciinfs:2011} by providing an
+in-depth explanation of the fundamental properties and defining criteria for the
 performance evaluation of \gls{slam} algorithms in terms of
 consistency, accuracy, and computational efficiency.
 In contrast to \cite{dissanayake:iciinfs:2011},
@@ -476,7 +502,7 @@ which focuses mainly on filtering-based \gls{slam},
 Huang~and~Dissanayake~\cite{huang-dissanayake:ijars:2016} also discuss the
 properties for smoothing formulations.
 Both studies focus only on theoretical aspects,
-without addressing the problem of long-term localization and mapping.
+without addressing long-term localization and mapping.
 
 In terms of surveys on \gls{slam} trends,
 Cadena~\etal~\cite{cadena:tro:2016} provide a broad overview
@@ -780,7 +806,8 @@ the last full inquiry did not consider the whole year~\cite{sousa:jfr:2023}}
 \label{fig:literature:systematic:results:year}
 \end{figure}
 
-Although the scope of our systematic literature review includes methodologies
+Although the scope of our systematic literature review~\cite{sousa:jfr:2023}
+includes methodologies
 for handling the dynamicity of the scene, the original query did not focus on
 any particular challenge related to long-term localization and mapping.
 \figref{fig:literature:systematic:results:year:scopus-wos}
@@ -805,8 +832,13 @@ uses a different string to present the evolution of
 publications on the challenge of localization and mapping
 in dynamic environments, which aligns with the goals of this PhD~Thesis.
 This scope reduction is accomplished by using the following search string:
-\texttt{(robot* OR vehicle*) AND ((locali* AND map*) OR "slam") AND ("long term" OR "life long" OR lifelong) AND (dynamic* OR mov*)}.
-The part of the query added to the original one (\texttt{dynamic* OR mov*})
+
+{\centering
+\texttt{(robot* OR vehicle*) AND ((locali* AND map*) OR "slam") AND}\\
+\texttt{("long term" OR "life long" OR lifelong) \textbf{AND (dynamic* OR mov*)}}
+\par}
+
+The part added to the original query (\texttt{dynamic* OR mov*})
 aims to limit search results to works
 featuring dynamic or moving elements in the scene.
 Also, only works since 2009 were considered in the analysis, given that year
