@@ -167,12 +167,12 @@ on evaluating the invariance of the proposed corner-like features.
 
 \section{Corner-Like Feature Detector}\label{sec:features:method}
 
-The proposed methodology for feature extraction on 2D~laser data performs
+We propose a feature extraction algorithm on 2D~laser data performing
 local line fitting to detect corner-like points in the scan.
-In summary, first, the scan data is transformed from polar to Cartesian
+In summary, first, we transform the scan data from polar to Cartesian
 coordinates. This transformation maintains the data's angular coordinate order.
-For each point in the scan, multiple distance-based scales are used
-to extract arrival and departure neighborhoods,
+For each point in the scan, our methodology considers multiple distance-based
+scales to extract arrival and departure neighborhoods,
 depending on whether the latter are in the negative or positive directions
 relative to the point's angular coordinate, respectively.
 Next, a linear regression algorithm fits lines to each neighborhood.
@@ -185,7 +185,7 @@ angle between arrival and departure lines,
 maximum \gls{rmse} allowed for the line fitting procedure, maximum distance
 of the candidate point to the intersection centroid on the multiple scales,
 and maximum distance to the laser point on analysis.
-The candidate feature keypoint is validated if it passes
+The candidate keypoint is validated if it passes
 all previous indicators over a minimum number of consecutive scales,
 thereby improving robustness to noise in the laser data.
 
@@ -268,7 +268,7 @@ the fitting \glslink{rmse}{\glsentryfull{rmse}}, $\varepsilon_{RMSE}$,
 for lines with an inclination angle between -90º and 90º and a simulation step
 of 0.25º, a set of 100 data points equally distributed along each line,
 a distance Gaussian noise added to the data point coordinates of zero mean
-and 0.03~m standard deviation, and 1000 simulation samples per line}
+and 0.03~m standard deviation, and 1000 simulation samples per line.}
 \label{fig:feature:model-error-analysis}
 \end{figure}
 
@@ -360,7 +360,7 @@ proposed corner-like feature extraction methodology on a laser point $(x_j,y_j)$
 at a distance scale $R_k=0.15$~m. Scan points $\left(x,y\right)$ simulated
 considering a 2D~laser scanner with 0.25º angular resolution,
 0.06--10.0~m range, and Gaussian noise with zero mean and 0.03~m
-standard deviation (same specifications as the Hokuyo UST-10LX sensor)}
+standard deviation (same specifications as the Hokuyo UST-10LX sensor).}
 \label{fig:feature:feature-extraction}
 \end{figure}
 
@@ -387,7 +387,7 @@ the lines intersection centroid on the multiple scales.
 \section{Experimental Results and Discussion}\label{sec:features:results}
 
 The experiments were performed using a three-wheeled omnidirectional robot
-developed by the 5dpo robotics team\footnote{\url{https://5dpo.github.io/}}.
+developed by the 5dpo robotics team~\cite{5dpo}.
 This platform was adapted to have a 2D~laser scanner, namely,
 the Hokuyo UST-10LX with 270º~\gls{fov}, 0.25º angular resolution,
 and 40~Hz sampling rate.
@@ -411,14 +411,14 @@ With this localization estimation, the point clouds from the 2D~laser scanner
 can be transformed to the map coordinate frame that is a static one,
 instead of being referenced to the moving laser frame.
 All parameters of the algorithms, launch configuration files,
-and scripts used in the experiments are also available in this paper's
-public GitHub repository\footref{footnote:repo}.
+and scripts used in the experiments are also available in a public GitHub
+repository\footnote{\url{https://github.com/INESCTEC/inesctec_mrdt_line_fit_based_corner_detector_2d_laser}}.
 
 \subsection{Feature extraction results}
 
 Figure~\ref{fig:features:example-results} is an example of the feature
-extraction results. This example represents the extracted features
-$\left(x,y\right)^{t=t_i}$ at a certain time instant $t_i$,
+extraction results. This example represents the feature keypoints
+$\left(x,y\right)^{t=t_i}$ at a time instant $t_i$,
 where the blue circle is the robot pose estimated by the
 \gls{amcl}~\cite{thrun:book:2005} algorithm and the orange dotted lines
 represent the \gls{fov} of the sensor.
@@ -433,7 +433,7 @@ videos\footnote{\label{footnote:videos}\url{https://www.youtube.com/watch?v=desB
 
 \begin{figure}[!t]
 \centering
-\centerline{\includegraphics[height=0.8\columnwidth]{features/example-feature-extraction.eps}}
+\centerline{\includegraphics[height=0.5\columnwidth]{features/example-feature-extraction.eps}}
 \caption[Example results for the proposed corner-like feature extraction
 methodology]{Example results for the proposed corner-like feature extraction
 methodology. Occupancy grid map obtained by using the
@@ -449,7 +449,7 @@ This observation is shown both in \figref{fig:features:example-results}
 and in the videos\footref{footnote:videos}, even detecting stable features
 in legs of passing people through the environment.
 As for the difference between the features detection at a certain time instant
-and the most persistent ones, this different may be due to noise
+and the most persistent ones, this difference may be due to noise
 in the distance measures of the 2D~laser.
 
 \subsection{Features observability}\label{sec:features:results:features-observability}
@@ -467,8 +467,11 @@ the 39~persistent features also shown in \figref{fig:features:example-results}.
 
 \begin{figure}[!t]
 \centering
-\centerline{\includegraphics[height=0.8\columnwidth]{features/features-persistence.eps}}
-\caption{Evaluation of the features observation ratio, considering the robot pose along time, the Field-Of-View (FOV) of the 2D laser scanner, and a map resolution of 0.03~m/px.}
+\centerline{\includegraphics[height=0.5\columnwidth]{features/features-persistence.eps}}
+\caption[Evaluation of the corner-like features observation ratio]{Evaluation
+of the corner-like features observation ratio, considering the robot pose
+along time, the \glslink{fov}{\glsentryfull{fov}} of the 2D~laser scanner,
+and a map resolution of 0.03~m/px.}
 \label{fig:features:features-observation-ratio}
 \end{figure}
 
@@ -488,20 +491,24 @@ For the same consideration of the N8-neighborhood, 20 and 16~features
 have an observability ratio greater or equal to 50\% and 75\%, respectively.
 These results indicate the possible usefulness of
 the proposed corner-like feature detector for tasks
-such as localization and mapping using 2D~lasers.
+such as localization and mapping using 2D~lasers,
+given the stability of the feature keypoints.
 
 \subsection{Features association distance}
 
-\begin{figure*}[!t]
+\begin{figure}[!t]
   \centering
-  \subfloat[][]{\includegraphics[width=0.9\columnwidth]{features/standard-deviation.eps}%
+  \subfloat[][]{\includegraphics[height=0.365\textwidth]{features/standard-deviation.eps}%
   \label{fig:features:standard-deviation:matrix}}
-  \hspace{1.5em}
-  \subfloat[][]{\includegraphics[width=0.9\columnwidth]{features/standard-deviation_hist.eps}%
+  \hfill
+  \subfloat[][]{\includegraphics[height=0.375\columnwidth]{features/standard-deviation_hist.eps}%
   \label{fig:features:standard-deviation:histogram}}
-  \caption{Standard deviation analysis of the distance between corresponding features: (a) association matrix; (b) histogram distribution.}
+  \caption[Standard deviation analysis of the distance between
+  corresponding corner-like features]{Standard deviation analysis of
+  the distance between corresponding corner-like features:
+  (a) association matrix; (b) histogram distribution.}
   \label{fig:features:standard-deviation}
-\end{figure*}
+\end{figure}
 
 Even though the analysis on the features observability indicate
 if the features are consistently seen in space,
