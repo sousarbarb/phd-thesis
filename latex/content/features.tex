@@ -1,6 +1,33 @@
 \chapter{Line Fitting-Based Corner-Like Detector for 2D Laser Scanners Data}\label{chap:features}
 
-TBC
+This chapter presents a novel line-fitting-based corner-like detector for
+2D~laser-scanning data~\cite{sousa:icara:2024},
+developed within the scope of this PhD~Thesis (see \appxref{appx:features}).
+Even though the most common way to represent 2D~environments is via
+occupancy grid maps, an alternative is to represent the scene
+as a set of features. Accordingly, this chapter explores
+the extraction of features that may resemble geometric corners
+in the environment. Our methodology explores local line fitting
+at each scan point and the intersection of the fitted lines
+before and after the point, with respect to the angular scanning direction.
+Experimental results reveal viewpoint and geometric invariance of
+the corner-like features extracted using the proposed methodology,
+demonstrating the potential of this work for
+localization and mapping problems on mobile robots.
+
+Thus, this chapter is divided into four sections.
+First, \secref{sec:features:background} introduces feature extraction algorithms
+for 2D~laser scanner data from the literature.
+\secref{sec:features:method} outlines our methodology for extracting
+corner-like features from 2D~laser data using local line fitting
+and multiple neighborhood-scale analysis.
+Then, \secref{sec:features:results} presents experimental results to investigate
+the observability ratio of the proposed corner-like feature detector,
+the viewpoint- and geometry-invariance properties of the extracted features,
+and the extraction of line segments in parallel with
+the proposed corner-like feature detector.
+Lastly, \secref{sec:features:conclusions} presents a summary of this chapter,
+the main conclusions, and future work.
 
 \section{Background}\label{sec:features:background}
 
@@ -268,7 +295,8 @@ the fitting \glslink{rmse}{\glsentryfull{rmse}}, $\varepsilon_{RMSE}$,
 for lines with an inclination angle between -90º and 90º and a simulation step
 of 0.25º, a set of 100 data points equally distributed along each line,
 a distance Gaussian noise added to the data point coordinates of zero mean
-and 0.03~m standard deviation, and 1000 simulation samples per line.}
+and 0.03~m standard deviation, and 1000 simulation samples per
+line~\cite{sousa:icara:2024}.}
 \label{fig:feature:model-error-analysis}
 \end{figure}
 
@@ -360,7 +388,8 @@ proposed corner-like feature extraction methodology on a laser point $(x_j,y_j)$
 at a distance scale $R_k=0.15$~m. Scan points $\left(x,y\right)$ simulated
 considering a 2D~laser scanner with 0.25º angular resolution,
 0.06--10.0~m range, and Gaussian noise with zero mean and 0.03~m
-standard deviation (same specifications as the Hokuyo UST-10LX sensor).}
+standard deviation (same specifications as the Hokuyo UST-10LX
+sensor)~\cite{sousa:icara:2024}.}
 \label{fig:feature:feature-extraction}
 \end{figure}
 
@@ -438,7 +467,8 @@ videos\footnote{\label{footnote:videos}\url{https://www.youtube.com/watch?v=desB
 methodology]{Example results for the proposed corner-like feature extraction
 methodology. Occupancy grid map obtained by using the
 SLAM Toolbox~\cite{macenski-jambrecic:joss:2021} algorithm,
-considering a map resolution of 0.03~m/px.}
+considering a map resolution of
+0.03~m/px~\cite{sousa:icara:2024}.}
 \label{fig:features:example-results}
 \end{figure}
 
@@ -471,7 +501,8 @@ the 39~persistent features also shown in \figref{fig:features:example-results}.
 \caption[Evaluation of the corner-like features observation ratio]{Evaluation
 of the corner-like features observation ratio, considering the robot pose
 along time, the \glslink{fov}{\glsentryfull{fov}} of the 2D~laser scanner,
-and a map resolution of 0.03~m/px.}
+and a map resolution of
+0.03~m/px~\cite{sousa:icara:2024}.}
 \label{fig:features:features-observation-ratio}
 \end{figure}
 
@@ -506,7 +537,8 @@ given the stability of the feature keypoints.
   \caption[Standard deviation analysis of the distance between
   corresponding corner-like features]{Standard deviation analysis of
   the distance between corresponding corner-like features:
-  (a) association matrix; (b) histogram distribution.}
+  (a) association matrix; (b) histogram
+  distribution~\cite{sousa:icara:2024}.}
   \label{fig:features:standard-deviation}
 \end{figure}
 
@@ -577,4 +609,79 @@ the range data from the 2D~laser scanner sensor.
 
 \section{Summary and Conclusions}\label{sec:features:conclusions}
 
-TBC
+This chapter addresses a feature extraction algorithm for corner-like features
+from 2D~lasers data. Although the most common way to represent the environment
+from 2D~lasers is via 2D~occupancy grid maps, an alternative is to represent
+the scene as a set of features. These features may include
+beacons\cite{sobreira:icarsc:2015}, geometric cues
+(line~\cite{castellanos:mfi:1996,roumeliotis-bekey:iros:2000,mohamed:isprs-arxiv:2016,liu:sensors:2023,nunez:icra:2006,vazquez-martin:sensors:2009,feng:aici:2009,pfister:icra:2003,gao:ijars:2018}
+and curve~\cite{falomir:prl:2013,nunez:icra:2006,vazquez-martin:sensors:2009,feng:aici:2009} segments,
+corners~\cite{castellanos:mfi:1996,roumeliotis-bekey:iros:2000,jung:tits:2008,falomir:prl:2013,mohamed:isprs-arxiv:2016,lin:yac:2017,liu:electronics:2022,liu:sensors:2023,nunez:icra:2006,vazquez-martin:sensors:2009,feng:aici:2009,certad:andescon:2012},
+and free endpoints of segments~\cite{castellanos:mfi:1996,liu:electronics:2022,vazquez-martin:sensors:2009,certad:andescon:2012}),
+and semantic features~\cite{jung:tits:2008,qu:robio:2018,roumeliotis-bekey:iros:2000}.
+In the specific case of corner-like features, the most common approach
+in the literature is to intersect line-segment features to extract corners
+from 2D~lasers data~\cite{castellanos:mfi:1996,roumeliotis-bekey:iros:2000,jung:tits:2008,falomir:prl:2013,fernandez-moral:ijrr:2015,mohamed:isprs-arxiv:2016,zhao:icsess:2016,lin:yac:2017,qu:robio:2018,liu:electronics:2022,liu:sensors:2023}.
+However, this methodology makes corner detection highly dependent on
+the line-detection algorithm and may be limited to well-structured environments.
+Another common approach is to estimate curvature from the scan
+data~\cite{nunez:icra:2006,vazquez-martin:sensors:2009,feng:aici:2009,certad:andescon:2012}.
+Still, the influence of sensor noise on curvature estimation may lead
+to variant features and false positives.
+
+Given the previous limitations, we propose a feature-extraction algorithm
+to detect points of interest in 2D~laser scanners data
+that resemble physical corners. The proposed algorithm performs
+local line fitting at multiple distance scales around a given point,
+similar to \gls{surf}~\cite{bay:eccv:2006}. These scales define arrival and
+departure distance-based neighborhoods around the points in the scan.
+The intersection of the fitted lines defines candidate feature keypoints.
+Then, a set of indicators based on line-fitting error, the angle between
+the arrival and departure lines, and consecutive observations of the same
+candidate keypoint across different scales defines a corner-like feature.
+Our methodology is independent of global search during line segment scanning, allowing other feature extraction methods to run concurrently.
+
+Experimental results show that the proposed corner-like features correspond
+not only to well-defined 90º corners but may also detect
+other corner-like points of interest.
+More points of interest yield more features that may help stabilize
+the robot's localization when estimating its pose using
+the proposed corner-like features.
+Furthermore, we analyze the observability ratio of the corner-like features
+throughout the experiment, based on the robot pose and sensor \gls{fov}.
+When considering the robot pose uncertainty and sensor, 6~features had a 100\%
+observability ratio, while 20~and 16~features had a ratio greater or equal
+to 50\% and 75\%, respectively. These results reveal viewpoint invariance
+of the proposed feature extractor algorithm. As for geometric invariance,
+when analyzing the association distance between the 39~most persistent
+features from the experiments, the maximum standard deviation of
+these distances for each pair of associated features was 0.051~m.
+In contrast, 91.5\% of possible feature associations had a standard deviation
+of 0.03~m or less, which is equivalent to the sensor noise.
+These results demonstrate that geometric relations between
+corner-like features extracted through our methodology
+remain consistent and geometrically invariant.
+
+Overall, our corner-like features demonstrate their usefulness
+for localization and mapping processes through their viewpoint- and
+geometry-invariant properties in the experiments.
+These features can be extracted simultaneously with line segments
+from 2D~laser scanner data, and combining different feature modalities
+can provide complementary observations, thereby improving
+the robustness and stability of localization.
+A natural continuation of this work is the development of
+a feature-based 2D~localization estimator for mobile robots
+using 2D~laser scan data, which could later be integrated
+as a front-end within a \gls{slam} framework.
+Although feature-based localization and mapping
+constitute a promising research direction,
+it also requires additional components, such as data association algorithms,
+uncertainty models for feature observations,
+possibly feature descriptors, and specific map data structures.
+These requirements are not commonly supported in \gls{ros}~\cite{ros},
+in which the most widely adopted representation of a 2D~environment is
+the occupancy grid map rather than a feature-based map.
+Therefore, the next chapters of this PhD~Thesis focus on
+the localization and mapping of mobile robots using wheeled odometry and
+raw 2D~laser scanner data, rather than relying on
+feature-based environment representations.
