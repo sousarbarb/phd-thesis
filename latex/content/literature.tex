@@ -14,7 +14,7 @@ localization and mapping processes. As a result,
 this chapter extends the discussion of dynamics modelling presented in
 the review article~\cite{sousa:jfr:2023} and updates the results of the
 latest full search inquiry to scientific databases, yielding an analysis of
-52~studies, compared with the 32~originally covered in the review.
+53~studies, compared with the 32~originally covered in the review.
 
 Hence, this chapter is divided into four sections.
 First, \secref{sec:literature:slam} formulates the traditional \gls{slam}
@@ -84,7 +84,7 @@ p\left(x_{1:t},m \;\vert\; z_{1:t},u_{1:t}\right)
   \label{fig:literature:slam:full}}
   \caption[Graphical model of the \glsentryfull{slam} problem]{%
   Graphical model of the \glslink{slam}{\glsentryfull{slam}} problem:
-  (a) online SLAM; (b) full SLAM~\cite{thrun:book:2005}}
+  (a) online SLAM; (b) full SLAM~\cite{thrun:book:2005}.}
   \label{fig:literature:slam}
 \end{figure}
 
@@ -147,7 +147,7 @@ allowing to perform \gls{slam} with a scan matching methodology.
   \centering
   \includegraphics[width=0.65\textwidth]{literature/slam-hector.pdf}
   \caption[Block diagram of the mapping and navigation systems of HectorSLAM]{%
-  Block diagram of the mapping and navigation systems of HectorSLAM~\cite{kohlbrecher:ssr:2011}}
+  Block diagram of the mapping and navigation systems of HectorSLAM~\cite{kohlbrecher:ssr:2011}.}
   \label{fig:literature:slam:hector-slam}
 \end{figure}
 
@@ -266,7 +266,7 @@ p\left(m \;\vert\; x_t,z_{1:t},c_{1:t}\right) =\\
   Composition of particles in
   FastSLAM~\cite{montemerlo:aaai:2002,montemerlo:ijcai:2003}
   in terms of path estimate and the set of estimators and associated covariances
-  for individual feature locations~\cite{thrun:book:2005}}
+  for individual feature locations~\cite{thrun:book:2005}.}
   \label{fig:literature:slam:fastslam}
 \end{figure}
 
@@ -390,7 +390,7 @@ x^* = \argmin_x F\left(x\right)
   between vertexes $x_i$ and $x_j$ originated from a measurement $z_{ij}$]{%
   Edge connection in the graph formulation of the \gls{slam} problem between
   vertexes $x_i$ and $x_j$ originated from a measurement
-  $z_{ij}$~\cite{grisetti:itsm:2010}}
+  $z_{ij}$~\cite{grisetti:itsm:2010}.}
   \label{fig:literature:slam:graph-slam}
 \end{figure}
 
@@ -684,7 +684,7 @@ leaving 411~eligible works for quality assessment.
 \includegraphics[height=10cm]{literature/selection.pdf}
 \caption[\glsentryfull{prisma} flow diagram for the selection process]{%
 \glslink{prisma}{\glsentryfull{prisma}} flow diagram
-for the selection process~\cite{sousa:jfr:2023}}
+for the selection process~\cite{sousa:jfr:2023}.}
 \label{fig:literature:systematic:method:prisma-flow}
 \end{figure}
 
@@ -720,9 +720,9 @@ resulting in 175~studies for the data extraction phase:
 Finally, the data extraction process involved analyzing the eligible records
 from the quality assessment phase and extracting relevant information.
 In the scope of the systematic review on long-term localization and mapping,
-we considered the following Data Extraction~(DE) items required for each record:
+we considered the following \gls{de} items required for each record:
 \begin{itemize}
-\item $\left[DE1\right]$ Long-term considerations -- long-term factors the works
+\item $\left[\gls{de}1\right]$ Long-term considerations -- long-term factors the works
 consider in their proposed approach and experiments. Considering the knowledge
 obtained in the previous phases of the review's methodology,
 we considered the following factors for categorizing the included works:
@@ -733,23 +733,24 @@ we considered the following factors for categorizing the included works:
   \item multi-session: map management;
   \item computational: memory management, efficiency.
   \end{itemize}
-\item $\left[DE2\right]$ Localization -- how the robot localizes itself and the
-type of localizer;
-\item $\left[DE3\right]$ Mapping -- type of the map;
-\item $\left[DE4\right]$ Multi-robot -- if the proposed methodologies consider
-multi-robot systems;
-\item $\left[DE5\right]$ Execution mode -- offline, online, if requires both,
-or if no information on this item;
-\item $\left[DE6\right]$ Environment and domain -- type of environment (indoor,
-outdoor) and domains (air, ground, water) tested with the proposed methodologies;
-\item $\left[DE7\right]$ Sensory setup -- which sensors considered in the
+\item $\left[\gls{de}2\right]$ Localization -- how the robot localizes itself
+and the type of localizer;
+\item $\left[\gls{de}3\right]$ Mapping -- type of the map;
+\item $\left[\gls{de}4\right]$ Multi-robot -- if the proposed methodologies
+consider multi-robot systems;
+\item $\left[\gls{de}5\right]$ Execution mode -- offline, online, if requires
+both, or if no information on this item;
+\item $\left[\gls{de}6\right]$ Environment and domain -- type of environment
+(indoor, outdoor) and domains (air, ground, water) tested with
+the proposed methodologies;
+\item $\left[\gls{de}7\right]$ Sensory setup -- which sensors considered in the
 methodologies;
-\item $\left[DE8\right]$ Non-public experiments -- if the authors performed
-experiments or tests with non-public data;
-\item $\left[DE9\right]$ Ground-truth -- how ground-truth for non-public data is
-obtained or its type, if available;
-\item $\left[DE10\right]$ Distance and time characteristics -- relative to the
-non-public experiments if available, as follows:
+\item $\left[\gls{de}8\right]$ Non-public experiments -- if the authors
+performed experiments or tests with non-public data;
+\item $\left[\gls{de}9\right]$ Ground-truth -- how ground-truth for non-public
+data is obtained or its type, if available;
+\item $\left[\gls{de}10\right]$ Distance and time characteristics -- relative
+to the non-public experiments if available, as follows:
   \begin{itemize}
   \item total distance (km) of the non-public experiments;
   \item path (km), in the case of repetitive paths;
@@ -757,9 +758,9 @@ non-public experiments if available, as follows:
   \item time interval (day/week/month/year, or d/w/m/y) between the first and
   the last run.
   \end{itemize}
-\item $\left[DE11\right]$ Datasets -- if and which public datasets are used
-in the experiments;
-\item $\left[DE12\right]$ Evaluation metrics -- which metrics are used
+\item $\left[\gls{de}11\right]$ Datasets -- if and which public datasets are
+used in the experiments;
+\item $\left[\gls{de}12\right]$ Evaluation metrics -- which metrics are used
 for evaluation.
 \end{itemize}
 
@@ -802,7 +803,7 @@ localization and mapping.
 The time interval is between the smallest publication year found in
 the included records~(2002) and the year of last full inquiry's date~(2022).
 The latter is with a diagonal hatch pattern due to the fact that
-the last full inquiry did not consider the whole year~\cite{sousa:jfr:2023}}
+the last full inquiry did not consider the whole year~\cite{sousa:jfr:2023}.}
 \label{fig:literature:systematic:results:year}
 \end{figure}
 
@@ -856,7 +857,7 @@ traction in the literature.
 (a) \texttt{(robot* OR vehicle*) AND ((locali* AND map*) OR "slam") AND ("long term" OR "life long" OR lifelong)};
 (b) \texttt{(robot* OR vehicle*) AND ((locali* AND map*) OR "slam") AND ("long term" OR "life long" OR lifelong) AND (dynamic* OR mov*)}.
 Date of the last full inquiry: February 13, 2026.
-The time interval is between 2009 and the year of last full inquiry's date~(2026). The latter is with a diagonal hatch pattern due to the fact that the last full inquiry did not consider the whole year}
+The time interval is between 2009 and the year of last full inquiry's date~(2026). The latter is with a diagonal hatch pattern due to the fact that the last full inquiry did not consider the whole year.}
 \label{fig:literature:systematic:results:year:scopus-wos}
 \end{figure}
 
@@ -887,37 +888,60 @@ underscores the relevance of this PhD~Thesis.
 
 \section{Long-Term SLAM in Dynamic Environments}\label{sec:literature:dynamic}
 
+In order to focus the literature discussion in this chapter on localization and
+mapping in dynamic environments, this section follows the same
+systematic methodology outlined in \secref{sec:literature:systematic:method}.
+The discussion builds on the analysis already made in the review
+article~\cite{sousa:jfr:2023} on dynamics modelling. This analysis examines
+how literature handles scene dynamics through map representation, map matching,
+dynamic object detection, and predictive modelling. However,
+similarly to \secref{sec:literature:systematic:results},
+the original search query is extended with \texttt{dynamic* OR mov*} to update
+the included works from the original date of the last full search inquiry
+in the scientific databases, May 17, 2022, to February 13, 2026,
+while focusing on works that handle scene dynamics.
+Also, this last full inquiry includes only
+Scopus~\cite{scopus} and Web~of~Science~\cite{wos} search results
+to facilitate the update to the discussion. As a result, after completing
+all stages of the review methodology described in \appxref{appx:slr}
+and briefly presented in \secref{sec:literature:systematic:method},
+this section discusses 53~works from the literature, including the 32~studies
+related to handling scene dynamics already discussed in the review article.
+
+\tabref{tab:literature:dynamics:discussion} presents the data extraction results
+for the 53~works identified in the latest full inquiry
+on dynamics modelling. The \gls{dde} items differ from those presented in
+\ref{sec:literature:systematic:method}, as they are designed to capture
+meaningful information within the scope of localization and mapping in
+dynamic environments. Accordingly, the \gls{dde} items required for each of
+the 53~records are as follows:
+\begin{itemize}
+\item $\left[\gls{dde}1\right]$ Mapping -- mapping process and type of the map;
+\item $\left[\gls{dde}2\right]$ Localization -- how the robot localizes itself
+and the type of localizer;
+\item $\left[\gls{dde}3\right]$ Environment and domain -- type of environment
+(indoor, outdoor) and domains (air, ground, water) tested with
+the proposed methodologies;
+\item $\left[\gls{dde}4\right]$ Sensory setup -- which sensors considered in the
+methodologies;
+\item $\left[\gls{dde}5\right]$ Dynamics detection -- how dynamics
+identified from sensor observations;
+\item $\left[\gls{dde}6\right]$ Dynamics labelling -- classification of dynamic
+observations;
+\item $\left[\gls{dde}7\right]$ Dynamics statistics -- statistics formulated
+in the methodologies related to dynamics modelling;
+\item $\left[\gls{dde}8\right]$ Dynamics prediction -- methodologies to predict
+scene dynamics in the environment;
+\item $\left[\gls{dde}9\right]$ Dynamics removal -- how dynamics are handled in
+localization and mapping processes.
+\end{itemize}
+
+Next, complementing the information available in
+\tabref{tab:literature:dynamics:discussion}, the following analysis discusses
+how the 53~works included in this section address scene dynamics through map representation, map matching, dynamic object detection, and
+prediction modelling.
+
 \input{tables/literature/data-extraction.tex}
-
-\cite{chen:itsc:2022}
-\cite{kim:icra:2022}
-\cite{wu:cvci:2022}
-\cite{deng:ram:2023}
-\cite{nielsen-hendeby:tiv:2023}
-\cite{soares:jint:2023}
-\cite{stefanini:sensors:2023}
-\cite{yu:acait:2023}
-\cite{hroob:ras:2024}
-\cite{hroob:ral:2024}
-\cite{wang:ras:2024}
-\cite{yang:ral:2024}
-\cite{cheng:ral:2025}
-\cite{hu:tcsvt:2025}
-\cite{jia:tcsvt:2025}
-\cite{li:tim:2025}
-\cite{wang:tim:2025}
-\cite{zhu:tim:2025}
-
-\todo{review this fucking section based on TRP!!! + new works from scopus and web of science}
-
-\todo{note that should be clear the structure on the following sections!}
-
-In terms of works in the literature for long-term \gls{slam}, as previously mentioned, Appendix~\ref{appx:slr} includes a systematic literature review on that topic following the \gls{prisma}~\cite{page:bmj:2021} guidelines. The literature review goes over several challenges related to long-term autonomy having the date of the last full inquiry for identifying records in the data sources considered in the study on May 17, 2022.
-Given the focus of this research proposal on the challenge for performing \gls{slam} in dynamic environments, this section focus on the included works of the review study categorized as dynamic in the data extraction phase of the methodology. Furthermore, another full inquiry was performed on October 25, 2022, to include more recent works published or made available online between the date considered in the review up to the latter one.
-As a result, after executing all stages of the review methodology described in Appendix~\ref{appx:slr} and focusing only on dynamic-related works, another five records were found in the literature (\cite{liu:scic:2022,nielsen-hendeby:tiv:2023,guo-liu:robio:2021,thomas:icra:2022,fu:ral:2022}). However, given that the work \cite{thomas:icra:2022} is an extension of \cite{thomas:icra:2021}, as assumed in the review, only the extended version will be considered for the discussion.
-
-So, next, this section analyzes literature works focused on modeling and identifying dynamic elements in the environment within the scope of long-term \gls{slam}, \ie, how the methods identify these elements and handle them for long-term localization and mapping.
-The discussion on dynamics modeling is organized into the following topics: specific map representations used to model or deal with dynamic elements in the scene, identification of dynamic elements matching the current observation to the current map, future prediction of dynamic properties of scene elements, and semantic identification of dynamic objects.
 
 \subsection{Map representation}
 
@@ -1664,7 +1688,7 @@ this PhD~Thesis, has also experienced clear growth over time.
 Subsequently, this PhD~Thesis builds on the results of our systematic review,
 narrowing the discussion to long-term \gls{slam} in dynamic environments
 and updating the search date of the last full inquiry to February~13, 2026. This
-update results in 52~works analyzed in \secref{sec:literature:dynamic}.
+update results in 53~works analyzed in \secref{sec:literature:dynamic}.
 A trend in the literature is that most methods
 still rely on conventional \gls{slam} map representations, such as graphs,
 occupancy grids, point clouds, or feature maps, and then augment them
