@@ -4,12 +4,43 @@ TBC
 
 \section{Background}\label{sec:features:background}
 
-TBC (background / literature analysis specific to the topic of this chapter)
+Laser scanners allow building a dense representation of the environment as
+a 2D~occupancy grid map, where each cell represents occupied, free,
+or unknown space~\cite{grisetti:tro:2007}.
+Although grid maps can represent arbitrary objects, they are computationally
+intensive and require substantial memory~\cite{wurm:ras:2010}.
+An alternative method is to represent the environment as a set of features.
+In the case of 2D~lasers, the features may include
+beacons\cite{sobreira:icarsc:2015}, geometric cues
+(line~\cite{castellanos:mfi:1996,roumeliotis-bekey:iros:2000,mohamed:isprs-arxiv:2016,liu:sensors:2023,nunez:icra:2006,vazquez-martin:sensors:2009,feng:aici:2009,pfister:icra:2003,gao:ijars:2018}
+and curve~\cite{falomir:prl:2013,nunez:icra:2006,vazquez-martin:sensors:2009,feng:aici:2009} segments,
+corners~\cite{castellanos:mfi:1996,roumeliotis-bekey:iros:2000,jung:tits:2008,falomir:prl:2013,mohamed:isprs-arxiv:2016,lin:yac:2017,liu:electronics:2022,liu:sensors:2023,nunez:icra:2006,vazquez-martin:sensors:2009,feng:aici:2009,certad:andescon:2012},
+and free endpoints of segments~\cite{castellanos:mfi:1996,liu:electronics:2022,vazquez-martin:sensors:2009,certad:andescon:2012}),
+and semantic features such as
+parked vehicles~\cite{jung:tits:2008,qu:robio:2018}
+and doors~\cite{roumeliotis-bekey:iros:2000}.
+
+The correspondence between geometric features and the environment
+(\eg, lines and corners) may be of interest for localization and mapping
+problems on mobile robots, as well as for user interaction
+with autonomous mobile systems.
+The current literature presents several algorithms for extracting
+line segments from 2D~laser scan
+data~\cite{castellanos:mfi:1996,roumeliotis-bekey:iros:2000,mohamed:isprs-arxiv:2016,liu:sensors:2023,nunez:icra:2006,vazquez-martin:sensors:2009,feng:aici:2009,pfister:icra:2003,gao:ijars:2018},
+including an open-source implementation based on the \gls{ros}~\cite{ros}
+framework\footnote{\label{note:features:line-feature-ros}\url{https://github.com/kam3k/laser_line_extraction}}.
+As for corner detection, the most common methodology found in the literature
+is to extract corners from the intersection of line segments detected in the
+laser scan~\cite{castellanos:mfi:1996,roumeliotis-bekey:iros:2000,jung:tits:2008,falomir:prl:2013,fernandez-moral:ijrr:2015,mohamed:isprs-arxiv:2016,zhao:icsess:2016,lin:yac:2017,qu:robio:2018,liu:electronics:2022,liu:sensors:2023}.
+Another typical approach in the literature is to estimate curvature from the
+scan data~\cite{nunez:icra:2006,vazquez-martin:sensors:2009,feng:aici:2009,certad:andescon:2012}.
+Next, both trends for extracting corner-like features are analyzed
+based on methods found in the literature.
 
 \subsection{Line fitting intersection}\label{sec:features:background:line-fitting}
 
 A trend in the literature is to extract corners at the intersections of
-line segments detected in the 2D~laser
+lines detected in the 2D~laser
 scan~\cite{castellanos:mfi:1996,roumeliotis-bekey:iros:2000,jung:tits:2008,falomir:prl:2013,fernandez-moral:ijrr:2015,mohamed:isprs-arxiv:2016,zhao:icsess:2016,lin:yac:2017,qu:robio:2018,liu:electronics:2022,liu:sensors:2023}.
 First, the laser data may be filtered to remove invalid values
 (zero range values~\cite{jung:tits:2008}) and possible noise
@@ -421,7 +452,7 @@ As for the difference between the features detection at a certain time instant
 and the most persistent ones, this different may be due to noise
 in the distance measures of the 2D~laser.
 
-\subsection{Features observability}
+\subsection{Features observability}\label{sec:features:results:features-observability}
 
 Next, the observability of the features extracted when moving the robot through
 the scene shown in \figref{fig:features:example-results} was evaluated
