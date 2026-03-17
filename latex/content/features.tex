@@ -551,9 +551,29 @@ underline the usefulness of the proposed corner-like features detector
 for localization processes, given that the geometric relations
 between features remain consistent and invariant.
 
-\subsection{Integration with a line features extractor algorithm}
+\subsection{Integration with a line-segment feature extraction algorithm}
 
-TBC
+The final experiment in the scope of this chapter is shown in a
+video\footnote{\url{https://www.youtube.com/watch?v=7xMKtlvd0wU}},
+where our corner-like feature extractor and an open-source line-segment
+feature extraction algorithm\footref{note:features:line-feature-ros}
+run simultaneously. In most cases, there is a complementarity
+between our corner-like features and line-segment features.
+Indeed, there are situations in which no corners are detected
+while line features are present. At the same time, other situations
+in which the expected lines are too small and are therefore possibly rejected
+by the line extractor, leaving only corners to be detected.
+Although the situations shown in the video are also dependent
+on the environment surrounding the robot, this complementarity
+between different types of features is advantageous
+for localization and mapping processes,
+thereby improving the robustness and stability of the robot pose
+estimate by increasing the number of features observable in the environment.
+Still, the main goal of this experiment is to show that
+the proposed feature extraction algorithm may be run in parallel
+with other algorithms, leveraging the \gls{ros}~\cite{ros} modular architecture
+of having independent nodes subscribing to the same data, in this case,
+the range data from the 2D~laser scanner sensor.
 
 \section{Summary and Conclusions}\label{sec:features:conclusions}
 
