@@ -96,11 +96,39 @@ accurate than \gls{gicp}~\cite{segal:rss:2009} and
 \gls{ndt}~\cite{magnusson:jfr:2007}
 registration algorithms on the evaluated datasets.
 
-Probabilistic-based registration?
-Montesano~\etal~\cite{montesano:iros:2005}.
-Censi~\etal~\cite{censi:icra:2006}.
-GMapping~\cite{grisetti:tro:2007},
-Cartographer~\cite{hess:icra:2016}.
+Furthermore, Montesano~\etal~\cite{montesano:iros:2005} present
+a probabilistic scan matching method for 2D~point cloud registration.
+The method~\cite{montesano:iros:2005} builds a set of possible correspondences
+using an individual compatibility test based on the Mahalanobis distance
+between pairs of points, while accounting for correspondence uncertainty.
+Then, Montesano~\etal~\cite{montesano:iros:2005} maximize
+the probability of scan alignment over the points correspondence distribution.
+The proposed algorithm~\cite{montesano:iros:2005} showed faster convergence
+rates than standard \gls{icp}~\cite{besl-mckay:tpami:1992}.
+Instead of selecting a single set of correspondences as
+Montesano~\etal~\cite{montesano:iros:2005}, Censi~\cite{censi:icra:2006}
+considers all possible correspondences and generates alignment hypotheses
+through the \gls{ght}, while avoiding explicit point-to-point correspondences.
+Censi~\cite{censi:icra:2006} computes alignment within
+a fully probabilistic framework that incorporates a motion model and estimates
+for registration uncertainty, accounting for surface normals.
+
+Similarly, the GMapping~\cite{grisetti:tro:2007} and
+Cartographer~\cite{hess:icra:2016} \gls{slam} algorithms use \gls{mle}
+probabilistic formulations to estimate the scan alignment \gls{wrt} the map.
+The scan matcher in GMapping~\cite{grisetti:tro:2007} seeks
+the most likely robot pose by matching the current observation against
+the map built so far. The \gls{mle} formulation estimates
+the robot pose given the map, the current scan, and an initial pose guess.
+This formulation performs a gradient-descent search over
+the observation likelihood function defined on the grid map, based on the
+beam-endpoint sensor model~\cite{thrun:book:2005}.
+Cartographer~\cite{hess:icra:2016} optimizes the scan pose relative to
+the current local submap using a Ceres~\cite{ceres:sw:2023}-based scan matcher.
+This matcher estimates the pose that maximizes the occupancy probabilities of
+the scan points projected onto the submap. The problem is formulated as
+a nonlinear least-squares optimization, using a smooth version of
+the occupancy probability values associated with the projected scan points.
 
 Registration based on distance maps:
 PerfectMatch~\cite{lauer:robocup:2006,sobreira:jint:2019},
