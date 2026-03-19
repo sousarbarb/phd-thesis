@@ -40,7 +40,38 @@ the point-to-point~\cite{besl-mckay:tpami:1992} formulation.
 \left( \mathbf{X} z_i - p_i \right) \|^2
 \end{equation}
 
-Moreover, \gls{gicp}~\cite{segal:rss:2009} retains the standard \gls{icp}
+Unlike traditional \gls{icp} methods, which rely on explicit point
+correspondences, the \glslink{ndt}{\glsentryfull{ndt}}
+proposed by Biber and Strasser~\cite{biber-strasser:iros:2003} performs
+2D~point cloud registration by representing the environment
+with local normal distributions. The 2D~space is discretized into cells.
+Each cell is associated with a Gaussian distribution defined by
+the mean and covariance of the cell points,
+which provide information about the surface those points represent.
+Then, Biber and Strasser~\cite{biber-strasser:iros:2003} formulate
+2D~point cloud registration as the minimization of an error function
+derived from these distributions, optimized using the Gauss--Newton algorithm.
+Experimental results showed that \gls{ndt}~\cite{biber-strasser:iros:2003} was
+able to map large areas without requiring odometry.
+Magnusson~\etal~\cite{magnusson:jfr:2007} later extended \gls{ndt} to
+3D~point cloud registration by subdividing space into voxels,
+each modelled as a normal distribution estimated from
+the points contained within it. The alignment is obtained by
+evaluating the likelihood of points from one scan under
+the distributions of the other scan.
+Compared with point-to-point \gls{icp}~\cite{besl-mckay:tpami:1992} using
+kd-tree nearest-neighbor search~\cite{bentley:cacm:1975},
+3D-\gls{ndt}~\cite{magnusson:jfr:2007} achieves
+lower computation cost by avoiding explicit correspondence search,
+while also offering a more compact representation of 3D~point cloud
+compared to raw data.
+
+While leveraging
+\gls{ndt}~\cite{biber-strasser:iros:2003,magnusson:jfr:2007}-like
+representations of the scene, \gls{gicp}~\cite{segal:rss:2009} and
+\gls{nicp}~\cite{serafin-grisetti:iros:2015} still retain the \gls{icp}
+structure for cloud registration.
+\gls{gicp}~\cite{segal:rss:2009} retains the standard \gls{icp}
 structure for correspondence estimation, typically using Euclidean
 closest-neighbor search accelerated with a kd-tree~\cite{bentley:cacm:1975}.
 The main modification lies in the minimization objective function,
@@ -62,11 +93,12 @@ or when the normals are insufficiently aligned. In the optimization step,
 its normal and minimizes a Mahalanobis distance in this 6D space.
 In the experiments, \gls{nicp}~\cite{serafin-grisetti:iros:2015} was more
 accurate than \gls{gicp}~\cite{segal:rss:2009} and
-\gls{ndt}~\cite{biber-strasser:iros:2003,magnusson:jfr:2007}
+\gls{ndt}~\cite{magnusson:jfr:2007}
 registration algorithms on the evaluated datasets.
 
 Probabilistic-based registration?
-\gls{ndt}~\cite{biber-strasser:iros:2003,magnusson:jfr:2007},
+Montesano~\etal~\cite{montesano:iros:2005}.
+Censi~\etal~\cite{censi:icra:2006}.
 GMapping~\cite{grisetti:tro:2007},
 Cartographer~\cite{hess:icra:2016}.
 
@@ -84,7 +116,7 @@ signed distance function: 10.1109/LRA.2021.3052388
 10.1109/ITSC.2016.7795604
 10.1109/IROS.2015.7353633
 
-\section{Least-squares optimization}\label{sec:distance-maps:background:least-squares}
+\subsection{Least-squares optimization}\label{sec:distance-maps:background:least-squares}
 
 \section{Distance Maps}\label{sec:distance-maps}
 
