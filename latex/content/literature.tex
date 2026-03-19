@@ -1203,8 +1203,8 @@ meaning frequent moving obstacles or changed structure near that node,
 are not considered for exploration because the robot may be
 unable to move to that position.
 
-Although the standard \gls{ndt} representation does not model free space,
-the works of
+Although the standard \gls{ndt}~\cite{biber-strasser:iros:2003} representation
+does not model free space, the works of
 Einhorn and Gross~\cite{einhorn-gross:ecmr:2013,einhorn-gross:ras:2015} and
 Saarinen~\etal~\cite{saarinen:ijrr:2013} use \gls{ndt} with occupancy maps
 to explicitly model free space and adopt
@@ -1596,7 +1596,7 @@ This regression network estimates a stability value for each point in a
 3D~\gls{lidar} point cloud, thereby providing a spatiotemporal stability measure.
 \gls{lts-net} is built on PointNet++ and uses labels generated unsupervised
 from previous observations and the map,
-with the \gls{ndt} employed for scan matching.
+with the \gls{ndt}~\cite{magnusson:jfr:2007} employed for scan matching.
 Once trained, the network is applied online to identify stable points
 in the current \gls{lidar} session, filtering out unstable observations.
 Experiments showed that filtering scans based on long-term stable features
@@ -1604,9 +1604,9 @@ significantly enhances localization performance and robustness
 in dynamic environments, enabling the network to identify and filter long-term
 stable objects. These experimental results led to improved localization
 performance compared to not using network inference on stability scores.
-As for Hroob~\etal~\cite{hroob:ral:2024},
-the authors formulate a more advanced method that also relies on \gls{ndt}
-for scan matching, but replaces PointNet++ with a modified MinkUNet14
+As for Hroob~\etal~\cite{hroob:ral:2024}, the authors formulate a more advanced
+method that also relies on \gls{ndt}~\cite{magnusson:jfr:2007} for scan
+matching, but replaces PointNet++ with a modified MinkUNet14
 to process sparse 4D~tensors containing spatial coordinates and time data.
 Rather than inferring stability primarily from training data,
 this method explicitly models the spatio-temporal discrepancy between

@@ -6,6 +6,86 @@ TBC
 
 TBC (ICP  and its variants, etc.)
 
+\subsection{Point cloud registration}\label{sec:distance-maps:background:registration}
+One of the most popular approaches for point cloud registration is
+the \glslink{icp}{\glsentryfull{icp}} algorithm.
+Besl and McKay~\cite{besl-mckay:tpami:1992} address registration of 3D~shapes
+represented as point clouds, introducing the standard \gls{icp} algorithm.
+The following two steps can summarize this algorithm:
+(i) compute correspondences between the source ($z_i$) and target ($p_i$)
+cloud points (closest nearest neighbor based on Euclidean distance); and
+(ii) estimate the rigid transformation of the source \gls{wrt} target cloud
+($\mathbf{X}$) that minimizes a point-to-point distance measure between
+corresponding points (see \eqref{eq:distance-maps:background:point-to-point}).
+Chen and Medioni~\cite{chen-medioni:icra:1991} exploit the tendency of
+most range data to be locally planar and introduce a point-to-plane variant
+of \gls{icp}. The proposed method exploits surface normal information ($n_i$).
+Instead of minimizing the difference between the projected source point and
+the target point, the point-to-plane error metric minimizes
+the squared dot product of the surface normal with
+the difference between the expected projected source point and
+the reference target point
+(see \eqref{eq:distance-maps:background:point-to-plane}).
+Indeed, Rusinkiewicz and Levoy~\cite{rusinkiewicz-levoy:im:2001} compared
+different variants of \gls{icp} with respect to point selection,
+data association, weighting of associated pairs, outlier rejection, and
+error metric and minimization. The point-to-plane~\cite{chen-medioni:icra:1991}
+metric demonstrated significantly better performance than
+the point-to-point~\cite{besl-mckay:tpami:1992} formulation.
+\begin{equation}\label{eq:distance-maps:background:point-to-point}
+\mathbf{X} = \arg \min_\mathbf{X} \sum_i \| \mathbf{X} z_i - p_i \|^2
+\end{equation}
+\begin{equation}\label{eq:distance-maps:background:point-to-plane}
+\mathbf{X} = \arg \min_\mathbf{X} \sum_i \| n_i^T \cdot
+\left( \mathbf{X} z_i - p_i \right) \|^2
+\end{equation}
+
+Moreover, \gls{gicp}~\cite{segal:rss:2009} retains the standard \gls{icp}
+structure for correspondence estimation, typically using Euclidean
+closest-neighbor search accelerated with a kd-tree~\cite{bentley:cacm:1975}.
+The main modification lies in the minimization objective function,
+introducing a plane-to-plane error metric. \gls{gicp} models
+local surface information around each point, estimated from
+neighboring points via \gls{pca}. By accounting for the covariance of
+the matched points, \gls{gicp} weights residuals based on
+local geometric uncertainty. Experiments showed that \gls{gicp} was more robust
+to incorrect correspondences and more accurate than
+standard point-to-point and point-to-plane \gls{icp}.
+\gls{nicp}~\cite{serafin-grisetti:iros:2015} extends \gls{gicp}
+not only in the optimization stage but also during correspondence search.
+Rather than relying purely on Euclidean nearest-neighbor matching,
+\gls{nicp}~\cite{serafin-grisetti:iros:2015} uses a line-of-sight-based
+association step and rejects candidate pairs when normals are not well defined,
+when point distance exceeds a threshold, when curvature mismatch is too large,
+or when the normals are insufficiently aligned. In the optimization step,
+\gls{nicp}~\cite{serafin-grisetti:iros:2015} augments each point with
+its normal and minimizes a Mahalanobis distance in this 6D space.
+In the experiments, \gls{nicp}~\cite{serafin-grisetti:iros:2015} was more
+accurate than \gls{gicp}~\cite{segal:rss:2009} and
+\gls{ndt}~\cite{biber-strasser:iros:2003,magnusson:jfr:2007}
+registration algorithms on the evaluated datasets.
+
+Probabilistic-based registration?
+\gls{ndt}~\cite{biber-strasser:iros:2003,magnusson:jfr:2007},
+GMapping~\cite{grisetti:tro:2007},
+Cartographer~\cite{hess:icra:2016}.
+
+Registration based on distance maps:
+PerfectMatch~\cite{lauer:robocup:2006,sobreira:jint:2019},
+HectorSLAM~\cite{kohlbrecher:ssr:2011}.
+
+\subsection{Distance function representations}\label{sec:distance-maps:background:distance-functions}
+
+truncated signed distance function: 10.1109/ICRA48506.2021.9562069
+
+signed distance function: 10.1109/LRA.2021.3052388
+
+10.1109/ICRA40945.2020.9196695
+10.1109/ITSC.2016.7795604
+10.1109/IROS.2015.7353633
+
+\section{Least-squares optimization}\label{sec:distance-maps:background:least-squares}
+
 \section{Distance Maps}\label{sec:distance-maps}
 
 TBC (unsigned distance map structure,
