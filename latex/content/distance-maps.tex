@@ -27,11 +27,11 @@ the difference between the expected projected source point and
 the reference target point
 (see \eqref{eq:distance-maps:background:point-to-plane}).
 Indeed, Rusinkiewicz and Levoy~\cite{rusinkiewicz-levoy:im:2001} compared
-different variants of \gls{icp} with respect to point selection,
+\gls{icp} variants with respect to point selection,
 data association, weighting of associated pairs, outlier rejection, and
-error metric and minimization. The point-to-plane~\cite{chen-medioni:icra:1991}
+error metrics. The point-to-plane~\cite{chen-medioni:icra:1991}
 metric demonstrated significantly better performance than
-the point-to-point~\cite{besl-mckay:tpami:1992} formulation.
+the point-to-point~\cite{besl-mckay:tpami:1992} formulation in the experiments.
 \begin{equation}\label{eq:distance-maps:background:point-to-point}
 \mathbf{X} = \arg \min_\mathbf{X} \sum_i \| \mathbf{X} z_i - p_i \|^2
 \end{equation}
@@ -79,11 +79,13 @@ introducing a plane-to-plane error metric. \gls{gicp} models
 local surface information around each point, estimated from
 neighboring points via \gls{pca}. By accounting for the covariance of
 the matched points, \gls{gicp} weights residuals based on
-local geometric uncertainty. Experiments showed that \gls{gicp} was more robust
-to incorrect correspondences and more accurate than
-standard point-to-point and point-to-plane \gls{icp}.
-\gls{nicp}~\cite{serafin-grisetti:iros:2015} extends \gls{gicp}
-not only in the optimization stage but also during correspondence search.
+local geometric uncertainty. Experiments showed that
+\gls{gicp}~\cite{segal:rss:2009} was more robust to incorrect correspondences
+and more accurate than standard point-to-point and point-to-plane
+\gls{icp}~\cite{besl-mckay:tpami:1992,chen-medioni:icra:1991}.
+\gls{nicp}~\cite{serafin-grisetti:iros:2015} extends
+\gls{gicp}~\cite{segal:rss:2009} not only in the optimization stage but also
+during correspondence search.
 Rather than relying purely on Euclidean nearest-neighbor matching,
 \gls{nicp}~\cite{serafin-grisetti:iros:2015} uses a line-of-sight-based
 association step and rejects candidate pairs when normals are not well defined,
@@ -103,14 +105,14 @@ using an individual compatibility test based on the Mahalanobis distance
 between pairs of points, while accounting for correspondence uncertainty.
 Then, Montesano~\etal~\cite{montesano:iros:2005} maximize
 the probability of scan alignment over the points correspondence distribution.
-The proposed algorithm~\cite{montesano:iros:2005} showed faster convergence
+The algorithm~\cite{montesano:iros:2005} showed faster convergence
 rates than standard \gls{icp}~\cite{besl-mckay:tpami:1992}.
 Instead of selecting a single set of correspondences as
 Montesano~\etal~\cite{montesano:iros:2005}, Censi~\cite{censi:icra:2006}
 considers all possible correspondences and generates alignment hypotheses
 through the \gls{ght}, while avoiding explicit point-to-point correspondences.
 Censi~\cite{censi:icra:2006} computes alignment within
-a fully probabilistic framework that incorporates a motion model and estimates
+a probabilistic framework that incorporates a motion model and estimates
 for registration uncertainty, accounting for surface normals.
 
 Similarly, the GMapping~\cite{grisetti:tro:2007} and
@@ -130,9 +132,50 @@ the scan points projected onto the submap. The problem is formulated as
 a nonlinear least-squares optimization, using a smooth version of
 the occupancy probability values associated with the projected scan points.
 
-Registration based on distance maps:
-PerfectMatch~\cite{lauer:robocup:2006,sobreira:jint:2019},
-HectorSLAM~\cite{kohlbrecher:ssr:2011}.
+Precomputed spatial gradients may be leveraged for the 2D~point cloud
+registration without requiring explicit point-to-point correspondences.
+HectorSLAM~\cite{kohlbrecher:ssr:2011} uses spatial gradients over
+the 2D~occupancy grid map ($M$). The scan matching finds the pose that maximizes
+the occupancy probability of where the beam endpoints land on occupied cells
+(see \eqref{eq:distance-maps:background:hectorslam}).
+The method uses bilinear interpolation over the occupancy map and approximates
+its spatial derivatives, applying then a Gauss-Newton update.
+PerfectMatch~\cite{lauer:robocup:2006,sobreira:jint:2019} focuses on
+a soccer field markings environment for robot soccer.
+This method formulates the 2D~registration problem based on distance maps, using
+the \gls{rprop}~\cite{riedmiller-braun:icnn:1993} gradient-descent algorithm.
+Each point is evaluated by the distance map ($\mathcal{D}_M$)
+that gives the distance to the closest field marking through a
+robust M-estimator ($\rho$)
+(see \eqref{eq:distance-maps:background:perfectmatch}).
+The algorithm considers that the distance map is over the entire soccer field
+environment, only considering scan-to-map alignment.
+Although distance maps are continuous and thus differentiable,
+the authors approximate the final estimation covariance based on the second
+derivative of the error assuming an environment with orthogonal walls,
+equivalent to the line markings of soccer fields.
+Sobreira~\etal~\cite{sobreira:jint:2019} benchmarked in a simulation environment
+PerfectMatch~\cite{lauer:robocup:2006} against
+\gls{icp}~\cite{besl-mckay:tpami:1992} and
+\gls{ndt}~\cite{biber-strasser:iros:2003}.
+PerfectMatch~\cite{lauer:robocup:2006} was faster than both
+\gls{icp}~\cite{besl-mckay:tpami:1992} and
+\gls{ndt}~\cite{biber-strasser:iros:2003}, given that
+PerfectMatch~\cite{lauer:robocup:2006} uses lookup tables
+for the error function.
+Additionally, the PerfectMatch~\cite{lauer:robocup:2006}
+algorithm demonstrated a higher tolerance to orientation initialization errors
+than \gls{icp}~\cite{besl-mckay:tpami:1992} and
+\gls{ndt}~\cite{biber-strasser:iros:2003}.
+
+\begin{equation}\label{eq:distance-maps:background:hectorslam}
+\mathbf{X} = \arg \min_\mathbf{X} \sum_i
+\left[ 1 - M \left(\mathbf{X} z_i\right) \right]^2
+\end{equation}
+\begin{equation}\label{eq:distance-maps:background:perfectmatch}
+\mathbf{X} = \arg \min_\mathbf{X} \sum_i
+\rho \left( \mathcal{D}_M \left( \mathbf{X} z_i \right) \right)
+\end{equation}
 
 \subsection{Distance function representations}\label{sec:distance-maps:background:distance-functions}
 
