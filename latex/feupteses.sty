@@ -178,10 +178,9 @@ with the `report' document style}{}}{}
 \clubpenalty=6000
 \widowpenalty=6000
 
-\RequirePackage{mathptmx}	   % font times
-\RequirePackage[scaled]{couriers}  % font courier
-\RequirePackage[scaled]{helvet}    % font helvetica
-\RequirePackage[pdftex]{graphicx}
+\RequirePackage[scaled]{couriers} % font courier
+\RequirePackage[scaled]{helvet}   % font helvetica
+\RequirePackage[pdftex]{graphicx} % enhanced support for graphics display
 \RequirePackage{url}
 \RequirePackage{setspace}
 \RequirePackage{makeidx}
@@ -192,6 +191,15 @@ with the `report' document style}{}}{}
 \RequirePackage[firstpage]{draftwatermark}
 \fi
 \RequirePackage{xcolor}
+
+% \RequirePackage{mathptmx}	   % font times
+\RequirePackage{amsmath}      % enhanced functions to improve math content display
+\RequirePackage{amssymb}      % math symbols
+% \RequirePackage{amsfonts}   % math extended fonts
+\RequirePackage{amsthm,thmtools}
+\RequirePackage{bm}           % bold symbols in maths mode
+\RequirePackage{newtxtext}    % font times
+\RequirePackage{newtxmath}    % math font times
 
 \if@numericrefs
   \newcommand{\citet}{\cite}
