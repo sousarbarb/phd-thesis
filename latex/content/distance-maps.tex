@@ -177,6 +177,25 @@ than \gls{icp}~\cite{besl-mckay:tpami:1992} and
 \rho \left( \mathcal{D}_M \left( \mathbf{X} z_i \right) \right)
 \end{equation}
 
+Overall, most \gls{icp} methods rely on explicit point-to-point correspondences,
+requiring two steps per optimization iteration: data association and
+pairwise error computation between source and target points.
+As for probabilistic-based approaches, these methods typically require
+computing a map estimate of the environment over time, which is not compatible
+with scan-to-scan registration. In contrast, distance maps
+should be compatible with both scan-to-scan and scan-to-map alignment,
+providing a nearest neighbor framework between source and target clouds.
+While the PerfectMatch~\cite{lauer:robocup:2006} algorithm is specific
+to scan-to-map registration, an adaptation of the original approach
+should be compatible with scan-to-scan alignment.
+Moreover, distance maps provide a precomputed lookup table
+that directly allows evaluating the registration error of each source point
+without requiring an explicit data association step.
+This property allows faster computation during point cloud registration than
+\gls{icp}~\cite{besl-mckay:tpami:1992} and
+\gls{ndt}~\cite{biber-strasser:iros:2003}, as showed in
+Sobreira~\etal~\cite{sobreira:jint:2019}.
+
 \subsection{Distance function representations}\label{sec:distance-maps:background:distance-functions}
 
 truncated signed distance function: 10.1109/ICRA48506.2021.9562069
