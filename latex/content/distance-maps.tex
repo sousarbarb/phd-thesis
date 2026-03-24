@@ -196,15 +196,22 @@ This property allows faster computation during point cloud registration than
 \gls{ndt}~\cite{biber-strasser:iros:2003}, as showed in
 Sobreira~\etal~\cite{sobreira:jint:2019}.
 
-\subsection{Distance function representations}\label{sec:distance-maps:background:distance-functions}
-
-truncated signed distance function: 10.1109/ICRA48506.2021.9562069
-
-signed distance function: 10.1109/LRA.2021.3052388
-
-10.1109/ICRA40945.2020.9196695
-10.1109/ITSC.2016.7795604
-10.1109/IROS.2015.7353633
+% \subsection{Distance function representations}\label{sec:distance-maps:background:distance-functions}
+%
+% (surface reconstruction)
+%
+% signed distance function:
+% - 10.1109/IROS.2015.7353633 (2D-SDF-SLAM,
+%   only use SDF to improve map representation results,
+%   occupancy probabilistic-based approach used for scan registration;
+%   still, only works for scan-to-map alignment)
+% - 2D: 10.1109/IROS40897.2019.8967683
+% - 3D: 10.1109/LRA.2021.3052388
+%
+% TSDF: 10.1145/237170.237269 (original? incremental update to compute SDF)
+% - 10.1109/CVPR.2015.7299077
+% - Voxblox (10.1109/IROS.2017.8202315) / Voxgraph (10.1109/LRA.2019.2953859)
+% - 10.1109/ICRA40945.2020.9196695
 
 \subsection{Least-squares optimization}\label{sec:distance-maps:background:least-squares}
 
