@@ -1,10 +1,10 @@
 \chapter{Data Registration with Distance Maps}\label{chap:distance-maps}
 
-TBC
+\todo{TBC}
 
 \section{Background}\label{sec:distance-maps:background}
 
-TBC (ICP  and its variants, etc.)
+\todo{TBC}
 
 \subsection{Point cloud registration}\label{sec:distance-maps:background:registration}
 One of the most popular approaches for point cloud registration is
@@ -216,6 +216,10 @@ Sobreira~\etal~\cite{sobreira:jint:2019}.
 
 \subsection{Least-squares minimization}\label{sec:distance-maps:background:least-squares}
 
+\todo{TBC}
+
+\subsubsection{Problem formulation}\label{sec:distance-maps:background:least-squares:problem-formulation}
+
 In terms of formulating least-squares minimization problems in robotics, first,
 let $\mathbf{x}$ denote non-observable state variables and
 $\mathbf{z}$ as the measurements.
@@ -249,6 +253,41 @@ p(\mathbf{x}|\mathbf{z}) =
 \propto p(\mathbf{z}|\mathbf{x})p(\mathbf{x})
 \propto p(\mathbf{z}|\mathbf{x})
 \end{equation}
+
+\todo{TBC}
+
+\begin{equation}\label{eq:distance-maps:background:least-squares:independence}
+p(\mathbf{x}|\mathbf{z}) \propto \prod_i p(\mathbf{z}^{[i]}|\mathbf{x})
+\end{equation}
+\begin{equation}\label{eq:distance-maps:background:least-squares:measurement}
+\begin{aligned}
+p(\mathbf{z}^{[i]}|\mathbf{x})
+  & = \mathcal{N}(\mathbf{z}^{[i]} ; \mathbf{h}^{[i]}(\mathbf{x}), \Sigma^{[i]})\\
+  & \propto \exp\left(-\left( \mathbf{h}^{[i]}(\mathbf{x}) - \mathbf{z}^{[i]} \right)^T
+                      \left(\Sigma^{[i]}\right)^{-1}
+                      \left( \mathbf{h}^{[i]}(\mathbf{x}) - \mathbf{z}^{[i]} \right)
+                \right)\\
+  & \propto \exp\left( -\mathbf{e}^{[i]}(\mathbf{x})^T \Omega^{[i]} \mathbf{e}^{[i]}(\mathbf{x}) \right)
+\end{aligned}
+\end{equation}
+\begin{equation}\label{eq:distance-maps:background:least-squares:error}
+\mathbf{e}^{[i]}(\mathbf{x})=\mathbf{h}^{[i]}(\mathbf{x}) - \mathbf{z}^{[i]}
+\end{equation}
+
+\todo{TBC}
+
+\begin{equation}\label{eq:distance-maps:background:least-squares:mle-log-likelihood}
+\begin{aligned}
+\mathbf{x}^*
+  & = \argmax_\mathbf{x} \prod_i p(\mathbf{z}^{[i]}|\mathbf{x})\\
+  & = \argmax_\mathbf{x} \prod_i \exp\left( -\mathbf{e}^{[i]}(\mathbf{x})^T \Omega^{[i]} \mathbf{e}^{[i]}(\mathbf{x}) \right)\\
+  & = \argmin_\mathbf{x} \sum_i \mathbf{e}^{[i]}(\mathbf{x})^T \Omega^{[i]} \mathbf{e}^{[i]}(\mathbf{x})
+\end{aligned}
+\end{equation}
+
+\subsubsection{Gauss-Newton algorithm}\label{sec:distance-maps:background:least-squares:gn}
+
+\todo{TBC}
 
 \section{Distance Maps}\label{sec:distance-maps}
 
