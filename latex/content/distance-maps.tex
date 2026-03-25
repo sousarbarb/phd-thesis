@@ -217,24 +217,37 @@ Sobreira~\etal~\cite{sobreira:jint:2019}.
 \subsection{Least-squares minimization}\label{sec:distance-maps:background:least-squares}
 
 In terms of formulating least-squares minimization problems in robotics, first,
-let $\mathbf{x}$ denote a non-observable state variable and
-$\mathbf{z}$ a measurement.
+let $\mathbf{x}$ denote non-observable state variables and
+$\mathbf{z}$ as the measurements.
 In the scope of this PhD~Thesis, the
-measurement corresponds to the perception of the environment obtained
+measurements corresponds to the perception of the environment obtained
 from on-board sensors of a mobile robot, namely 2D~laser scanners.
-The state is assumed to follow a prior distribution
-$p\mathopen{}\left(\mathbf{x}\right)\mathclose{}$,
+The state is assumed to follow a prior distribution $p(\mathbf{x})$,
 while the conditional distribution of the measurement given the state,
-$p\mathopen{}\left(\mathbf{z}|\mathbf{x}\right)\mathclose{}$,
+$p(\mathbf{z}|\mathbf{x})$,
 is known, commonly referred to as the \emph{observation model}. Then, the goal
 is to estimate the most probable state given the measurement,
-that is, the posterior
-$p\mathopen{}\left(\mathbf{x}|\mathbf{z}\right)\mathclose{}$~\cite{grisetti:robotics:2020}.
+that is, the posterior $p(\mathbf{x}|\mathbf{z})$~\cite{grisetti:robotics:2020}.
 This problem represents a \gls{map} estimation problem, as shown in
 \eqref{eq:distance-maps:background:least-squares:map}.
 \begin{equation}\label{eq:distance-maps:background:least-squares:map}
-\mathbf{x}^* = \argmax_\mathbf{x}
-p\mathopen{}\left(\mathbf{x}|\mathbf{z}\right)\mathclose{}
+\mathbf{x}^* = \argmax_\mathbf{x} p(\mathbf{x}|\mathbf{z})
+\end{equation}
+
+By applying Bayes' rule, as shown in
+\eqref{eq:distance-maps:background:least-squares:bayes}, the posterior
+$p(\mathbf{x}|\mathbf{z})$ becomes proportional to
+the likelihood distribution of the \emph{observation model} given the state
+$p(\mathbf{z}|\mathbf{x})$ multiplied by the prior $p(\mathbf{x})$.
+Assuming an uniform prior distribution over the state (meaning that
+all admissible values of $\mathbf{x}$ are considered equally likely), then, the
+posterior $p(\mathbf{x}|\mathbf{z})$ depends only on the measurement
+distribution conditioned on the state $p(\mathbf{z}|\mathbf{x})$.
+\begin{equation}\label{eq:distance-maps:background:least-squares:bayes}
+p(\mathbf{x}|\mathbf{z}) =
+\frac{p(\mathbf{z}|\mathbf{x})p(\mathbf{x})}{p(\mathbf{z})}
+\propto p(\mathbf{z}|\mathbf{x})p(\mathbf{x})
+\propto p(\mathbf{z}|\mathbf{x})
 \end{equation}
 
 \section{Distance Maps}\label{sec:distance-maps}
