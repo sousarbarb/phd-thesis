@@ -33,10 +33,10 @@ error metrics. The point-to-plane~\cite{chen-medioni:icra:1991}
 metric demonstrated significantly better performance than
 the point-to-point~\cite{besl-mckay:tpami:1992} formulation in the experiments.
 \begin{equation}\label{eq:distance-maps:background:point-to-point}
-\mathbf{X} = \arg \min_\mathbf{X} \sum_i \| \mathbf{X} z_i - p_i \|^2
+\mathbf{X} = \argmin_\mathbf{X} \sum_i \| \mathbf{X} z_i - p_i \|^2
 \end{equation}
 \begin{equation}\label{eq:distance-maps:background:point-to-plane}
-\mathbf{X} = \arg \min_\mathbf{X} \sum_i \| n_i^T \cdot
+\mathbf{X} = \argmin_\mathbf{X} \sum_i \| n_i^T \cdot
 \left( \mathbf{X} z_i - p_i \right) \|^2
 \end{equation}
 
@@ -169,20 +169,21 @@ than \gls{icp}~\cite{besl-mckay:tpami:1992} and
 \gls{ndt}~\cite{biber-strasser:iros:2003}.
 
 \begin{equation}\label{eq:distance-maps:background:hectorslam}
-\mathbf{X} = \arg \min_\mathbf{X} \sum_i
+\mathbf{X} = \argmin_\mathbf{X} \sum_i
 \left[ 1 - M \left(\mathbf{X} z_i\right) \right]^2
 \end{equation}
 \begin{equation}\label{eq:distance-maps:background:perfectmatch}
-\mathbf{X} = \arg \min_\mathbf{X} \sum_i
+\mathbf{X} = \argmin_\mathbf{X} \sum_i
 \rho \left( \mathcal{D}_M \left( \mathbf{X} z_i \right) \right)
 \end{equation}
 
 Overall, most \gls{icp} methods rely on explicit point-to-point correspondences,
 requiring two steps per optimization iteration: data association and
 pairwise error computation between source and target points.
-As for probabilistic-based approaches, these methods typically require
-computing a map estimate of the environment over time, which is not compatible
-with scan-to-scan registration. In contrast, distance maps
+As for probabilistic-based approaches, these methods typically require solving a
+\gls{map} problem and having a map estimate of the environment over time, which
+is not compatible with scan-to-scan registration~\cite{segal:rss:2009}.
+In contrast, distance maps
 should be compatible with both scan-to-scan and scan-to-map alignment,
 providing a nearest neighbor framework between source and target clouds.
 While the PerfectMatch~\cite{lauer:robocup:2006} algorithm is specific
@@ -213,7 +214,28 @@ Sobreira~\etal~\cite{sobreira:jint:2019}.
 % - Voxblox (10.1109/IROS.2017.8202315) / Voxgraph (10.1109/LRA.2019.2953859)
 % - 10.1109/ICRA40945.2020.9196695
 
-\subsection{Least-squares optimization}\label{sec:distance-maps:background:least-squares}
+\subsection{Least-squares minimization}\label{sec:distance-maps:background:least-squares}
+
+In terms of formulating least-squares minimization problems in robotics, first,
+let $\mathbf{x}$ denote a non-observable state variable and
+$\mathbf{z}$ a measurement.
+In the scope of this PhD~Thesis, the
+measurement corresponds to the perception of the environment obtained
+from on-board sensors of a mobile robot, namely 2D~laser scanners.
+The state is assumed to follow a prior distribution
+$p\mathopen{}\left(\mathbf{x}\right)\mathclose{}$,
+while the conditional distribution of the measurement given the state,
+$p\mathopen{}\left(\mathbf{z}|\mathbf{x}\right)\mathclose{}$,
+is known, commonly referred to as the \emph{observation model}. Then, the goal
+is to estimate the most probable state given the measurement,
+that is, the posterior
+$p\mathopen{}\left(\mathbf{x}|\mathbf{z}\right)\mathclose{}$~\cite{grisetti:robotics:2020}.
+This problem represents a \gls{map} estimation problem, as shown in
+\eqref{eq:distance-maps:background:least-squares:map}.
+\begin{equation}\label{eq:distance-maps:background:least-squares:map}
+\mathbf{x}^* = \argmax_\mathbf{x}
+p\mathopen{}\left(\mathbf{x}|\mathbf{z}\right)\mathclose{}
+\end{equation}
 
 \section{Distance Maps}\label{sec:distance-maps}
 
