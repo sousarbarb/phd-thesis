@@ -220,33 +220,33 @@ Sobreira~\etal~\cite{sobreira:jint:2019}.
 
 \subsubsection{Problem formulation}\label{sec:distance-maps:background:least-squares:problem-formulation}
 
-In terms of formulating least-squares minimization problems in robotics, first,
-let $\mathbf{x}$ denote non-observable state variables and
-$\mathbf{z}$ as the measurements.
+Least-squares minimization arises in robotics when estimating an unknown state
+from noisy sensor measurements. Let $\mathbf{x}$ denote non-observable
+state variables and $\mathbf{z}$ the measurements.
 In the scope of this PhD~Thesis, the
 measurements corresponds to the perception of the environment obtained
-from on-board sensors of a mobile robot, namely 2D~laser scanners.
+by on-board sensors of a mobile robot, namely 2D~laser scanners.
 The state is assumed to follow a prior distribution $p(\mathbf{x})$,
-while the conditional distribution of the measurement given the state,
-$p(\mathbf{z}|\mathbf{x})$,
-is known, commonly referred to as the \emph{observation model}. Then, the goal
-is to estimate the most probable state given the measurement,
-that is, the posterior $p(\mathbf{x}|\mathbf{z})$~\cite{grisetti:robotics:2020}.
+while the conditional distribution of the measurements given the state,
+$p(\mathbf{z}|\mathbf{x})$, is assumed known,
+commonly referred to as the observation model. Then, the goal
+is to estimate the most probable state given the measurements,
+\ie, the posterior $p(\mathbf{x}|\mathbf{z})$~\cite{grisetti:robotics:2020}.
 This problem represents a \gls{map} estimation problem, as shown in
 \eqref{eq:distance-maps:background:least-squares:map}.
 \begin{equation}\label{eq:distance-maps:background:least-squares:map}
 \mathbf{x}^* = \argmax_\mathbf{x} p(\mathbf{x}|\mathbf{z})
 \end{equation}
 
-By applying Bayes' rule, as shown in
+By applying Bayes' rule, shown in
 \eqref{eq:distance-maps:background:least-squares:bayes}, the posterior
-$p(\mathbf{x}|\mathbf{z})$ becomes proportional to
-the likelihood distribution of the \emph{observation model} given the state
+distribution $p(\mathbf{x}|\mathbf{z})$ becomes proportional to
+the likelihood of the measurements given the state
 $p(\mathbf{z}|\mathbf{x})$ multiplied by the prior $p(\mathbf{x})$.
-Assuming an uniform prior distribution over the state (meaning that
-all admissible values of $\mathbf{x}$ are considered equally likely), then, the
+If a uniform prior over the admissible values of $\mathbf{x}$ is assumed,
+then $p(\mathbf{x})$ is constant and the
 posterior $p(\mathbf{x}|\mathbf{z})$ depends only on the measurement
-distribution conditioned on the state $p(\mathbf{z}|\mathbf{x})$.
+distribution conditioned by the state $p(\mathbf{z}|\mathbf{x})$.
 \begin{equation}\label{eq:distance-maps:background:least-squares:bayes}
 p(\mathbf{x}|\mathbf{z}) =
 \frac{p(\mathbf{z}|\mathbf{x})p(\mathbf{x})}{p(\mathbf{z})}
@@ -254,34 +254,61 @@ p(\mathbf{x}|\mathbf{z}) =
 \propto p(\mathbf{z}|\mathbf{x})
 \end{equation}
 
-\todo{TBC}
-
+Next, considering multiple measurements $\mathbf{z}^{[i]}$, these are assumed
+conditionally independent given $\mathbf{x}$, resulting in
+\eqref{eq:distance-maps:background:least-squares:independence}.
+Under the assumption that each measurement follows a Gaussian distribution,
+\eqref{eq:distance-maps:background:least-squares:measurement} illustrates the
+proportionality of each measurement distribution conditioned by the state
+$p(\mathbf{z}^{[i]}|\mathbf{x})$ over the corresponding residual error
+$\mathbf{e}^{[i]}(\mathbf{x})$
+defined in \eqref{eq:distance-maps:background:least-squares:error},
+where $\mathbf{\Omega}^{[i]}$ is the information matrix,
+$\mathbf{h}^{[i]}(\mathbf{x})$ represents the predicted measurement given the
+state estimate $\mathbf{x}$, and $\mathbf{z}^{[i]}$ the measurement itself.
 \begin{equation}\label{eq:distance-maps:background:least-squares:independence}
 p(\mathbf{x}|\mathbf{z}) \propto \prod_i p(\mathbf{z}^{[i]}|\mathbf{x})
 \end{equation}
 \begin{equation}\label{eq:distance-maps:background:least-squares:measurement}
 \begin{aligned}
 p(\mathbf{z}^{[i]}|\mathbf{x})
-  & = \mathcal{N}(\mathbf{z}^{[i]} ; \mathbf{h}^{[i]}(\mathbf{x}), \Sigma^{[i]})\\
-  & \propto \exp\left(-\left( \mathbf{h}^{[i]}(\mathbf{x}) - \mathbf{z}^{[i]} \right)^T
-                      \left(\Sigma^{[i]}\right)^{-1}
-                      \left( \mathbf{h}^{[i]}(\mathbf{x}) - \mathbf{z}^{[i]} \right)
-                \right)\\
-  & \propto \exp\left( -\mathbf{e}^{[i]}(\mathbf{x})^T \Omega^{[i]} \mathbf{e}^{[i]}(\mathbf{x}) \right)
+  & = \mathcal{N}(\mathbf{z}^{[i]} ; \mathbf{h}^{[i]}(\mathbf{x}), \mathbf{\Sigma^{[i]}})\\
+  & \propto \exp\left(
+      -\frac{1}{2}
+      \left( \mathbf{h}^{[i]}(\mathbf{x}) - \mathbf{z}^{[i]} \right)^T
+      \left(\mathbf{\Sigma^{[i]}}\right)^{-1}
+      \left( \mathbf{h}^{[i]}(\mathbf{x}) - \mathbf{z}^{[i]} \right)
+  \right)\\
+  & \propto \exp\left(
+      -\frac{1}{2}
+      \mathbf{e}^{[i]}(\mathbf{x})^T
+      \mathbf{\Omega^{[i]}}
+      \mathbf{e}^{[i]}(\mathbf{x})
+  \right)
 \end{aligned}
 \end{equation}
 \begin{equation}\label{eq:distance-maps:background:least-squares:error}
 \mathbf{e}^{[i]}(\mathbf{x})=\mathbf{h}^{[i]}(\mathbf{x}) - \mathbf{z}^{[i]}
 \end{equation}
 
-\todo{TBC}
-
+As a result, under the assumption of having an uniform prior,
+the original \gls{map} problem formulated in
+\eqref{eq:distance-maps:background:least-squares:map} can be rewritten as
+an \gls{mle} problem that maximizes the probability of the measurements given
+the state $p(\mathbf{z}^{[i]}|\mathbf{x})$
+(see \eqref{eq:distance-maps:background:least-squares:mle-log-likelihood}).
+Thus, through the log-likelihood over the conditioned measurement distribution
+(see \defref{def:literature:slam:log-likelihood}) and assuming the measurements
+under Gaussian noise, the state estimation in robotics from
+the \gls{mle} formulation can be formulated as a non-linear least-squares
+problem, where the objective is to minimize the sum of squared residuals
+weighted by the corresponding information matrices.
 \begin{equation}\label{eq:distance-maps:background:least-squares:mle-log-likelihood}
 \begin{aligned}
 \mathbf{x}^*
   & = \argmax_\mathbf{x} \prod_i p(\mathbf{z}^{[i]}|\mathbf{x})\\
-  & = \argmax_\mathbf{x} \prod_i \exp\left( -\mathbf{e}^{[i]}(\mathbf{x})^T \Omega^{[i]} \mathbf{e}^{[i]}(\mathbf{x}) \right)\\
-  & = \argmin_\mathbf{x} \sum_i \mathbf{e}^{[i]}(\mathbf{x})^T \Omega^{[i]} \mathbf{e}^{[i]}(\mathbf{x})
+  & = \argmax_\mathbf{x} \prod_i \exp\left( -\frac{1}{2}\mathbf{e}^{[i]}(\mathbf{x})^T \mathbf{\Omega}^{[i]} \mathbf{e}^{[i]}(\mathbf{x}) \right)\\
+  & = \argmin_\mathbf{x} \sum_i \mathbf{e}^{[i]}(\mathbf{x})^T \mathbf{\Omega}^{[i]} \mathbf{e}^{[i]}(\mathbf{x})
 \end{aligned}
 \end{equation}
 
