@@ -437,9 +437,42 @@ This iterative procedure corresponds to the Gauss-Newton method, which
 linearizes the residual error functions around the current estimate and
 minimizes the resulting quadratic approximation of the weighted non-linear
 least-squares cost~\cite{grisetti:robotics:2020}.
+\algref{alg:distance-maps:background:least-squares:gauss-newton} details the
+steps of the Gauss-Newton minimization algorithm for a single iteration of the
+iterative procedure.
 \begin{equation}\label{eq:distance-maps:background:least-squares:b-hx}
 \mathbf{H} \mathbf{\Delta x}_k = -\mathbf{b}
 \end{equation}
+
+\begin{algorithm}[!t]
+\DontPrintSemicolon
+\caption[Gauss-Newton minimization algorithm for Euclidean measurement and state
+spaces]{Gauss-Newton minimization algorithm for Euclidean measurement and
+state spaces (one single iteration of the iterative procedure)}
+\label{alg:distance-maps:background:least-squares:gauss-newton}
+\KwIn{Current state estimation $\mathbf{x}_k$,
+measurements $\mathcal{C} = {\langle \mathbf{z}_i , \mathbf{\Omega}_i \rangle}$}
+\KwOut{State estimation for the next iteration step $\mathbf{x}_{k+1}$}
+$\mathbf{b} \leftarrow \mathbf{0}_{n \times 1}$\;
+$\mathbf{H} \leftarrow \mathbf{0}_{n \times n}$\;
+\ForAll{$i$}{
+  $\mathbf{e}^{[i]} \leftarrow \mathbf{h}^{[i]} - \mathbf{z}^{[i]}$\;
+  $\mathbf{J}^{\left[i\right]} \leftarrow \left.\frac{\partial
+      \mathbf{e}^{\left[i\right]}\left(\mathbf{x}\right)}{\partial \mathbf{x}}
+      \right|_{\mathbf{x}=\mathbf{x}_k}$\;
+  $\mathbf{H} \leftarrow \mathbf{H} + {\mathbf{J}^{\left[i\right]}}^T
+      \mathbf{\Omega}_i \mathbf{J}^{\left[i\right]}$\;
+  $\mathbf{b} \leftarrow \mathbf{b} + {\mathbf{J}^{\left[i\right]}}^T
+      \mathbf{\Omega}_i \mathbf{e}^{\left[i\right]}$\;
+}
+$\mathbf{\Delta x}_k \leftarrow \text{solve}(\mathbf{H} \mathbf{\Delta x}_k = -\mathbf{b})$\;
+$\mathbf{x}_{k+1} \leftarrow \mathbf{x}_{k} + \mathbf{\Delta x}_k$\;
+\Return{$\mathbf{x}_{k+1}$}\;
+\end{algorithm}
+
+\subsubsection{Least-squares and uncertainty}\label{sec:distance-maps:background:least-squares:uncertainty}
+\subsubsection{Robust estimators}\label{sec:distance-maps:background:least-squares:robust-estimators}
+\subsubsection{Non-Euclidean spaces}\label{sec:distance-maps:background:least-squares:manifold}
 
 \section{Distance Maps}\label{sec:distance-maps}
 
