@@ -712,6 +712,251 @@ uncertainty estimate recovered from the Gauss-Newton optimisation process
 under the Gaussian noise assumption.
 
 \subsubsection{Robust estimators}\label{sec:distance-maps:background:least-squares:robust-estimators}
+
+\paragraph{Standard Gauss-Newton Formulation}
+
+Consider a non-linear least-squares problem over a set of $m$ measurements
+$\mathbf{z} = \{z_i\}_{i=1}^{m}$ and a state vector $\mathbf{x} \in \mathbb{R}^n$.
+Each measurement induces a vector-valued residual
+\begin{equation}
+    \mathbf{e}_i(\mathbf{x}) = z_i - h_i(\mathbf{x}),
+\end{equation}
+where $h_i(\cdot)$ is the (possibly non-linear) measurement model.
+Assuming zero-mean Gaussian noise with information matrix
+$\boldsymbol{\Omega}_i = \boldsymbol{\Sigma}_i^{-1}$,
+the negative log-likelihood reduces to the standard weighted least-squares cost
+\begin{equation}
+    F(\mathbf{x})
+    = \frac{1}{2}\sum_{i=1}^{m}
+      \mathbf{e}_i(\mathbf{x})^{\top}
+      \boldsymbol{\Omega}_i\,
+      \mathbf{e}_i(\mathbf{x})
+    = \frac{1}{2}\sum_{i=1}^{m} \chi_i^2(\mathbf{x}),
+    \label{eq:gn_cost}
+\end{equation}
+where $\chi_i^2 = \mathbf{e}_i^{\top}\boldsymbol{\Omega}_i\mathbf{e}_i$ is the
+squared Mahalanobis distance of residual $i$.
+
+Linearising $h_i$ around the current estimate $\mathbf{x}_k$ via its
+Jacobian $\mathbf{J}_i = \partial h_i / \partial \mathbf{x}\big|_{\mathbf{x}_k}$
+yields the Gauss-Newton normal equations
+\begin{equation}
+    \underbrace{\left(\sum_{i=1}^{m}
+        \mathbf{J}_i^{\top}\boldsymbol{\Omega}_i\mathbf{J}_i
+    \right)}_{\mathbf{H}}
+    \boldsymbol{\delta x}
+    =
+    \underbrace{\sum_{i=1}^{m}
+        \mathbf{J}_i^{\top}\boldsymbol{\Omega}_i\,\mathbf{e}_i(\mathbf{x}_k)
+    }_{\mathbf{b}},
+    \label{eq:gn_normal}
+\end{equation}
+where $\mathbf{H} \approx \nabla^2 F$ is the approximated Hessian and
+$\boldsymbol{\delta x}$ is the state increment applied as
+$\mathbf{x}_{k+1} = \mathbf{x}_k \oplus \boldsymbol{\delta x}$.
+The inverse of $\mathbf{H}$ at convergence provides the approximate covariance
+of the state estimate, $\boldsymbol{\Sigma}_{\mathbf{x}} \approx \mathbf{H}^{-1}$.
+
+\paragraph{Breakdown of the Gaussian Assumption Under Outliers}
+
+The quadratic cost in~\eqref{eq:gn_cost} grows without bound as the residual
+magnitude increases.
+Consequently, a single outlying measurement with large $\chi_i^2$ can
+dominate the sum and severely corrupt the optimum.
+M-estimators \cite{Huber1964,Zhang1997} address this by replacing the
+quadratic penalty with a robust loss function $\rho(\cdot)$ that
+\emph{down-weights} large residuals rather than penalising them quadratically.
+
+\paragraph{M-Estimator Cost Function}
+
+The robust cost replaces~\eqref{eq:gn_cost} with
+\begin{equation}
+    F_{\rho}(\mathbf{x})
+    = \sum_{i=1}^{m}
+      \rho\!\left(\sqrt{\chi_i^2(\mathbf{x})}\right),
+    \label{eq:robust_cost}
+\end{equation}
+where $s_i = \sqrt{\chi_i^2}$ is the (scalar) Mahalanobis residual.
+Popular choices for $\rho$ are summarised in Table~\ref{tab:rho_functions}.
+
+\begin{table}[h]
+\centering
+\caption{Common M-estimator loss functions and their weight functions
+         $w(s) = \psi(s)/s$, where $\psi(s) = \rho'(s)$.
+         The tuning constant $c$ controls the inlier/outlier threshold.}
+\label{tab:rho_functions}
+\begin{tabular}{llll}
+\hline
+\textbf{Estimator} & $\rho(s)$ & $\psi(s) = \rho'(s)$ & $w(s) = \psi(s)/s$ \\
+\hline
+Quadratic (L2)     & $\tfrac{1}{2}s^2$ & $s$ & $1$ \\[4pt]
+Huber              & $\begin{cases}\tfrac{1}{2}s^2 & |s|\le c\\ c|s|-\tfrac{1}{2}c^2 & |s|>c\end{cases}$
+                   & $\begin{cases}s & |s|\le c\\ c\,\mathrm{sgn}(s) & |s|>c\end{cases}$
+                   & $\begin{cases}1 & |s|\le c\\ c/|s| & |s|>c\end{cases}$ \\[6pt]
+Cauchy             & $\tfrac{c^2}{2}\ln\!\left(1+\tfrac{s^2}{c^2}\right)$
+                   & $\dfrac{s}{1+(s/c)^2}$
+                   & $\dfrac{1}{1+(s/c)^2}$ \\[6pt]
+Geman-McClure      & $\dfrac{s^2/2}{c^2+s^2}$
+                   & $\dfrac{c^2 s}{(c^2+s^2)^2}$
+                   & $\dfrac{c^2}{(c^2+s^2)^2}$ \\[6pt]
+Tukey (Biweight)   & $\begin{cases}\tfrac{c^2}{6}\!\left[1-\left(1-\tfrac{s^2}{c^2}\right)^3\right] & |s|\le c\\ \tfrac{c^2}{6} & |s|>c\end{cases}$
+                   & $\begin{cases}s\!\left(1-\tfrac{s^2}{c^2}\right)^2 & |s|\le c\\ 0 & |s|>c\end{cases}$
+                   & $\begin{cases}\!\left(1-\tfrac{s^2}{c^2}\right)^2 & |s|\le c\\ 0 & |s|>c\end{cases}$ \\
+\hline
+\end{tabular}
+\end{table}
+
+\paragraph{Iteratively Reweighted Least Squares (IRLS)}
+
+The gradient of the robust cost with respect to $\mathbf{x}$ is
+\begin{equation}
+    \nabla_{\mathbf{x}} F_{\rho}
+    = \sum_{i=1}^{m}
+      w_i\,\mathbf{J}_i^{\top}\boldsymbol{\Omega}_i\,\mathbf{e}_i(\mathbf{x}),
+    \qquad
+    w_i = w(s_i) = \frac{\rho'(s_i)}{s_i}.
+    \label{eq:robust_grad}
+\end{equation}
+Setting this gradient to zero and comparing with~\eqref{eq:gn_normal} reveals
+that the robust problem is equivalent to a \emph{reweighted} least-squares
+problem where each factor receives a scalar weight $w_i$.
+This observation motivates the \textbf{Iteratively Reweighted Least Squares
+(IRLS)} algorithm: at each outer iteration $k$, the weights are fixed at
+their current values and the inner Gauss-Newton step is solved as a standard
+weighted least-squares problem.
+
+\paragraph{Robust Gauss-Newton Normal Equations}
+
+Introducing the effective information matrix for factor $i$,
+\begin{equation}
+    \tilde{\boldsymbol{\Omega}}_i(\mathbf{x}_k)
+    = w_i(\mathbf{x}_k)\,\boldsymbol{\Omega}_i,
+    \label{eq:effective_info}
+\end{equation}
+the robust normal equations at iteration $k$ take the form
+\begin{equation}
+    \tilde{\mathbf{H}}\,\boldsymbol{\delta x} = \tilde{\mathbf{b}},
+    \label{eq:robust_normal}
+\end{equation}
+with
+\begin{align}
+    \tilde{\mathbf{H}}
+        &= \sum_{i=1}^{m}
+           \mathbf{J}_i^{\top}\,\tilde{\boldsymbol{\Omega}}_i\,\mathbf{J}_i,
+    \label{eq:robust_hessian} \\[4pt]
+    \tilde{\mathbf{b}}
+        &= \sum_{i=1}^{m}
+           \mathbf{J}_i^{\top}\,\tilde{\boldsymbol{\Omega}}_i\,
+           \mathbf{e}_i(\mathbf{x}_k).
+    \label{eq:robust_rhs}
+\end{align}
+System~\eqref{eq:robust_normal} is structurally identical to the
+standard Gauss-Newton normal equations~\eqref{eq:gn_normal};
+the only modification is the substitution
+$\boldsymbol{\Omega}_i \leftarrow \tilde{\boldsymbol{\Omega}}_i$.
+This means that any sparse linear solver (e.g.\ Cholesky factorisation of
+the block-sparse Hessian) can be reused without modification.
+
+\paragraph{IRLS Algorithm}
+
+The complete procedure is summarised in Algorithm~\ref{alg:robust_gn}.
+
+% \begin{algorithm}[h]
+% \caption{Robust Gauss-Newton via IRLS}
+% \label{alg:robust_gn}
+% \begin{algorithmic}[1]
+% \Require Initial estimate $\mathbf{x}_0$, loss function $\rho$,
+%          tuning constant $c$, convergence threshold $\epsilon$
+% \Repeat
+%     \ForAll{factors $i$}
+%         \State Compute residual $\mathbf{e}_i \leftarrow z_i - h_i(\mathbf{x}_k)$
+%         \State Compute Jacobian $\mathbf{J}_i \leftarrow \partial h_i/\partial\mathbf{x}\big|_{\mathbf{x}_k}$
+%         \State Compute Mahalanobis norm $s_i \leftarrow \sqrt{\mathbf{e}_i^{\top}\boldsymbol{\Omega}_i\mathbf{e}_i}$
+%         \State Compute robust weight $w_i \leftarrow w(s_i) = \rho'(s_i)/s_i$
+%     \EndFor
+%     \State Assemble $\tilde{\mathbf{H}}$ and $\tilde{\mathbf{b}}$ via
+%            \eqref{eq:robust_hessian}--\eqref{eq:robust_rhs}
+%     \State Solve $\tilde{\mathbf{H}}\,\boldsymbol{\delta x} = \tilde{\mathbf{b}}$
+%     \State Update $\mathbf{x}_{k+1} \leftarrow \mathbf{x}_k \oplus \boldsymbol{\delta x}$
+% \Until{$\|\boldsymbol{\delta x}\| < \epsilon$}
+% \Ensure Robust estimate $\mathbf{x}^*$ and approximate robust covariance
+%         $\tilde{\boldsymbol{\Sigma}}_{\mathbf{x}} \approx \tilde{\mathbf{H}}^{-1}$
+% \end{algorithmic}
+% \end{algorithm}
+
+\paragraph{Uncertainty Estimation Under Robust Losses}
+
+At convergence, the robust approximated Hessian $\tilde{\mathbf{H}}$ can still
+be used to provide an approximate state covariance,
+\begin{equation}
+    \tilde{\boldsymbol{\Sigma}}_{\mathbf{x}}
+    \approx \tilde{\mathbf{H}}^{-1}
+    = \left(\sum_{i=1}^{m}
+        w_i\,\mathbf{J}_i^{\top}\boldsymbol{\Omega}_i\mathbf{J}_i
+      \right)^{-1}.
+    \label{eq:robust_cov}
+\end{equation}
+Because outlier factors receive $w_i \approx 0$, they contribute negligibly
+to $\tilde{\mathbf{H}}$ and therefore also negligibly to the covariance
+estimate.
+This is the desired behaviour: outliers inflate the residual but should
+\emph{not} inflate the reported uncertainty of the inlier-driven solution.
+
+It should be noted, however, that~\eqref{eq:robust_cov} is only an
+approximation; it ignores the second-order term
+$\rho''(s_i)\,\mathbf{J}_i^{\top}\boldsymbol{\Omega}_i\mathbf{e}_i$ that
+arises from differentiating the gradient of~\eqref{eq:robust_cost} a second
+time \cite{Hartley2004}.
+For inlier-dominated problems this term vanishes near the minimum (where
+$\mathbf{e}_i \approx \mathbf{0}$), making~\eqref{eq:robust_cov} an accurate
+approximation of the true covariance.
+
+\paragraph{Practical Considerations}
+
+\paragraph{Choice of tuning constant.}
+The constant $c$ controls the transition between the inlier region
+(near-quadratic behaviour) and the outlier region (down-weighting).
+For the Huber estimator, $c = 1.345\,\hat{\sigma}$ preserves
+$95\,\%$ asymptotic efficiency under Gaussian noise \cite{Huber1964}.
+In practice $\hat{\sigma}$ is estimated from the median absolute deviation
+(MAD) of the current residuals, $\hat{\sigma} = \text{MAD}/0.6745$,
+and updated at each IRLS iteration.
+
+\paragraph{Initialisation.}
+Because the robust cost is non-convex for redescending estimators
+(e.g.\ Tukey), good initialisation is important.
+A common strategy is to run a few standard Gauss-Newton iterations first,
+then switch to IRLS.
+
+\paragraph{Convergence.}
+IRLS converges to a local minimum of~\eqref{eq:robust_cost} \cite{Zhang1997}.
+For convex losses (Huber, Cauchy) the minimum is unique;
+for non-convex losses (Geman-McClure, Tukey) multiple local minima may exist
+and the result depends on initialisation.
+
+% ---- References (add to your main .bib file) -------------------
+% @article{Huber1964,
+%   author  = {Huber, Peter J.},
+%   title   = {Robust Estimation of a Location Parameter},
+%   journal = {The Annals of Mathematical Statistics},
+%   year    = {1964}, volume = {35}, pages = {73--101}
+% }
+% @article{Zhang1997,
+%   author  = {Zhang, Zhengyou},
+%   title   = {Parameter Estimation Techniques: A Tutorial with Application
+%              to Conic Fitting},
+%   journal = {Image and Vision Computing},
+%   year    = {1997}, volume = {15}, pages = {59--76}
+% }
+% @book{Hartley2004,
+%   author    = {Hartley, Richard and Zisserman, Andrew},
+%   title     = {Multiple View Geometry in Computer Vision},
+%   edition   = {2},
+%   publisher = {Cambridge University Press},
+%   year      = {2004}
+% }
+% ----------------------------------------------------------------
+
 \subsubsection{Non-Euclidean spaces}\label{sec:distance-maps:background:least-squares:manifold}
 
 \section{Distance Maps}\label{sec:distance-maps}
