@@ -959,6 +959,330 @@ and the result depends on initialisation.
 
 \subsubsection{Non-Euclidean spaces}\label{sec:distance-maps:background:least-squares:manifold}
 
+% ============================================================
+%  Background: Non-Linear Least-Squares on Manifolds
+%  Gauss-Newton via first-order linearisation and exponential map
+% ============================================================
+
+% ------------------------------------------------------------
+\paragraph{Problem Formulation}
+\label{ssec:nls_formulation}
+
+State estimation in robotics is commonly framed as a Maximum-A-Posteriori
+(MAP) inference problem, which under Gaussian noise assumptions reduces to
+minimising a weighted sum of squared residuals~\cite{barfoot2017}.
+Let the state $\mathbf{x}$ reside on a smooth manifold $\mathcal{M}$ of
+dimension $n$, and let $\{(\mathbf{z}_i,\, f_i)\}_{i=1}^{N}$ be a set of
+measurements together with their associated nonlinear models.
+For each measurement, define the error (residual) function
+
+\begin{equation}
+  \mathbf{e}_i : \mathcal{M} \to \mathbb{R}^{m_i},
+  \qquad
+  \mathbf{e}_i(\mathbf{x}) \;\triangleq\; \mathbf{z}_i - f_i(\mathbf{x}),
+  \label{eq:residual}
+\end{equation}
+
+where $f_i$ is a (possibly nonlinear) measurement model.
+The MAP objective is
+
+\begin{equation}
+  \mathbf{x}^{\star}
+  \;=\;
+  \arg\min_{\mathbf{x}\in\mathcal{M}}\;\mathcal{F}(\mathbf{x}),
+  \qquad
+  \mathcal{F}(\mathbf{x})
+  \;\triangleq\;
+  \frac{1}{2}
+  \sum_{i=1}^{N}
+  \mathbf{e}_i(\mathbf{x})^{\top}
+  \boldsymbol{\Omega}_i\,
+  \mathbf{e}_i(\mathbf{x}),
+  \label{eq:cost}
+\end{equation}
+
+where $\boldsymbol{\Omega}_i = \boldsymbol{\Sigma}_i^{-1} \succ 0$ is the
+information matrix (inverse covariance) of the $i$-th measurement.
+Because $\mathcal{M}$ is in general curved, minimisation cannot proceed by
+standard Euclidean calculus; the geometry of the manifold must be accounted
+for explicitly~\cite{sola2018micro}.
+
+% ------------------------------------------------------------
+\paragraph{Perturbation on the Manifold via the Exponential Map}
+\label{ssec:manifold_perturbation}
+
+A smooth manifold $\mathcal{M}$ locally resembles a linear space, but does
+not globally admit addition and subtraction of its elements.
+At each point $\mathbf{x}\in\mathcal{M}$, the \emph{tangent space}
+$T_{\mathbf{x}}\mathcal{M} \cong \mathbb{R}^{n}$ provides the appropriate
+linear structure for computing increments.
+A small perturbation $\boldsymbol{\delta}\in\mathbb{R}^{n}$, expressed in
+the tangent space, is mapped back onto the manifold through the
+\emph{exponential map} (or, more generally, a smooth
+retraction)~\cite{sola2018micro,barfoot2017}
+
+\begin{equation}
+  \mathbf{x} \oplus \boldsymbol{\delta}
+  \;\triangleq\;
+  \mathrm{Exp}_{\mathbf{x}}(\boldsymbol{\delta})
+  \;\in\;
+  \mathcal{M}.
+  \label{eq:retraction}
+\end{equation}
+
+For Lie groups --- the prevalent case in robotics, where states include
+rotations $SO(3)$ or rigid-body poses $SE(3)$ --- the exponential map
+coincides with the group exponential composed with left- or
+right-multiplication, e.g.\
+$\mathbf{x} \oplus \boldsymbol{\delta} = \mathbf{x}\cdot\mathrm{Exp}(\boldsymbol{\delta})$
+for a right perturbation~\cite{sola2018micro}.
+The inverse operation, which maps a nearby element
+$\mathbf{y}\in\mathcal{M}$ back to the tangent space at $\mathbf{x}$, is
+the \emph{logarithmic map}
+
+\begin{equation}
+  \mathbf{y} \ominus \mathbf{x}
+  \;\triangleq\;
+  \mathrm{Log}_{\mathbf{x}}(\mathbf{y})
+  \;\in\;
+  T_{\mathbf{x}}\mathcal{M}.
+  \label{eq:log_map}
+\end{equation}
+
+The operators $\oplus$ and $\ominus$ replace standard Euclidean addition and
+subtraction throughout the optimisation and ensure that every iterate remains
+on $\mathcal{M}$, preserving geometric constraints intrinsic to the state
+representation (e.g.\ the orthogonality constraint on rotation matrices, or
+the unit-norm constraint on quaternions).
+
+% ------------------------------------------------------------
+\paragraph{First-Order Linearisation of the Error}
+\label{ssec:linearisation}
+
+The Gauss-Newton method iteratively linearises each residual around the
+current estimate~\cite{nocedal2006}.
+Given the current iterate $\mathbf{x}_k\in\mathcal{M}$ and a tangent-space
+perturbation $\boldsymbol{\delta}\in\mathbb{R}^{n}$, the first-order Taylor
+expansion of $\mathbf{e}_i$ reads
+
+\begin{equation}
+  \mathbf{e}_i\!\left(\mathbf{x}_k \oplus \boldsymbol{\delta}\right)
+  \;\approx\;
+  \mathbf{e}_i(\mathbf{x}_k)
+  \;+\;
+  \mathbf{J}_i(\mathbf{x}_k)\,\boldsymbol{\delta},
+  \label{eq:linearisation}
+\end{equation}
+
+where the \emph{manifold Jacobian} is defined as the derivative of the error
+with respect to the tangent-space perturbation, evaluated at the
+identity~\cite{sola2018micro,barfoot2017}
+
+\begin{equation}
+  \mathbf{J}_i(\mathbf{x})
+  \;\triangleq\;
+  \left.
+  \frac{\partial\,\mathbf{e}_i\!\left(\mathbf{x} \oplus \boldsymbol{\delta}\right)}
+       {\partial\,\boldsymbol{\delta}}
+  \right|_{\boldsymbol{\delta}=\mathbf{0}}
+  \;\in\;
+  \mathbb{R}^{m_i \times n}.
+  \label{eq:jacobian}
+\end{equation}
+
+Under a right-perturbation convention this is termed the \emph{right
+Jacobian} of $\mathbf{e}_i$ at $\mathbf{x}$.
+Substituting~\eqref{eq:linearisation} into the
+cost~\eqref{eq:cost} and introducing the shorthands
+$\mathbf{e}_i^k \triangleq \mathbf{e}_i(\mathbf{x}_k)$ and
+$\mathbf{J}_i^k \triangleq \mathbf{J}_i(\mathbf{x}_k)$, the approximated
+cost becomes a quadratic function of $\boldsymbol{\delta}$ alone,
+
+\begin{equation}
+  \mathcal{F}\!\left(\mathbf{x}_k \oplus \boldsymbol{\delta}\right)
+  \;\approx\;
+  \frac{1}{2}
+  \sum_{i=1}^{N}
+  \left(
+    \mathbf{e}_i^k + \mathbf{J}_i^k\,\boldsymbol{\delta}
+  \right)^{\!\top}
+  \boldsymbol{\Omega}_i
+  \left(
+    \mathbf{e}_i^k + \mathbf{J}_i^k\,\boldsymbol{\delta}
+  \right).
+  \label{eq:linearised_cost}
+\end{equation}
+
+% ------------------------------------------------------------
+\paragraph{Gauss-Newton Normal Equations}
+\label{ssec:normal_equations}
+
+Because~\eqref{eq:linearised_cost} is quadratic in $\boldsymbol{\delta}$,
+its minimiser is found in closed form by differentiating with respect to
+$\boldsymbol{\delta}$ and setting the result to zero, yielding the
+\emph{normal equations}~\cite{nocedal2006}
+
+\begin{equation}
+  \mathbf{H}_k\,\boldsymbol{\delta}^{\star} = -\mathbf{b}_k,
+  \label{eq:normal_equations}
+\end{equation}
+
+with the \emph{approximate Hessian} (information matrix) and the
+\emph{gradient vector} defined, respectively, as
+
+\begin{align}
+  \mathbf{H}_k
+  &\;\triangleq\;
+  \sum_{i=1}^{N}
+  {\mathbf{J}_i^k}^{\!\top}
+  \boldsymbol{\Omega}_i\,
+  \mathbf{J}_i^k
+  \;\in\;
+  \mathbb{R}^{n \times n},
+  \label{eq:hessian}
+  \\[4pt]
+  \mathbf{b}_k
+  &\;\triangleq\;
+  \sum_{i=1}^{N}
+  {\mathbf{J}_i^k}^{\!\top}
+  \boldsymbol{\Omega}_i\,
+  \mathbf{e}_i^k
+  \;\in\;
+  \mathbb{R}^{n}.
+  \label{eq:gradient}
+\end{align}
+
+The matrix $\mathbf{H}_k$ is the Gauss-Newton approximation to the true
+Hessian of $\mathcal{F}$: it is obtained by retaining only the
+first-order term and discarding the term involving second derivatives of
+$\mathbf{e}_i$, which vanishes at the optimum when residuals are small.
+Provided $\mathbf{H}_k \succ 0$ --- guaranteed whenever the stacked Jacobian
+$\mathbf{J}^k \triangleq [{\mathbf{J}_1^k}^{\!\top}, \ldots,
+{\mathbf{J}_N^k}^{\!\top}]^{\!\top}$ has full column rank --- the
+optimal increment is
+
+\begin{equation}
+  \boldsymbol{\delta}^{\star} = -\mathbf{H}_k^{-1}\,\mathbf{b}_k.
+  \label{eq:increment}
+\end{equation}
+
+% ------------------------------------------------------------
+\paragraph{State Update on the Manifold}
+\label{ssec:state_update}
+
+Once $\boldsymbol{\delta}^{\star}$ has been computed in the tangent space
+$T_{\mathbf{x}_k}\mathcal{M}$, the state is retracted back onto the manifold
+via the exponential map~\eqref{eq:retraction}:
+
+\begin{equation}
+  \mathbf{x}_{k+1}
+  \;=\;
+  \mathbf{x}_k \oplus \boldsymbol{\delta}^{\star}
+  \;=\;
+  \mathrm{Exp}_{\mathbf{x}_k}\!\left(-\mathbf{H}_k^{-1}\,\mathbf{b}_k\right).
+  \label{eq:state_update}
+\end{equation}
+
+Summarising, the complete Gauss-Newton iteration is
+
+\begin{equation}
+  \boxed{
+    \mathbf{x}_{k+1}
+    \;=\;
+    \mathbf{x}_k
+    \;\oplus\;
+    \left(-\mathbf{H}_k^{-1}\,\mathbf{b}_k\right),
+  }
+  \label{eq:gn_iteration}
+\end{equation}
+
+and is repeated until a convergence criterion is satisfied.
+
+% ------------------------------------------------------------
+\paragraph{Convergence}
+\label{ssec:convergence}
+
+The iteration is declared converged when one or more of the following
+criteria are met~\cite{nocedal2006}:
+
+\begin{itemize}
+  \item \textbf{Increment norm:}
+        $\|\boldsymbol{\delta}^{\star}\| < \varepsilon_\delta$,
+        indicating the state is no longer moving appreciably in the tangent
+        space;
+  \item \textbf{Gradient norm:}
+        $\|\mathbf{b}_k\| < \varepsilon_g$,
+        indicating proximity to a stationary point of $\mathcal{F}$;
+  \item \textbf{Relative cost decrease:}
+        $\lvert\mathcal{F}(\mathbf{x}_{k+1}) -
+        \mathcal{F}(\mathbf{x}_k)\rvert \,/\,
+        \mathcal{F}(\mathbf{x}_k) < \varepsilon_{\mathcal{F}}$.
+\end{itemize}
+
+Gauss-Newton exhibits \emph{quadratic convergence} in a neighbourhood of the
+optimum when the residuals are small at the solution
+($\mathbf{e}_i(\mathbf{x}^{\star}) \approx \mathbf{0}$), matching the
+convergence rate of full Newton's method in that
+regime~\cite{nocedal2006}.
+When residuals are large at the solution, convergence degrades to linear and
+the method may fail to converge altogether.
+This motivates trust-region extensions such as the
+Levenberg-Marquardt algorithm~\cite{marquardt1963}, which augments the
+approximate Hessian with a damping term to regularise the step:
+
+\begin{equation}
+  \left(\mathbf{H}_k + \mu_k\,\mathbf{I}\right)
+  \boldsymbol{\delta}^{\star}
+  = -\mathbf{b}_k,
+  \qquad \mu_k > 0.
+  \label{eq:levenberg_marquardt}
+\end{equation}
+
+By varying $\mu_k$, the Levenberg-Marquardt method interpolates between the
+Gauss-Newton step (small $\mu_k$) and a steepest-descent step (large
+$\mu_k$), providing a more robust global convergence behaviour at the cost of
+an additional scalar tuning parameter.
+
+% ============================================================
+%  Bibliography entries (BibTeX)
+% ============================================================
+% Place the following in your .bib file:
+%
+% @book{barfoot2017,
+%   author    = {Barfoot, Timothy D.},
+%   title     = {State Estimation for Robotics},
+%   publisher = {Cambridge University Press},
+%   year      = {2017},
+%   isbn      = {9781107159396}
+% }
+%
+% @article{sola2018micro,
+%   author  = {Sol\`{a}, Joan and Deray, J\'{e}r\'{e}mie and Atchuthan, Dinesh},
+%   title   = {A Micro {Lie} Theory for State Estimation in Robotics},
+%   journal = {arXiv preprint arXiv:1812.01537},
+%   year    = {2018}
+% }
+%
+% @book{nocedal2006,
+%   author    = {Nocedal, Jorge and Wright, Stephen J.},
+%   title     = {Numerical Optimization},
+%   edition   = {2},
+%   publisher = {Springer},
+%   series    = {Springer Series in Operations Research and
+%                Financial Engineering},
+%   year      = {2006}
+% }
+%
+% @article{marquardt1963,
+%   author  = {Marquardt, Donald W.},
+%   title   = {An Algorithm for Least-Squares Estimation of Nonlinear Parameters},
+%   journal = {Journal of the Society for Industrial and Applied Mathematics},
+%   volume  = {11},
+%   number  = {2},
+%   pages   = {431--441},
+%   year    = {1963}
+% }
+
 \section{Distance Maps}\label{sec:distance-maps}
 
 TBC (unsigned distance map structure,
