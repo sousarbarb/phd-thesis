@@ -134,8 +134,9 @@ the occupancy probability values associated with the projected scan points.
 
 Precomputed spatial gradients may be leveraged for the 2D~point cloud
 registration without requiring explicit point-to-point correspondences.
-HectorSLAM~\cite{kohlbrecher:ssr:2011} uses spatial gradients over
-the 2D~occupancy grid map ($M$). The scan matching finds the pose that maximizes
+HectorSLAM~\cite{kohlbrecher:ssr:2011} uses spatial gradients over the
+2D~occupancy grid map ($\mathcal{M}$).
+The scan matching finds the pose that maximizes
 the occupancy probability of where the beam endpoints land on occupied cells
 (see \eqref{eq:distance-maps:background:hectorslam}).
 The method uses bilinear interpolation over the occupancy map and approximates
@@ -144,7 +145,7 @@ PerfectMatch~\cite{lauer:robocup:2006,sobreira:jint:2019} focuses on
 a soccer field markings environment for robot soccer.
 This method formulates the 2D~registration problem based on distance maps, using
 the \gls{rprop}~\cite{riedmiller-braun:icnn:1993} gradient-descent algorithm.
-Each point is evaluated by the distance map ($\mathcal{D}_M$)
+Each point is evaluated by the distance map ($\mathcal{D}_\mathcal{M}$)
 that gives the distance to the closest field marking through a
 robust M-estimator ($\rho$)
 (see \eqref{eq:distance-maps:background:perfectmatch}).
@@ -170,11 +171,11 @@ than \gls{icp}~\cite{besl-mckay:tpami:1992} and
 
 \begin{equation}\label{eq:distance-maps:background:hectorslam}
 \mathbf{X} = \argmin_\mathbf{X} \sum_i
-\left[ 1 - M \left(\mathbf{X} z_i\right) \right]^2
+\left[ 1 - \mathcal{M} \left(\mathbf{X} z_i\right) \right]^2
 \end{equation}
 \begin{equation}\label{eq:distance-maps:background:perfectmatch}
 \mathbf{X} = \argmin_\mathbf{X} \sum_i
-\rho \left( \mathcal{D}_M \left( \mathbf{X} z_i \right) \right)
+\rho \left( \mathcal{D}_\mathcal{M} \left( \mathbf{X} z_i \right) \right)
 \end{equation}
 
 Overall, most \gls{icp} methods rely on explicit point-to-point correspondences,
@@ -266,23 +267,27 @@ defined in \eqref{eq:distance-maps:background:least-squares:error},
 where $\mathbf{\Omega}^{[i]}$ is the information matrix,
 $\mathbf{h}^{[i]}(\mathbf{x})$ represents the predicted measurement given the
 state estimate $\mathbf{x}$, and $\mathbf{z}^{[i]}$ the measurement itself.
+These measurements' distributions conditioned by the state
+$p(\mathbf{z}^{[i]}|\mathbf{x})$ are over the measurements themselves,
+$\mathbf{z}^{[i]}$, with mean $\mu_{z|x}=\mathbf{h}^{[i]}(\mathbf{x})$ and
+covariance $\mathbf{\Sigma}^{[i]} = {\mathbf{\Omega}^{[i]}}^{-1}$.
 \begin{equation}\label{eq:distance-maps:background:least-squares:independence}
 p(\mathbf{x}|\mathbf{z}) \propto \prod_i p(\mathbf{z}^{[i]}|\mathbf{x})
 \end{equation}
 \begin{equation}\label{eq:distance-maps:background:least-squares:measurement}
 \begin{aligned}
 p(\mathbf{z}^{[i]}|\mathbf{x})
-  & = \mathcal{N}(\mathbf{z}^{[i]} ; \mathbf{h}^{[i]}(\mathbf{x}), \mathbf{\Sigma^{[i]}})\\
+  & = \mathcal{N}(\mathbf{z}^{[i]} ; \mathbf{h}^{[i]}(\mathbf{x}), \mathbf{\Sigma}^{[i]})\\
   & \propto \exp\left(
       -\frac{1}{2}
       \left( \mathbf{h}^{[i]}(\mathbf{x}) - \mathbf{z}^{[i]} \right)^T
-      \left(\mathbf{\Sigma^{[i]}}\right)^{-1}
+      \left(\mathbf{\Sigma}^{[i]}\right)^{-1}
       \left( \mathbf{h}^{[i]}(\mathbf{x}) - \mathbf{z}^{[i]} \right)
   \right)\\
   & \propto \exp\left(
       -\frac{1}{2}
       \mathbf{e}^{[i]}(\mathbf{x})^T
-      \mathbf{\Omega^{[i]}}
+      \mathbf{\Omega}^{[i]}
       \mathbf{e}^{[i]}(\mathbf{x})
   \right)
 \end{aligned}
@@ -322,9 +327,9 @@ perturbation $\mathbf{\Delta x}_k$, as shown in
 \eqref{eq:distance-maps:background:least-squares:perturbation}.
 \begin{equation}\label{eq:distance-maps:background:least-squares:iterative-function}
 F\left(\mathbf{x}_k\right) =
-\sum_i \mathbf{e}^{\left[i\right]}\left(\mathbf{x}_k\right)^T
-       \mathbf{\Omega}^{\left[i\right]}
-       \mathbf{e}^{\left[i\right]}\left(\mathbf{x}_k\right)
+\sum_i \mathbf{e}^{[i]}\left(\mathbf{x}_k\right)^T
+       \mathbf{\Omega}^{[i]}
+       \mathbf{e}^{[i]}\left(\mathbf{x}_k\right)
 \end{equation}
 \begin{equation}\label{eq:distance-maps:background:least-squares:perturbation}
 \mathbf{x}_{k+1} = \mathbf{x}_k + \mathbf{\Delta x}_k
@@ -335,11 +340,11 @@ we can linearize each error function around the current estimate $\mathbf{x}_k$
 using a first-order Taylor approximation, as formulated in
 \eqref{eq:distance-maps:background:least-squares:error-function-taylor}.
 \begin{equation}\label{eq:distance-maps:background:least-squares:error-function-taylor}
-\mathbf{e}^{\left[i\right]}\left(\mathbf{x}_k + \mathbf{\Delta x}_k\right)
+\mathbf{e}^{[i]}\left(\mathbf{x}_k + \mathbf{\Delta x}_k\right)
 \simeq
-\underbrace{\mathbf{e}^{\left[i\right]}\left(\mathbf{x}_k\right)}_{\mathbf{e}^{\left[i\right]}} +
-\underbrace{\left.\frac{\partial \mathbf{e}^{\left[i\right]}\left(\mathbf{x}\right)}{\partial \mathbf{x}}
-\right|_{\mathbf{x}=\mathbf{x}_k}}_{\mathbf{J}^{\left[i\right]}}
+\underbrace{\mathbf{e}^{[i]}\left(\mathbf{x}_k\right)}_{\mathbf{e}^{[i]}} +
+\underbrace{\left.\frac{\partial \mathbf{e}^{[i]}\left(\mathbf{x}\right)}{\partial \mathbf{x}}
+\right|_{\mathbf{x}=\mathbf{x}_k}}_{\mathbf{J}^{[i]}}
 \mathbf{\Delta x}_k
 \end{equation}
 
@@ -350,30 +355,30 @@ considering the state perturbation update shown in
 \eqref{eq:distance-maps:background:least-squares:perturbation}.
 This expansion considers the state variables
 $\mathbf{x}\in\mathbb{R}^n$,
-the error function $\mathbf{e}^{\left[i\right]}\in\mathbb{R}^m$,
-the information matrix $\mathbf{\Omega}^{\left[i\right]}\in\mathbb{R}^{m\times m}$,
-and the Jacobian matrix $\mathbf{J}^{\left[i\right]}\in\mathbb{R}^{m\times n}$.
+the error function $\mathbf{e}^{[i]}\in\mathbb{R}^{m_i}$,
+the information matrix $\mathbf{\Omega}^{[i]}\in\mathbb{R}^{m_i\times m_i}$,
+and the Jacobian matrix $\mathbf{J}^{[i]}\in\mathbb{R}^{m_i\times n}$.
 Since each term in the expression from
 \eqref{eq:distance-maps:background:least-squares:products-expansion} is a
-scalar, $\mathbf{\Delta x}^T {\mathbf{J}^{\left[i\right]}}^T
-\mathbf{\Omega}^{\left[i\right]} \mathbf{e}^{\left[i\right]} =
-{\mathbf{e}^{\left[i\right]}}^T \mathbf{\Omega}^{\left[i\right]}
-\mathbf{J}^{\left[i\right]} \mathbf{\Delta x}$.
+scalar, $\mathbf{\Delta x}^T {\mathbf{J}^{[i]}}^T
+\mathbf{\Omega}^{[i]} \mathbf{e}^{[i]} =
+{\mathbf{e}^{[i]}}^T \mathbf{\Omega}^{[i]}
+\mathbf{J}^{[i]} \mathbf{\Delta x}$.
 \begin{equation}\label{eq:distance-maps:background:least-squares:products-expansion}
 \begin{aligned}
-\mathbf{e}^{\left[i\right]}\left(\mathbf{x}_k + \mathbf{\Delta x}_k\right)^T
-\mathbf{\Omega}^{\left[i\right]}
-\mathbf{e}^{\left[i\right]}\left(\mathbf{x}_k + \mathbf{\Delta x}_k\right)
-& \simeq & \left(\mathbf{e}^{\left[i\right]} + \mathbf{J}^{\left[i\right]} \mathbf{\Delta x}\right)^T
-         \mathbf{\Omega}^{\left[i\right]}
-         \left(\mathbf{e}^{\left[i\right]} + \mathbf{J}^{\left[i\right]} \mathbf{\Delta x}\right) & =\\
-& = & {\mathbf{e}^{\left[i\right]}}^T \mathbf{\Omega}^{\left[i\right]} \mathbf{e}^{\left[i\right]} +
-      {\mathbf{e}^{\left[i\right]}}^T \mathbf{\Omega}^{\left[i\right]} \mathbf{J}^{\left[i\right]} \mathbf{\Delta x} & \; +\\
-&   & \mathbf{\Delta x}^T {\mathbf{J}^{\left[i\right]}}^T \mathbf{\Omega}^{\left[i\right]} \mathbf{e}^{\left[i\right]} +
-      \mathbf{\Delta x}^T {\mathbf{J}^{\left[i\right]}}^T \mathbf{\Omega}^{\left[i\right]} \mathbf{J}^{\left[i\right]} \mathbf{\Delta x} & =\\
-& = & \mathbf{\Delta x}^T \underbrace{{\mathbf{J}^{\left[i\right]}}^T \mathbf{\Omega}^{\left[i\right]} \mathbf{J}^{\left[i\right]}}_{\mathbf{H}^{\left[i\right]}} \mathbf{\Delta x} +
-      2 \underbrace{{\mathbf{e}^{\left[i\right]}}^T \mathbf{\Omega}^{\left[i\right]} \mathbf{J}^{\left[i\right]}}_{{\mathbf{b}^{\left[i\right]}}^T} \mathbf{\Delta x} +
-      \underbrace{{\mathbf{e}^{\left[i\right]}}^T \mathbf{\Omega}^{\left[i\right]} \mathbf{e}^{\left[i\right]}}_{c^{\left[i\right]}} &
+\mathbf{e}^{[i]}\left(\mathbf{x}_k + \mathbf{\Delta x}_k\right)^T
+\mathbf{\Omega}^{[i]}
+\mathbf{e}^{[i]}\left(\mathbf{x}_k + \mathbf{\Delta x}_k\right)
+& \simeq & \left(\mathbf{e}^{[i]} + \mathbf{J}^{[i]} \mathbf{\Delta x}\right)^T
+         \mathbf{\Omega}^{[i]}
+         \left(\mathbf{e}^{[i]} + \mathbf{J}^{[i]} \mathbf{\Delta x}\right) & =\\
+& = & {\mathbf{e}^{[i]}}^T \mathbf{\Omega}^{[i]} \mathbf{e}^{[i]} +
+      {\mathbf{e}^{[i]}}^T \mathbf{\Omega}^{[i]} \mathbf{J}^{[i]} \mathbf{\Delta x} & \; +\\
+&   & \mathbf{\Delta x}^T {\mathbf{J}^{[i]}}^T \mathbf{\Omega}^{[i]} \mathbf{e}^{[i]} +
+      \mathbf{\Delta x}^T {\mathbf{J}^{[i]}}^T \mathbf{\Omega}^{[i]} \mathbf{J}^{[i]} \mathbf{\Delta x} & =\\
+& = & \mathbf{\Delta x}^T \underbrace{{\mathbf{J}^{[i]}}^T \mathbf{\Omega}^{[i]} \mathbf{J}^{[i]}}_{\mathbf{H}^{[i]}} \mathbf{\Delta x} +
+      2 \underbrace{{\mathbf{e}^{[i]}}^T \mathbf{\Omega}^{[i]} \mathbf{J}^{[i]}}_{{\mathbf{b}^{[i]}}^T} \mathbf{\Delta x} +
+      \underbrace{{\mathbf{e}^{[i]}}^T \mathbf{\Omega}^{[i]} \mathbf{e}^{[i]}}_{c^{[i]}} &
 \end{aligned}
 \end{equation}
 
@@ -382,11 +387,11 @@ Next,
 groups the terms illustrated in
 \eqref{eq:distance-maps:background:least-squares:products-expansion}
 to formulate a quadratic form in the perturbation of the state variables,
-considering $\mathbf{H} = \sum_i \mathbf{H}^{\left[i\right]}\in\mathbb{R}^{n\times n}$,
-$\mathbf{b} = \sum_i \mathbf{b}^{\left[i\right]}\in\mathbb{R}^{n}$, and
-$c = \sum_i c^{\left[i\right]}\in\mathbb{R}$.
+considering $\mathbf{H} = \sum_i \mathbf{H}^{[i]}\in\mathbb{R}^{n\times n}$,
+$\mathbf{b} = \sum_i \mathbf{b}^{[i]}\in\mathbb{R}^{n}$, and
+$c = \sum_i c^{[i]}\in\mathbb{R}$.
 Considering that the measurements' information matrices
-$\mathbf{\Omega}^{\left[i\right]}$ is symmetric, $\mathbf{H}$ matrix is
+$\mathbf{\Omega}^{[i]}$ is symmetric, $\mathbf{H}$ matrix is
 symmetric and positive semi-definite by
 construction, where $\mathbf{H}^T=\mathbf{H}$~\cite{grisetti:robotics:2020}.
 This quadratic form linearizes the original non-linear least-squares problem
@@ -461,13 +466,13 @@ $\mathbf{b} \leftarrow \mathbf{0}_{n \times 1}$\;
 $\mathbf{H} \leftarrow \mathbf{0}_{n \times n}$\;
 \ForAll{$i$}{
   $\mathbf{e}^{[i]} \leftarrow \mathbf{h}^{[i]} - \mathbf{z}^{[i]}$\;
-  $\mathbf{J}^{\left[i\right]} \leftarrow \left.\frac{\partial
-      \mathbf{e}^{\left[i\right]}\left(\mathbf{x}\right)}{\partial \mathbf{x}}
+  $\mathbf{J}^{[i]} \leftarrow \left.\frac{\partial
+      \mathbf{e}^{[i]}\left(\mathbf{x}\right)}{\partial \mathbf{x}}
       \right|_{\mathbf{x}=\mathbf{x}_k}$\;
-  $\mathbf{H} \leftarrow \mathbf{H} + {\mathbf{J}^{\left[i\right]}}^T
-      \mathbf{\Omega}_i \mathbf{J}^{\left[i\right]}$\;
-  $\mathbf{b} \leftarrow \mathbf{b} + {\mathbf{J}^{\left[i\right]}}^T
-      \mathbf{\Omega}_i \mathbf{e}^{\left[i\right]}$\;
+  $\mathbf{H} \leftarrow \mathbf{H} + {\mathbf{J}^{[i]}}^T
+      \mathbf{\Omega}_i \mathbf{J}^{[i]}$\;
+  $\mathbf{b} \leftarrow \mathbf{b} + {\mathbf{J}^{[i]}}^T
+      \mathbf{\Omega}_i \mathbf{e}^{[i]}$\;
 }
 $\mathbf{\Delta x}_k \leftarrow \text{solve}(\mathbf{H} \mathbf{\Delta x}_k = -\mathbf{b})$\;
 $\mathbf{x}_{k+1} \leftarrow \mathbf{x}_{k} + \mathbf{\Delta x}_k$\;
@@ -475,6 +480,237 @@ $\mathbf{x}_{k+1} \leftarrow \mathbf{x}_{k} + \mathbf{\Delta x}_k$\;
 \end{algorithm}
 
 \subsubsection{Least-squares and uncertainty}\label{sec:distance-maps:background:least-squares:uncertainty}
+
+Under the assumption that the measurement functions $\mathbf{h}^{[i]}$
+can be approximated by their first-order Taylor expansion,
+the estimated measurement ${\mathbf{z}^{[i]}}^{*}$ around the optimum
+$\mathbf{x}^{*}$ can be approximated by:
+\begin{equation}
+{\mathbf{z}^{[i]}}^{*} = \mathbf{h}^{[i]}\left(\mathbf{x}^{*}\right)
+\end{equation}
+\begin{equation}
+\mathbf{h}^{[i]}\left(\mathbf{x}^{*} + \mathbf{\Delta x}\right)
+\simeq
+{\mathbf{z}^{[i]}}^{*} +
+\underbrace{\left.\frac{\partial\mathbf{h}^{[i]}\left(\mathbf{x}\right)}{\partial \mathbf{x}}
+\right|_{\mathbf{x}=\mathbf{x}^{*}}}_{\mathbf{J}^{[i]}}
+\mathbf{\Delta x}
+\end{equation}
+Here $\mathbf{J}^{[i]} \in \mathbb{R}^{d_z^{[i]} \times d_x}$ is the Jacobian
+of the $i$-th measurement function evaluated at the optimum, where
+$d_z^{[i]}$ is the dimension of the $i$-th measurement and $d_x$ is the
+dimension of the state vector. The perturbation $\mathbf{\Delta x}$
+represents a small deviation away from the optimum $\mathbf{x}^{*}$.
+This linearisation is valid as long as the measurement function is
+sufficiently smooth and $\|\mathbf{\Delta x}\|$ is small.
+
+Under this linearisation, the measurement $\mathbf{z}^{[i]}$ observed at
+a state $\mathbf{x}^{*} + \mathbf{\Delta x}$ differs from the predicted
+measurement ${\mathbf{z}^{[i]}}^{*}$ only through a linear term in
+$\mathbf{\Delta x}$, plus additive Gaussian noise with covariance
+${\mathbf{\Omega}^{[i]}}^{-1}$. Therefore, the conditional probability
+of the $i$-th measurement given the perturbed state is:
+\begin{equation}
+p(\mathbf{z}^{[i]}|\mathbf{x}^{*} + \mathbf{\Delta x})
+=
+\mathcal{N}\left(
+    \mathbf{z}^{[i]} ;
+    \mu_{z|x}^{[i]} = {\mathbf{z}^{[i]}}^{*} + \mathbf{J}^{[i]}\mathbf{\Delta x},
+    {\mathbf{\Omega}^{[i]}}^{-1}
+\right)
+\end{equation}
+This is a Gaussian distribution over $\mathbf{z}^{[i]}$, with mean equal
+to the linearised prediction and covariance ${\mathbf{\Omega}^{[i]}}^{-1}$,
+where $\mathbf{\Omega}^{[i]}$ is the information matrix (inverse covariance)
+of the $i$-th measurement noise model.
+
+Since measurements are assumed to be conditionally independent given the
+state, the joint conditional likelihood over all $M$ measurements factorises
+into a product of Gaussians, which is itself a Gaussian over the stacked
+measurement vector $\mathbf{z} = ({\mathbf{z}^{[1]}}^\top, \ldots,
+{\mathbf{z}^{[M]}}^\top)^\top$:
+\begin{equation}
+p(\mathbf{z}|\mathbf{x}^{*} + \mathbf{\Delta x}) =
+\mathcal{N}\left(\mathbf{z};\, \mu_{z|x},\, \mathbf{\Omega}_{z}^{-1}\right)
+\end{equation}
+where the stacked mean and block-diagonal information matrix are:
+\begin{equation}
+\mu_{z|x} =
+\begin{pmatrix}
+\mathbf{J}^{[1]}\mathbf{\Delta x} + {\mathbf{z}^{[1]}}^{*}\\
+\mathbf{J}^{[2]}\mathbf{\Delta x} + {\mathbf{z}^{[2]}}^{*}\\
+\vdots\\
+\mathbf{J}^{[M]}\mathbf{\Delta x} + {\mathbf{z}^{[M]}}^{*}
+\end{pmatrix} =
+\underbrace{\begin{pmatrix}
+\mathbf{J}^{[1]}\\
+\mathbf{J}^{[2]}\\
+\vdots\\
+\mathbf{J}^{[M]}
+\end{pmatrix}}_{\mathbf{J}} \mathbf{\Delta x} +
+\underbrace{\begin{pmatrix}
+{\mathbf{z}^{[1]}}^{*}\\
+{\mathbf{z}^{[2]}}^{*}\\
+\vdots\\
+{\mathbf{z}^{[M]}}^{*}
+\end{pmatrix}}_{\mathbf{z}^{*}}
+= \mathbf{J}\,\mathbf{\Delta x} + \mathbf{z}^{*}
+\end{equation}
+\begin{equation}
+\mathbf{\Omega}_z =
+\begin{pmatrix}
+\mathbf{\Omega}^{[1]}\\
+& \mathbf{\Omega}^{[2]}\\
+&& \ddots\\
+&&& \mathbf{\Omega}^{[M]}
+\end{pmatrix}
+\end{equation}
+The block-diagonal structure of $\mathbf{\Omega}_z$ reflects the conditional
+independence of the measurements: the noise on measurement $i$ is uncorrelated
+with the noise on measurement $j \neq i$. The stacked Jacobian
+$\mathbf{J} \in \mathbb{R}^{d_z \times d_x}$, where
+$d_z = \sum_{i=1}^{M} d_z^{[i]}$, gathers the local linearisations of all
+measurement functions into a single matrix.
+
+We now place a prior on the state perturbation $\mathbf{\Delta x}$.
+Since we are expanding around the optimum $\mathbf{x}^{*}$ and have
+no additional information about the direction of $\mathbf{\Delta x}$,
+we assume a uniform (uninformative) prior. In the Gaussian framework,
+a uniform prior is the limiting case of a zero-mean Gaussian whose covariance
+tends to infinity, or equivalently, whose information matrix tends to zero:
+\begin{equation}
+p(\mathbf{\Delta x}) = \mathcal{N}\!\left(\mathbf{\Delta x};\,
+    \mu_{\Delta x} = \mathbf{0},\,
+    \mathbf{\Omega}_{\Delta x} = \mathbf{0}
+\right)
+\end{equation}
+A zero information matrix encodes the fact that all values of
+$\mathbf{\Delta x}$ are equally likely a priori; the prior contributes
+no constraints to the inference.
+
+Combining the uninformative prior and the measurement likelihood, we have:
+\begin{equation}
+p(\mathbf{\Delta x}) = \mathcal{N}\!\left(\mathbf{\Delta x};\,
+    \mathbf{0},\,
+    \mathbf{0}
+\right)
+\end{equation}
+\begin{equation}
+p(\mathbf{z}|\mathbf{\Delta x}) = \mathcal{N}\!\left(\mathbf{z};\,
+    \mathbf{J}\mathbf{\Delta x} + \mathbf{z}^{*},\,
+    \mathbf{\Omega}_{z}^{-1}
+\right)
+\end{equation}
+
+We now apply the Gaussian chain rule to derive the joint distribution
+$p(\mathbf{\Delta x}, \mathbf{z})$. For two jointly Gaussian variables
+$\mathbf{a}$ and $\mathbf{b}$ where $p(\mathbf{a}) = \mathcal{N}(\mathbf{a};
+\mu_a, \Omega_a^{-1})$ and $p(\mathbf{b}|\mathbf{a}) =
+\mathcal{N}(\mathbf{b}; \mathbf{A}\mathbf{a} + \mathbf{b}_0, \Omega_b^{-1})$,
+the joint information matrix is:
+\begin{equation}
+\mathbf{\Omega}_{a,b} =
+\begin{pmatrix}
+\mathbf{\Omega}_a + \mathbf{A}^{\top}\mathbf{\Omega}_b\mathbf{A}
+    & \mathbf{A}^{\top}\mathbf{\Omega}_b \\
+\mathbf{\Omega}_b\mathbf{A}
+    & \mathbf{\Omega}_b
+\end{pmatrix}
+\end{equation}
+Applying this to our case with $\mathbf{a} = \mathbf{\Delta x}$,
+$\mathbf{b} = \mathbf{z}$, $\mathbf{A} = \mathbf{J}$,
+$\mathbf{b}_0 = \mathbf{z}^{*}$,
+$\mathbf{\Omega}_a = \mathbf{0}$ (uninformative prior), and
+$\mathbf{\Omega}_b = \mathbf{\Omega}_z$, the joint distribution is:
+\begin{equation}
+p(\mathbf{\Delta x},\mathbf{z}) = \mathcal{N}\!\left(
+    \begin{pmatrix}\mathbf{\Delta x}\\ \mathbf{z}\end{pmatrix};\,
+    \mu_{\Delta x, z},\,
+    \mathbf{\Omega}_{\Delta x, z}^{-1}
+\right)
+\end{equation}
+\begin{equation}
+\mu_{\mathbf{\Delta x},\mathbf{z}} =
+\begin{pmatrix}
+\mathbf{0}\\
+\mathbf{z}^{*}
+\end{pmatrix}
+\end{equation}
+\begin{equation}
+\mathbf{\Omega}_{\Delta x, z} =
+\begin{pmatrix}
+\mathbf{0} + \mathbf{J}^{\top} \mathbf{\Omega}_{z} \mathbf{J}
+    & \mathbf{J}^{\top} \mathbf{\Omega}_z\\
+\mathbf{\Omega}_z \mathbf{J}
+    & \mathbf{\Omega}_z
+\end{pmatrix} =
+\begin{pmatrix}
+\mathbf{J}^{\top} \mathbf{\Omega}_{z} \mathbf{J}
+    & \mathbf{J}^{\top} \mathbf{\Omega}_z\\
+\mathbf{\Omega}_z \mathbf{J}
+    & \mathbf{\Omega}_z
+\end{pmatrix} =
+\begin{pmatrix}
+\mathbf{\Omega}_{xx} & \mathbf{\Omega}_{xz}\\
+\mathbf{\Omega}_{zx} & \mathbf{\Omega}_{zz}
+\end{pmatrix}
+\end{equation}
+Note that the $\mathbf{0}$ term in the top-left block vanishes because the
+prior carries no information. The resulting $\mathbf{\Omega}_{xx} =
+\mathbf{J}^{\top}\mathbf{\Omega}_z\mathbf{J}$ block will turn out to be
+precisely the Gauss-Newton approximate Hessian.
+
+Finally, to obtain the distribution of $\mathbf{\Delta x}$ alone given the
+measurements $\mathbf{z}$, we condition the joint Gaussian on $\mathbf{z}$.
+For a jointly Gaussian distribution partitioned as above, the conditional
+information matrix is given by the Schur complement of the
+$\mathbf{\Omega}_{zz}$ block:
+\begin{equation}
+\mathbf{\Omega}_{x|z}
+= \mathbf{\Omega}_{xx} - \mathbf{\Omega}_{xz}\,\mathbf{\Omega}_{zz}^{-1}\,\mathbf{\Omega}_{zx}
+\end{equation}
+Substituting the expressions derived above:
+\begin{equation}
+\mathbf{\Omega}_{x|z}
+= \mathbf{J}^{\top}\mathbf{\Omega}_{z}\mathbf{J}
+  - \mathbf{J}^{\top}\mathbf{\Omega}_{z}
+    \,\mathbf{\Omega}_{z}^{-1}\,
+    \mathbf{\Omega}_{z}\mathbf{J}
+= \mathbf{J}^{\top}\mathbf{\Omega}_{z}\mathbf{J}
+  - \mathbf{J}^{\top}\mathbf{\Omega}_{z}\mathbf{J}
+  = \mathbf{0}
+\end{equation}
+This result may appear surprising at first: the Schur complement cancels
+exactly, yielding zero. This is a direct consequence of the uninformative
+prior --- with no prior information on $\mathbf{\Delta x}$, conditioning on
+$\mathbf{z}$ through a linear observation model with full-rank $\mathbf{J}$
+leaves no residual uncertainty in the directions spanned by $\mathbf{J}$.
+In other words, $\mathbf{\Omega}_{x|z}$ collapses because the problem is
+formulated as a perturbation around the already-optimal $\mathbf{x}^{*}$;
+the relevant quantity is not the posterior information on the perturbation
+itself, but rather the curvature of the cost function at the optimum.
+
+This curvature is captured by the top-left block of the joint information
+matrix before conditioning, namely:
+\begin{equation}
+\mathbf{\Omega}_{x|z} \approx \mathbf{\Omega}_{xx}
+= \mathbf{J}^{\top}\mathbf{\Omega}_{z}\mathbf{J}
+\end{equation}
+This is the standard approximation used in practice: the state uncertainty
+at the optimum is estimated by inverting the approximate Hessian
+$\mathbf{H} \approx \mathbf{J}^{\top}\mathbf{\Omega}_{z}\mathbf{J}$,
+giving the covariance estimate:
+\begin{equation}
+\mathbf{\Sigma}_{x|z} \approx
+\left(\mathbf{J}^{\top}\mathbf{\Omega}_{z}\mathbf{J}\right)^{-1}
+\end{equation}
+This covariance matrix provides an estimate of the uncertainty of the
+optimised state $\mathbf{x}^{*}$: its diagonal entries are the marginal
+variances of each component of the state, and its off-diagonal entries
+encode the correlations induced by the measurement model. This is the
+uncertainty estimate recovered from the Gauss-Newton optimisation process
+under the Gaussian noise assumption.
+
 \subsubsection{Robust estimators}\label{sec:distance-maps:background:least-squares:robust-estimators}
 \subsubsection{Non-Euclidean spaces}\label{sec:distance-maps:background:least-squares:manifold}
 
