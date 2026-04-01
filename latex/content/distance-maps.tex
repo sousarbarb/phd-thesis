@@ -241,7 +241,8 @@ the non-linear least-squares problems for non-Euclidean state spaces.
 \label{sec:distance-maps:background:least-squares:problem-formulation}
 
 Least-squares minimization arises in robotics when estimating an unknown state
-from noisy sensor measurements. Let $\mathbf{x}$ denote non-observable
+from noisy sensor measurements~\cite{grisetti:robotics:2020}.
+Let $\mathbf{x}$ denote non-observable
 state variables and $\mathbf{z}$ the measurements.
 In the scope of this PhD~Thesis, the
 measurements correspond to the perception of the environment obtained
@@ -251,9 +252,9 @@ while the conditional distribution of the measurements given the state,
 $p(\mathbf{z}|\mathbf{x})$, is assumed known,
 commonly referred to as the \emph{observation model}. Then, the goal
 is to estimate the most probable state given the measurements,
-\ie, the posterior $p(\mathbf{x}|\mathbf{z})$~\cite{grisetti:robotics:2020}.
+\ie, the posterior $p(\mathbf{x}|\mathbf{z})$.
 This problem represents a \gls{map} estimation problem, as shown in
-\eqref{eq:distance-maps:background:least-squares:map}.
+\eqref{eq:distance-maps:background:least-squares:map}~\cite{barfoot:book:2017}.
 \begin{equation}\label{eq:distance-maps:background:least-squares:map}
 \mathbf{x}^* = \argmax_\mathbf{x} p(\mathbf{x}|\mathbf{z})
 \end{equation}
@@ -364,24 +365,28 @@ as formalized in
 Following the non-linear least-squares formulation commonly used in
 robotics state estimation, one possible solution is an iterative minimization of
 \eqref{eq:distance-maps:background:least-squares:iterative-function}~\cite{grisetti:robotics:2020}.
-At each iteration $k$, the current estimate $\mathbf{x}_k$ is updated by a
+At each iteration $k$, the state is updated by a
 perturbation $\mathbf{\Delta x}_k$, as shown in
 \eqref{eq:distance-maps:background:least-squares:perturbation}.
 \begin{equation}\label{eq:distance-maps:background:least-squares:iterative-function}
 F\left(\mathbf{x}_k\right) =
-\sum_i \mathbf{e}^{[i]}\left(\mathbf{x}_k\right)^T
-       \mathbf{\Omega}^{[i]}
-       \mathbf{e}^{[i]}\left(\mathbf{x}_k\right)
+\sum_{i=1}^{m} \mathbf{e}^{[i]}\left(\mathbf{x}_k\right)^T
+               \mathbf{\Omega}^{[i]}
+               \mathbf{e}^{[i]}\left(\mathbf{x}_k\right)
 \end{equation}
 \begin{equation}\label{eq:distance-maps:background:least-squares:perturbation}
 \mathbf{x}_{k+1} = \mathbf{x}_k + \mathbf{\Delta x}_k
 \end{equation}
 
 In order to compute the state perturbation $\mathbf{\Delta x}_k$,
-we can linearize each error function around the current estimate $\mathbf{x}_k$
-using a first-order Taylor approximation, as formulated in
-\eqref{eq:distance-maps:background:least-squares:error-function-taylor}.
-\begin{equation}\label{eq:distance-maps:background:least-squares:error-function-taylor}
+each residual is linearized around the  current estimate $\mathbf{x}_k$
+via a first-order Taylor approximation, as formulated in
+\eqref{eq:distance-maps:background:least-squares:error-function-taylor}~\cite{barfoot:book:2017,nocedal-wright:book:2006},
+where $\mathbf{J}^{[i]}\in\mathbb{R}^{m_i\times n}$ is the Jacobian of the
+$i$-th residual evaluated at $\mathbf{x}_k$, with $m_i$ the dimension of the
+residual $i$ and $n$ the dimension of the state.
+\begin{equation}
+\label{eq:distance-maps:background:least-squares:error-function-taylor}
 \mathbf{e}^{[i]}\left(\mathbf{x}_k + \mathbf{\Delta x}_k\right)
 \simeq
 \underbrace{\mathbf{e}^{[i]}\left(\mathbf{x}_k\right)}_{\mathbf{e}^{[i]}} +
@@ -390,59 +395,44 @@ using a first-order Taylor approximation, as formulated in
 \mathbf{\Delta x}_k
 \end{equation}
 
-\eqref{eq:distance-maps:background:least-squares:products-expansion}
-expands the products of the first-order Taylor approximation in
+Next, \eqref{eq:distance-maps:background:least-squares:products-expansion}
+substitutes the first-order Taylor approximation into the objective function and
+expands the products in
 \eqref{eq:distance-maps:background:least-squares:iterative-function},
-considering the state perturbation update shown in
-\eqref{eq:distance-maps:background:least-squares:perturbation}.
-This expansion considers the state variables
-$\mathbf{x}\in\mathbb{R}^n$,
-the error function $\mathbf{e}^{[i]}\in\mathbb{R}^{m_i}$,
-the information matrix $\mathbf{\Omega}^{[i]}\in\mathbb{R}^{m_i\times m_i}$,
-and the Jacobian matrix $\mathbf{J}^{[i]}\in\mathbb{R}^{m_i\times n}$.
-Since each term in the expression from
-\eqref{eq:distance-maps:background:least-squares:products-expansion} is a
-scalar, $\mathbf{\Delta x}^T {\mathbf{J}^{[i]}}^T
-\mathbf{\Omega}^{[i]} \mathbf{e}^{[i]} =
-{\mathbf{e}^{[i]}}^T \mathbf{\Omega}^{[i]}
-\mathbf{J}^{[i]} \mathbf{\Delta x}$.
-\begin{equation}\label{eq:distance-maps:background:least-squares:products-expansion}
+where the scalar symmetry
+$\mathbf{\Delta x}^T {\mathbf{J}^{[i]}}^T \mathbf{\Omega}^{[i]}
+\mathbf{e}^{[i]} = {\mathbf{e}^{[i]}}^T \mathbf{\Omega}^{[i]}
+\mathbf{J}^{[i]} \mathbf{\Delta x}$ has been used to combine the two
+cross-terms.
+\begin{equation}
+\label{eq:distance-maps:background:least-squares:products-expansion}
 \begin{aligned}
 \mathbf{e}^{[i]}\left(\mathbf{x}_k + \mathbf{\Delta x}_k\right)^T
 \mathbf{\Omega}^{[i]}
 \mathbf{e}^{[i]}\left(\mathbf{x}_k + \mathbf{\Delta x}_k\right)
-& \simeq & \left(\mathbf{e}^{[i]} + \mathbf{J}^{[i]} \mathbf{\Delta x}\right)^T
+& \simeq \left(\mathbf{e}^{[i]} + \mathbf{J}^{[i]} \mathbf{\Delta x}\right)^T
          \mathbf{\Omega}^{[i]}
-         \left(\mathbf{e}^{[i]} + \mathbf{J}^{[i]} \mathbf{\Delta x}\right) & =\\
-& = & {\mathbf{e}^{[i]}}^T \mathbf{\Omega}^{[i]} \mathbf{e}^{[i]} +
-      {\mathbf{e}^{[i]}}^T \mathbf{\Omega}^{[i]} \mathbf{J}^{[i]} \mathbf{\Delta x} & \; +\\
-&   & \mathbf{\Delta x}^T {\mathbf{J}^{[i]}}^T \mathbf{\Omega}^{[i]} \mathbf{e}^{[i]} +
-      \mathbf{\Delta x}^T {\mathbf{J}^{[i]}}^T \mathbf{\Omega}^{[i]} \mathbf{J}^{[i]} \mathbf{\Delta x} & =\\
-& = & \mathbf{\Delta x}^T \underbrace{{\mathbf{J}^{[i]}}^T \mathbf{\Omega}^{[i]} \mathbf{J}^{[i]}}_{\mathbf{H}^{[i]}} \mathbf{\Delta x} +
-      2 \underbrace{{\mathbf{e}^{[i]}}^T \mathbf{\Omega}^{[i]} \mathbf{J}^{[i]}}_{{\mathbf{b}^{[i]}}^T} \mathbf{\Delta x} +
-      \underbrace{{\mathbf{e}^{[i]}}^T \mathbf{\Omega}^{[i]} \mathbf{e}^{[i]}}_{c^{[i]}} &
+         \left(\mathbf{e}^{[i]} + \mathbf{J}^{[i]} \mathbf{\Delta x}\right)\\
+& = \mathbf{\Delta x}^T \underbrace{{\mathbf{J}^{[i]}}^T \mathbf{\Omega}^{[i]} \mathbf{J}^{[i]}}_{\mathbf{H}^{[i]}} \mathbf{\Delta x} +
+    2 \underbrace{{\mathbf{e}^{[i]}}^T \mathbf{\Omega}^{[i]} \mathbf{J}^{[i]}}_{{\mathbf{b}^{[i]}}^T} \mathbf{\Delta x} +
+    \underbrace{{\mathbf{e}^{[i]}}^T \mathbf{\Omega}^{[i]} \mathbf{e}^{[i]}}_{c^{[i]}}
 \end{aligned}
 \end{equation}
 
-Next,
+Summing over all measurements and defining
+$\mathbf{H} = \sum_{i=1}^m \mathbf{H}^{[i]} \in \mathbb{R}^{n \times n}$,
+$\mathbf{b} = \sum_{i=1}^m \mathbf{b}^{[i]} \in \mathbb{R}^{n}$, and
+$c = \sum_{i=1}^m c^{[i]} \in \mathbb{R}$,
 \eqref{eq:distance-maps:background:least-squares:iterative-function-linearized}
-groups the terms illustrated in
+formulates the linearized cost derived in
 \eqref{eq:distance-maps:background:least-squares:products-expansion}
-to formulate a quadratic form in the perturbation of the state variables,
-considering $\mathbf{H} = \sum_i \mathbf{H}^{[i]}\in\mathbb{R}^{n\times n}$,
-$\mathbf{b} = \sum_i \mathbf{b}^{[i]}\in\mathbb{R}^{n}$, and
-$c = \sum_i c^{[i]}\in\mathbb{R}$.
-Considering that the measurements' information matrices
-$\mathbf{\Omega}^{[i]}$ is symmetric, $\mathbf{H}$ matrix is
-symmetric and positive semi-definite by
-construction, where $\mathbf{H}^T=\mathbf{H}$~\cite{grisetti:robotics:2020}.
-This quadratic form linearizes the original non-linear least-squares problem
-formulated in
-\eqref{eq:distance-maps:background:least-squares:mle-log-likelihood}
-at each iteration of the minimization, considering the perturbation update of
-the state variables in
-\eqref{eq:distance-maps:background:least-squares:perturbation}.
-\begin{equation}\label{eq:distance-maps:background:least-squares:iterative-function-linearized}
+to a quadratic form in $\mathbf{\Delta x}$.
+The information matrices of the measurements $\mathbf{\Omega}^{[i]}$ are
+symmetric positive semi-definite. Consequently, the matrix $\mathbf{H}$
+inherits the same property by construction, where
+$\mathbf{H}^T=\mathbf{H}$~\cite{grisetti:robotics:2020}.
+\begin{equation}
+\label{eq:distance-maps:background:least-squares:iterative-function-linearized}
 F\left(\mathbf{x}_k + \mathbf{\Delta x}_k\right)
 \simeq
 \mathbf{\Delta x}_k^T \mathbf{H} \mathbf{\Delta x}_k +
@@ -450,47 +440,29 @@ F\left(\mathbf{x}_k + \mathbf{\Delta x}_k\right)
 c
 \end{equation}
 
-The perturbation $\mathbf{\Delta x}_k$ is obtained by minimizing the quadratic
-approximation of the objective function (see
-\eqref{eq:distance-maps:background:least-squares:perturbation-minimization}).
-This minimization is done by setting the gradient of the quadratic approximation
-\gls{wrt} $\mathbf{\Delta x}_k$ to zero, as shown in
-\eqref{eq:distance-maps:background:least-squares:perturbation-minimization-solution}.
-\begin{equation}\label{eq:distance-maps:background:least-squares:perturbation-minimization}
-\begin{aligned}
-\mathbf{\Delta x}_k^*
-& = \argmin_{\mathbf{\Delta x}}
-    F\left(\mathbf{x}_k + \mathbf{\Delta x}_k\right)\\
-& \simeq \argmin_{\mathbf{\Delta x}}
-    \mathbf{\Delta x}_k^T \mathbf{H} \mathbf{\Delta x}_k +
-    2 \mathbf{b}^T \mathbf{\Delta x} + c
-\end{aligned}
-\end{equation}
-\begin{equation}\label{eq:distance-maps:background:least-squares:perturbation-minimization-solution}
-\begin{aligned}
-\mathbf{0}
-& = \frac{\partial \left[ \mathbf{\Delta x}_k^T \mathbf{H} \mathbf{\Delta x}_k +
-    2 \mathbf{b}^T \mathbf{\Delta x} + c \right]}{\partial \mathbf{\Delta x}}\\
-\mathbf{0}
-& = \left( \mathbf{H} + \mathbf{H}^T \right) \mathbf{\Delta x}_k + 2 \mathbf{b}\\
-\mathbf{0}
-& = 2 \mathbf{H} \mathbf{\Delta x}_k + 2 \mathbf{b}\\
--\mathbf{b} & = \mathbf{H} \mathbf{\Delta x}_k
-\end{aligned}
-\end{equation}
-
-Therefore, at iteration $k$, the perturbation $\mathbf{\Delta x}_k$ is obtained
-by solving the linear system presented in
-\eqref{eq:distance-maps:background:least-squares:perturbation-minimization-solution}.
-The estimate is then updated following
-\eqref{eq:distance-maps:background:least-squares:perturbation}.
-This iterative procedure corresponds to the Gauss-Newton method, which
-linearizes the residual error functions around the current estimate and
-minimizes the resulting quadratic approximation of the weighted non-linear
+The optimal perturbation minimizes the quadratic approximation presented in
+\eqref{eq:distance-maps:background:least-squares:iterative-function-linearized}.
+Setting the gradient \gls{wrt} $\mathbf{\Delta x}$ to zero, as shown in
+\eqref{eq:distance-maps:background:least-squares:perturbation-minimization-solution},
+yields the normal equations presented in
+\eqref{eq:distance-maps:background:least-squares:b-hx}, whose solution
+$\mathbf{\Delta x}_k$ is then used to update the state via
+\eqref{eq:distance-maps:background:least-squares:perturbation}, constituting
+one iteration of the \emph{Gauss-Newton} method.
+The method linearizes the residual error functions around the current estimate
+and minimizes the resulting quadratic approximation of the weighted non-linear
 least-squares cost~\cite{grisetti:robotics:2020}.
 \algref{alg:distance-maps:background:least-squares:gauss-newton} details the
-steps of the Gauss-Newton minimization algorithm for a single iteration of the
-iterative procedure.
+steps for a single iteration of the minimization procedure.
+\begin{equation}
+\label{eq:distance-maps:background:least-squares:perturbation-minimization-solution}
+\mathbf{0} =
+\frac{\partial}{\partial \mathbf{\Delta x}}
+\left[
+  \mathbf{\Delta x}_k^T \mathbf{H} \mathbf{\Delta x}_k
+  + 2 \mathbf{b}^T \mathbf{\Delta x}_k + c
+\right] = 2\mathbf{H} \mathbf{\Delta x}_k + 2\mathbf{b},
+\end{equation}
 \begin{equation}\label{eq:distance-maps:background:least-squares:b-hx}
 \mathbf{H} \mathbf{\Delta x}_k = -\mathbf{b}
 \end{equation}
@@ -502,26 +474,28 @@ spaces]{Gauss-Newton minimization algorithm for Euclidean measurement and
 state spaces (one single iteration of the iterative procedure)}
 \label{alg:distance-maps:background:least-squares:gauss-newton}
 \KwIn{Current state estimation $\mathbf{x}_k$,
-measurements $\mathcal{C} = {\langle \mathbf{z}_i , \mathbf{\Omega}_i \rangle}$}
+measurements $\mathcal{C} = \{\langle  \mathbf{z}^{[i]} , \mathbf{\Omega}^{[i]} \rangle\}$}
 \KwOut{State estimation for the next iteration step $\mathbf{x}_{k+1}$}
 $\mathbf{b} \leftarrow \mathbf{0}_{n \times 1}$\;
 $\mathbf{H} \leftarrow \mathbf{0}_{n \times n}$\;
 \ForAll{$i$}{
-  $\mathbf{e}^{[i]} \leftarrow \mathbf{h}^{[i]} - \mathbf{z}^{[i]}$\;
-  $\mathbf{J}^{[i]} \leftarrow \left.\frac{\partial
-      \mathbf{e}^{[i]}\left(\mathbf{x}\right)}{\partial \mathbf{x}}
+  $\mathbf{e}^{[i]} \leftarrow \mathbf{h}^{[i]}(\mathbf{x}_k) - \mathbf{z}^{[i]}$\;
+  $\mathbf{J}^{[i]} \leftarrow
+      \left.\dfrac{\partial\mathbf{e}^{[i]}(\mathbf{x})}{\partial \mathbf{x}}
       \right|_{\mathbf{x}=\mathbf{x}_k}$\;
   $\mathbf{H} \leftarrow \mathbf{H} + {\mathbf{J}^{[i]}}^T
-      \mathbf{\Omega}_i \mathbf{J}^{[i]}$\;
+      \mathbf{\Omega}^{[i]} \mathbf{J}^{[i]}$\;
   $\mathbf{b} \leftarrow \mathbf{b} + {\mathbf{J}^{[i]}}^T
-      \mathbf{\Omega}_i \mathbf{e}^{[i]}$\;
+      \mathbf{\Omega}^{[i]} \mathbf{e}^{[i]}$\;
 }
-$\mathbf{\Delta x}_k \leftarrow \text{solve}(\mathbf{H} \mathbf{\Delta x}_k = -\mathbf{b})$\;
+$\mathbf{\Delta x}_k \leftarrow \mathrm{solve}
+  \left(\mathbf{H} \mathbf{\Delta x}_k = -\mathbf{b}\right)$\;
 $\mathbf{x}_{k+1} \leftarrow \mathbf{x}_{k} + \mathbf{\Delta x}_k$\;
 \Return{$\mathbf{x}_{k+1}$}\;
 \end{algorithm}
 
-\subsubsection{Least-squares and uncertainty}\label{sec:distance-maps:background:least-squares:uncertainty}
+\subsubsection{Least-squares and uncertainty}
+\label{sec:distance-maps:background:least-squares:uncertainty}
 
 Under the assumption that the measurement functions $\mathbf{h}^{[i]}$
 can be approximated by their first-order Taylor expansion,
