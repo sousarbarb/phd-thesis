@@ -12,19 +12,20 @@ the \glslink{icp}{\glsentryfull{icp}} algorithm.
 Besl and McKay~\cite{besl-mckay:tpami:1992} address registration of 3D~shapes
 represented as point clouds, introducing the standard \gls{icp} algorithm.
 The following two steps can summarize this algorithm:
-(i) compute correspondences between the source ($z_i$) and target ($p_i$)
+(i) compute correspondences between the source ($p_i$) and target ($z_i$)
 cloud points (closest nearest neighbor based on Euclidean distance); and
 (ii) estimate the rigid transformation of the source \gls{wrt} target cloud
-($\mathbf{X}$) that minimizes a point-to-point distance measure between
+($\mathbf{x}$) that minimizes a point-to-point distance measure between
 corresponding points (see \eqref{eq:distance-maps:background:point-to-point}).
 Chen and Medioni~\cite{chen-medioni:icra:1991} exploit the tendency of
 most range data to be locally planar and introduce a point-to-plane variant
-of \gls{icp}. The proposed method exploits surface normal information ($n_i$).
-Instead of minimizing the difference between the projected source point and
-the target point, the point-to-plane error metric minimizes
+of \gls{icp}. The proposed method exploits surface normal information
+on the target cloud ($n_{z_i}$).
+Instead of minimizing the difference between the projected source and
+the target points, the point-to-plane error metric minimizes
 the squared dot product of the surface normal with
-the difference between the expected projected source point and
-the reference target point
+the difference between the expected projected source and
+the reference target points
 (see \eqref{eq:distance-maps:background:point-to-plane}).
 Indeed, Rusinkiewicz and Levoy~\cite{rusinkiewicz-levoy:im:2001} compared
 \gls{icp} variants with respect to point selection,
@@ -33,11 +34,11 @@ error metrics. The point-to-plane~\cite{chen-medioni:icra:1991}
 metric demonstrated significantly better performance than
 the point-to-point~\cite{besl-mckay:tpami:1992} formulation in the experiments.
 \begin{equation}\label{eq:distance-maps:background:point-to-point}
-\mathbf{X} = \argmin_\mathbf{X} \sum_i \| \mathbf{X} z_i - p_i \|^2
+\mathbf{x} = \argmin_\mathbf{x} \sum_{i=1}^{m} \| \mathbf{x} p_i - z_i \|^2
 \end{equation}
 \begin{equation}\label{eq:distance-maps:background:point-to-plane}
-\mathbf{X} = \argmin_\mathbf{X} \sum_i \| n_i^T \cdot
-\left( \mathbf{X} z_i - p_i \right) \|^2
+\mathbf{x} = \argmin_\mathbf{x} \sum_{i=1}^{m} \| n_{z_i}^T \cdot
+\left( \mathbf{x} p_i - z_i \right) \|^2
 \end{equation}
 
 Unlike traditional \gls{icp} methods, which rely on explicit point
@@ -137,8 +138,8 @@ registration without requiring explicit point-to-point correspondences.
 HectorSLAM~\cite{kohlbrecher:ssr:2011} uses spatial gradients over the
 2D~occupancy grid map ($\mathcal{M}$).
 The scan matching finds the pose that maximizes
-the occupancy probability of where the beam endpoints land on occupied cells
-(see \eqref{eq:distance-maps:background:hectorslam}).
+the occupancy probability of where the beam endpoints $z_i$ land on occupied
+cells (see \eqref{eq:distance-maps:background:hectorslam}).
 The method uses bilinear interpolation over the occupancy map and approximates
 its spatial derivatives, applying then a Gauss-Newton update.
 PerfectMatch~\cite{lauer:robocup:2006,sobreira:jint:2019} focuses on
@@ -170,12 +171,12 @@ than \gls{icp}~\cite{besl-mckay:tpami:1992} and
 \gls{ndt}~\cite{biber-strasser:iros:2003}.
 
 \begin{equation}\label{eq:distance-maps:background:hectorslam}
-\mathbf{X} = \argmin_\mathbf{X} \sum_i
-\left[ 1 - \mathcal{M} \left(\mathbf{X} z_i\right) \right]^2
+\mathbf{x} = \argmin_\mathbf{x} \sum_{i=1}^{m}
+\left[ 1 - \mathcal{M} \left(\mathbf{x} z_i\right) \right]^2
 \end{equation}
 \begin{equation}\label{eq:distance-maps:background:perfectmatch}
-\mathbf{X} = \argmin_\mathbf{X} \sum_i
-\rho \left( \mathcal{D}_\mathcal{M} \left( \mathbf{X} z_i \right) \right)
+\mathbf{x} = \argmin_\mathbf{x} \sum_{i=1}^{m}
+\rho \left( \mathcal{D}_\mathcal{M} \left( \mathbf{x} z_i \right) \right)
 \end{equation}
 
 Overall, most \gls{icp} methods rely on explicit point-to-point correspondences,
@@ -215,11 +216,29 @@ Sobreira~\etal~\cite{sobreira:jint:2019}.
 % - Voxblox (10.1109/IROS.2017.8202315) / Voxgraph (10.1109/LRA.2019.2953859)
 % - 10.1109/ICRA40945.2020.9196695
 
-\subsection{Least-squares minimization}\label{sec:distance-maps:background:least-squares}
+\subsection{Least-squares minimization}
+\label{sec:distance-maps:background:least-squares}
 
-\todo{TBC}
+State estimation in mobile robotics requires inferring an unknown state
+from noisy sensor measurements. First,
+\secref{sec:distance-maps:background:least-squares:problem-formulation}
+formulates the problem as a \glslink{map}{\glsentryfull{map}} inference problem
+and demonstrates how, under Gaussian noise assumptions, it reduces to
+a non-linear least-squares problem. Next,
+\secref{sec:distance-maps:background:least-squares:gn} shows how
+the Gauss-Newton algorithm solves the non-linear least-squares problem
+through a first-order approximation from the Taylor series.
+\secref{sec:distance-maps:background:least-squares:uncertainty} presents
+an analysis of the uncertainty of the recovered state estimate based on
+the approximate Hessian matrix retrieved from the Gauss-Newton solver. Then,
+\secref{sec:distance-maps:background:least-squares:robust-estimators} extends
+the non-linear least-squares problem to use robust estimators to handle
+outliers. Finally,
+\secref{sec:distance-maps:background:least-squares:manifold} generalizes
+the non-linear least-squares problems for non-Euclidean state spaces.
 
-\subsubsection{Problem formulation}\label{sec:distance-maps:background:least-squares:problem-formulation}
+\subsubsection{Problem formulation}
+\label{sec:distance-maps:background:least-squares:problem-formulation}
 
 Least-squares minimization arises in robotics when estimating an unknown state
 from noisy sensor measurements. Let $\mathbf{x}$ denote non-observable
@@ -230,7 +249,7 @@ by on-board sensors of a mobile robot, namely 2D~laser scanners.
 The state is assumed to follow a prior distribution $p(\mathbf{x})$,
 while the conditional distribution of the measurements given the state,
 $p(\mathbf{z}|\mathbf{x})$, is assumed known,
-commonly referred to as the observation model. Then, the goal
+commonly referred to as the \emph{observation model}. Then, the goal
 is to estimate the most probable state given the measurements,
 \ie, the posterior $p(\mathbf{x}|\mathbf{z})$~\cite{grisetti:robotics:2020}.
 This problem represents a \gls{map} estimation problem, as shown in
@@ -255,69 +274,92 @@ p(\mathbf{x}|\mathbf{z}) =
 \propto p(\mathbf{z}|\mathbf{x})
 \end{equation}
 
-Next, considering multiple measurements $\mathbf{z}^{[i]}$, these are assumed
-conditionally independent given $\mathbf{x}$, resulting in
+Next, considering multiple measurements $\mathbf{z}^{[i]}$ that are
+conditionally independent given $\mathbf{x}$, the likelihood
+$p(\mathbf{x}|\mathbf{z})$ results in
 \eqref{eq:distance-maps:background:least-squares:independence}.
-Under the assumption that each measurement follows a Gaussian distribution,
-\eqref{eq:distance-maps:background:least-squares:measurement} illustrates the
-proportionality of each measurement distribution conditioned by the state
-$p(\mathbf{z}^{[i]}|\mathbf{x})$ over the corresponding residual error
-$\mathbf{e}^{[i]}(\mathbf{x})$
-defined in \eqref{eq:distance-maps:background:least-squares:error},
-where $\mathbf{\Omega}^{[i]}$ is the information matrix,
-$\mathbf{h}^{[i]}(\mathbf{x})$ represents the predicted measurement given the
-state estimate $\mathbf{x}$, and $\mathbf{z}^{[i]}$ the measurement itself.
-These measurements' distributions conditioned by the state
-$p(\mathbf{z}^{[i]}|\mathbf{x})$ are over the measurements themselves,
-$\mathbf{z}^{[i]}$, with mean $\mu_{z|x}=\mathbf{h}^{[i]}(\mathbf{x})$ and
-covariance $\mathbf{\Sigma}^{[i]} = {\mathbf{\Omega}^{[i]}}^{-1}$.
+Under the assumption that each measurement follows a Gaussian distribution
+with mean $\mu_{z|x}^{[i]}=\mathbf{h}^{[i]}(\mathbf{x})$
+(predicted measurement given the state $\mathbf{x}$) and covariance
+$\mathbf{\Sigma}^{[i]} = {\mathbf{\Omega}^{[i]}}^{-1}$ (where
+$\mathbf{\Omega}^{[i]}$ represents the information matrix of each measurement),
+the individual likelihoods $p(\mathbf{z}^{[i]}|\mathbf{x})$ result in
+\eqref{eq:distance-maps:background:least-squares:measurement}, based on the
+probability density function of normal distributions.
 \begin{equation}\label{eq:distance-maps:background:least-squares:independence}
-p(\mathbf{x}|\mathbf{z}) \propto \prod_i p(\mathbf{z}^{[i]}|\mathbf{x})
+p(\mathbf{x}|\mathbf{z}) \propto \prod_{i=1}^{m} p(\mathbf{z}^{[i]}|\mathbf{x})
 \end{equation}
 \begin{equation}\label{eq:distance-maps:background:least-squares:measurement}
 \begin{aligned}
 p(\mathbf{z}^{[i]}|\mathbf{x})
-  & = \mathcal{N}(\mathbf{z}^{[i]} ; \mathbf{h}^{[i]}(\mathbf{x}), \mathbf{\Sigma}^{[i]})\\
+  & = \mathcal{N}(\mathbf{z}^{[i]} ; \mathbf{h}^{[i]}(\mathbf{x}),
+                                    {\mathbf{\Omega}^{[i]}}^{-1})\\
   & \propto \exp\left(
       -\frac{1}{2}
       \left( \mathbf{h}^{[i]}(\mathbf{x}) - \mathbf{z}^{[i]} \right)^T
-      \left(\mathbf{\Sigma}^{[i]}\right)^{-1}
+      \mathbf{\Omega}^{[i]}
       \left( \mathbf{h}^{[i]}(\mathbf{x}) - \mathbf{z}^{[i]} \right)
-  \right)\\
+  \right)
+\end{aligned}
+\end{equation}
+
+Furthermore, \eqref{eq:distance-maps:background:least-squares:error} defines
+the residual error $\mathbf{e}^{[i]}(\mathbf{x})$ for each measurement.
+Then, the Mahalanobis distance ${\chi^2}^{[i]}(\mathbf{x})$ of the residual
+error is formulated in \eqref{eq:distance-maps:background:least-squares:chi2}.
+Consequently,
+\eqref{eq:distance-maps:background:least-squares:measurement-detailed}
+illustrates the proportionality of the individual likelihoods
+$p(\mathbf{z}^{[i]}|\mathbf{x})$ over the Mahalanobis distance
+${\chi^2}^{[i]}(\mathbf{x})$.
+\begin{equation}\label{eq:distance-maps:background:least-squares:error}
+\mathbf{e}^{[i]}(\mathbf{x})=\mathbf{h}^{[i]}(\mathbf{x}) - \mathbf{z}^{[i]}
+\end{equation}
+\begin{equation}\label{eq:distance-maps:background:least-squares:chi2}
+\chi^{2[i]}(\mathbf{x}) =
+\mathbf{e}^{[i]}(\mathbf{x})^T \mathbf{\Omega}^{[i]} \mathbf{e}^{[i]}(\mathbf{x})
+\end{equation}
+\begin{equation}
+\label{eq:distance-maps:background:least-squares:measurement-detailed}
+\begin{aligned}
+p(\mathbf{z}^{[i]}|\mathbf{x})
   & \propto \exp\left(
       -\frac{1}{2}
       \mathbf{e}^{[i]}(\mathbf{x})^T
       \mathbf{\Omega}^{[i]}
       \mathbf{e}^{[i]}(\mathbf{x})
-  \right)
+  \right)\\
+  & \propto \exp\left(-\frac{1}{2}{\chi^2}^{[i]}(\mathbf{x})\right)
 \end{aligned}
 \end{equation}
-\begin{equation}\label{eq:distance-maps:background:least-squares:error}
-\mathbf{e}^{[i]}(\mathbf{x})=\mathbf{h}^{[i]}(\mathbf{x}) - \mathbf{z}^{[i]}
-\end{equation}
 
-As a result, under the assumption of having an uniform prior,
+Under the assumption of having a uniform prior,
 the original \gls{map} problem formulated in
 \eqref{eq:distance-maps:background:least-squares:map} can be rewritten as
 an \gls{mle} problem that maximizes the probability of the measurements given
 the state $p(\mathbf{z}^{[i]}|\mathbf{x})$
 (see \eqref{eq:distance-maps:background:least-squares:mle-log-likelihood}).
-Thus, through the log-likelihood over the conditioned measurement distribution
-(see \defref{def:literature:slam:log-likelihood}) and assuming the measurements
-under Gaussian noise, the state estimation in robotics from
-the \gls{mle} formulation can be formulated as a non-linear least-squares
-problem, where the objective is to minimize the sum of squared residuals
-weighted by the corresponding information matrices.
+Thus, through the negative log-likelihood
+(see \defref{def:literature:slam:log-likelihood}), dropping constant factors,
+and assuming the measurements under Gaussian noise,
+the original \gls{map} problem for robotics state estimation reduces to a
+\glslink{mle}{\glsentryfull{mle}} problem, which in turn reduces to minimizing
+the sum of squared Mahalanobis residuals.
+This problem is equivalent to a weighted non-linear least-squares problem,
+as formalized in
+\eqref{eq:distance-maps:background:least-squares:mle-log-likelihood}.
 \begin{equation}\label{eq:distance-maps:background:least-squares:mle-log-likelihood}
 \begin{aligned}
 \mathbf{x}^*
-  & = \argmax_\mathbf{x} \prod_i p(\mathbf{z}^{[i]}|\mathbf{x})\\
-  & = \argmax_\mathbf{x} \prod_i \exp\left( -\frac{1}{2}\mathbf{e}^{[i]}(\mathbf{x})^T \mathbf{\Omega}^{[i]} \mathbf{e}^{[i]}(\mathbf{x}) \right)\\
-  & = \argmin_\mathbf{x} \sum_i \mathbf{e}^{[i]}(\mathbf{x})^T \mathbf{\Omega}^{[i]} \mathbf{e}^{[i]}(\mathbf{x})
+  & = \argmax_\mathbf{x} \prod_{i=1}^{m} p(\mathbf{z}^{[i]}|\mathbf{x})\\
+  & = \argmax_\mathbf{x} \prod_{i=1}^{m} \exp\left( -\frac{1}{2}\mathbf{e}^{[i]}(\mathbf{x})^T \mathbf{\Omega}^{[i]} \mathbf{e}^{[i]}(\mathbf{x}) \right)\\
+  & = \argmin_\mathbf{x} \sum_{i=1}^{m} \mathbf{e}^{[i]}(\mathbf{x})^T \mathbf{\Omega}^{[i]} \mathbf{e}^{[i]}(\mathbf{x})\\
+  & = \argmin_\mathbf{x} \sum_{i=1}^{m} {\chi^2}^{[i]}(\mathbf{x})
 \end{aligned}
 \end{equation}
 
-\subsubsection{Gauss-Newton algorithm}\label{sec:distance-maps:background:least-squares:gn}
+\subsubsection{Gauss-Newton algorithm}
+\label{sec:distance-maps:background:least-squares:gn}
 
 Following the non-linear least-squares formulation commonly used in
 robotics state estimation, one possible solution is an iterative minimization of
