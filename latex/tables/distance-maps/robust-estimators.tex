@@ -1,0 +1,93 @@
+{\setlength{\tabcolsep}{3pt}
+\begin{table}[!t]
+\centering
+\caption[Common M-estimator loss functions $\rho(s)$, their first-order
+         derivative $\psi(s) = \rho'(s)$, and weight functions
+         $w(s) = \psi(s)/(2s)$]{Common M-estimator loss functions $\rho(s)$,
+         their first-order derivative $\psi(s) = \rho'(s)$, and weight functions
+         $w(s) = \psi(s)/(2s)$.
+         The tuning constant $c$ controls the inlier/outlier
+         threshold~\cite{babin:icra:2019}.}
+\label{tab:distance-maps:background:least-squares:robust-losses}
+\begin{tabular}{llll}
+\hline
+\textbf{Estimator} & $\rho(s)$ & $\psi(s)$ & $w(s)$ \\
+\hline
+$L^2$ &
+$s^2$ &
+$2s$  &
+$1$\\[8pt]
+\hline
+$L^1$   &
+$|s|$   &
+$s/|s|$ &
+$1/(2|s|)$\\
+\hline
+$L_{\mathrm{trunc}}^2$ &
+$\begin{cases}
+s^2 & \mathrm{if}\; |s| < c\\
+c^2 & \mathrm{otherwise}
+\end{cases}$ &
+$\begin{cases}
+2s & \mathrm{if}\; |s| < c\\
+0  & \mathrm{otherwise}
+\end{cases}$ &
+$\begin{cases}
+1 & \mathrm{if}\; |s| < c\\
+0 & \mathrm{otherwise}
+\end{cases}$\\
+\hline
+$L_{\mathrm{trunc}}^1$ &
+$\begin{cases}
+|s| & \mathrm{if}\; |s| < c\\
+c   & \mathrm{otherwise}
+\end{cases}$ &
+$\begin{cases}
+s/|s| & \mathrm{if}\; |s| < c\\
+0     & \mathrm{otherwise}
+\end{cases}$ &
+$\begin{cases}
+1/(2|s|) & \mathrm{if}\; |s| < c\\
+0        & \mathrm{otherwise}
+\end{cases}$\\
+\hline
+Huber &
+$\begin{cases}
+s^2       & \mathrm{if}\; |s| < c\\
+2c|s|-c^2 & \mathrm{otherwise}
+\end{cases}$ &
+$\begin{cases}
+2s             & \mathrm{if}\; |s| < c\\
+2c \cdot s/|s| & \mathrm{otherwise}
+\end{cases}$ &
+$\begin{cases}
+1      & \mathrm{if}\; |s| < c\\
+c /|s| & \mathrm{otherwise}
+\end{cases}$\\
+\hline
+Cauchy &
+$c^2 \ln\!\left(1+\tfrac{s^2}{c^2}\right)$ &
+$\dfrac{2s}{1+(s/c)^2}$ &
+$\dfrac{1}{1+(s/c)^2}$\\
+\hline
+Tukey &
+$\begin{cases}
+c^2\left[1-\left(1-\tfrac{s^2}{c^2}\right)^3\right] & \mathrm{if}\; |s| < c\\
+c^2                                                 & \mathrm{otherwise}
+\end{cases}$&
+$\begin{cases}
+6s\left(1-\tfrac{s^2}{c^2}\right)^2 & \mathrm{if}\; |s| < c\\
+0                                   & \mathrm{otherwise}
+\end{cases}$ &
+$\begin{cases}
+3\left(1-\tfrac{s^2}{c^2}\right)^2 & \mathrm{if}\; |s| < c\\
+0                                  & \mathrm{otherwise}
+\end{cases}$\\
+\hline
+Geman-McClure &
+$\dfrac{s^2}{c^2+s^2}$ &
+$2s\cdot\dfrac{c^2}{(c^2+s^2)^2}$&
+$\dfrac{c^2}{(c^2+s^2)^2}$\\
+\hline
+\end{tabular}
+\end{table}}
