@@ -1283,6 +1283,45 @@ $\mathbf{y}_{\mathcal{D},\min}$, as formulated in
 \mathbf{y} = \delta \cdot (r, c)^T + \mathbf{y}_{\mathcal{M},\min} \in \mathbb{R}^2
 \end{equation}
 
+\paragraph{Data structure storage}
+Independently of the required
+$\mathcal{M}_l$, we store the discrete grid in one of two memory layouts.
+Under \emph{dense storage} ($\mathcal{M}_{l,\mathrm{dense}}$), the grid is
+allocated as a contiguous array of cells (generic
+Eigen\footnote{\label{note:eigen}\url{https://libeigen.gitlab.io/}} matrix in
+C++), where every cell in the grid is populated during precomputation.
+Under \emph{sparse storage}, only cells satisfying
+$\mathcal{D}(\mathbf{y})\leq d_{\max}$ are stored, since moving points
+projecting further than $d_{\max}$ distance from any reference point
+are excluded from the registration cost. This truncated representation is
+analogous to the \glslink{tsdf}{\glsentryfull{tsdf}} used in volumetric
+reconstruction~\cite{curless-levoy:siggraph:1996},
+where only a narrow band of the distance values is retained around a surface.
+
+Moreover, we implement the sparse grid in C++ as a hash table using the container
+\texttt{std::unordered\_map}\footnote{\label{note:hash-table}\url{https://en.cppreference.com/w/cpp/container/unordered_map.html}}.
+The hash key for a cell $(r,c)$ is computed by encoding both integer indices
+(\texttt{int32}) into a single 64-bit unsigned integer, as formulated in
+\eqref{eq:distance-maps:alignment:dmaps:computation:hash-key}, where
+$\ll$ denotes a bit-wise left shift and $|$ denotes a bit-wise OR.
+An important property of \texttt{std::unordered\_map} is that the container does
+not invalidate existing element pointers upon rehashing, allowing the
+priority queue to store raw cell pointers safely throughout the entire
+wavefront propagation. After propagation, a rehash call consolidates
+the bucket layout before the gradient and Hessian post-processing passes
+iterate over all stored entries.
+\begin{equation}
+\label{eq:distance-maps:alignment:dmaps:computation:hash-key}
+\mathrm{key}(r, c) =
+\bigl(\texttt{uint64}(r) \ll 32\bigr)
+\;\big|\;
+\bigl(\texttt{uint64}(c) \;\&\; \texttt{0xFFFFFFFF}\bigr)
+\end{equation}
+
+\paragraph{Computation of the representation levels}
+
+\todo{TBC}
+
 \section{Distance Maps}\label{sec:distance-maps}
 
 TBC (unsigned distance map structure,
