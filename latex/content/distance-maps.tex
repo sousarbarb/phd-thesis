@@ -969,7 +969,7 @@ Note that $\mathcal{D}(\mathbf{y}) \geq 0$ for all $\mathbf{y}$, making
 this an \emph{unsigned distance function}, as opposed to
 \glspl{sdf} used in volumetric reconstruction. An important property of
 \emph{unsigned distance fields} is that they are continuous everywhere,
-but is not everywhere differentiable~\cite{jones:tvcg:2006}
+but is not everywhere differentiable~\cite{jones:tvcg:2006}.
 \begin{equation}
 \label{eq:distance-maps:alignment:dmaps:definition}
 \mathcal{D}(\mathbf{y}) =
@@ -1015,7 +1015,7 @@ Indeed, the unit-norm property $\|\bm{\nabla}\mathcal{D}\|_2 = 1$ holds
 almost everywhere for \emph{unsigned distance fields},
 with the exception of points equidistant from two or more reference points in
 $\mathcal{P}$, where the gradient is not defined
-(\eg, at the center of a sphere).
+(\eg, at the center of a circumference).
 This property represents the Eikonal equation, a fundamental property
 of Euclidean distance fields~\cite{jones:tvcg:2006}.
 \begin{equation}
@@ -1039,7 +1039,7 @@ differences used at grid borders.
 \approx
 \frac{\mathcal{D}(y_1 + \delta,\, y_2) -
       \mathcal{D}(y_1 - \delta,\, y_2)}{2\delta},
-\qquad
+\;
 \left.\frac{\partial \mathcal{D}}{\partial y_2}\right|_{\mathbf{y}}
 \approx
 \frac{\mathcal{D}(y_1,\, y_2 + \delta) -
@@ -1078,7 +1078,8 @@ the analytical gradient $\bm{\nabla}\mathcal{D}(\mathbf{y})$, as formulated in
 \end{equation}
 
 In practice, $\mathbf{H}_{\mathcal{D}}$ is computed numerically as the centered
-finite difference of the normalized neighbor gradients, as shown in
+finite difference of the normalized neighbor gradients
+($\hat{\bm{\nabla}}\mathcal{D}$), as shown in
 \eqref{eq:distance-maps:alignment:dmaps:2nd-deriv:H:numerical},
 where $(\cdot)_{y_j}$ denotes the $j$-th component of the enclosed vector.
 This numerical approximation is the discretization implemented in the proposed
@@ -1107,6 +1108,113 @@ when requiring 2nd-order derivatives.
 \right)_{y_2}
 \end{bmatrix}
 \end{equation}
+
+\subsubsection{Representation levels}
+\label{sec:distance-maps:alignment:dmaps:representation}
+
+As for the representation of the distance map required for the proposed
+registration process, each cell of the discrete grid may store different amounts
+of precomputed information about the distance field. Therefore, we consider
+three representation levels of increasing information and memory cost.
+The choice of the representation determines which quantities are available at
+$O(1)$ query cost during registration, and which must be recomputed on the fly
+from neighboring cells or analytical expressions.
+
+\paragraph{Level~0 -- $\mathcal{M}_0$ (\gls{nn} index only)}
+Each cell stores only the integer index $k^*(\mathbf{y})$ of the
+nearest reference point in $\mathcal{P}$
+(see \eqref{eq:distance-maps:alignment:dmaps:representations:level0}).
+The scalar distance $\mathcal{D}(\mathbf{y})$, the gradient vector
+$\bm{\nabla}\mathcal{D}(\mathbf{y})$, and the Hessian matrix
+$\mathbf{H}_{\mathcal{D}}(\mathbf{y})$ are not precomputed nor stored explicitly.
+These values may be recovered at query time through their analytical expressions
+discussed in \secref{sec:distance-maps:alignment:dmaps:derivation}.
+\begin{equation}
+\label{eq:distance-maps:alignment:dmaps:representations:level0}
+\mathcal{M}_0(\mathbf{y}) = k^*(\mathbf{y})
+= \argmin_{i \in \{1,\dots,n\}}
+\|\mathbf{y} - \mathbf{p}_i\|_2 \in \mathbb{Z}
+\end{equation}
+
+Furthermore, $\mathcal{M}_0$ provides the most memory-efficient data
+structure for data association, and may serve as a drop-in replacement
+for the kd-tree \gls{nn} search~\cite{bentley:cacm:1975}
+used in classical \gls{icp} methods~\cite{besl-mckay:tpami:1992,
+chen-medioni:icra:1991}. This modification reduces the per-query cost from
+$O(\log n)$ to $O(1)$ at the expense of
+the precomputation step of $\mathcal{M}_0$.
+
+\paragraph{Level~1 -- $\mathcal{M}_1$ (distance and first-order derivatives)}
+Each cell stores the scalar distance $\mathcal{D}(\mathbf{y})$ together
+with the two components of its spatial gradient
+$\bm{\nabla}\mathcal{D}(\mathbf{y}) \in \mathbb{R}^2$, as shown in
+\eqref{eq:distance-maps:alignment:dmaps:representations:level1}.
+The integer index $k^*(\mathbf{y})$ of the nearest reference point in
+$\mathcal{P}$
+(see \eqref{eq:distance-maps:alignment:dmaps:representations:level0})
+is optional for $\mathcal{M}_1$.
+Hence, $\mathcal{M}_1$ requires three or four scalar values
+per cell, depending on whether the $k^*(\mathbf{y})$ index is included into
+$\mathcal{M}_1(\mathbf{y})$.
+\begin{equation}
+\label{eq:distance-maps:alignment:dmaps:representations:level1}
+\mathcal{M}_1(\mathbf{y}) =
+\left(
+    \mathcal{D}(\mathbf{y}),
+    \frac{\partial \mathcal{D}}{\partial y_1}(\mathbf{y}),
+    \frac{\partial \mathcal{D}}{\partial y_2}(\mathbf{y})
+\right)
+\end{equation}
+
+Subsequently, the scalar distance $\mathcal{D}(\mathbf{y})$ and
+the gradient vector $\bm{\nabla}\mathcal{D}(\mathbf{y})$ are precomputed
+based on \eqref{eq:distance-maps:alignment:dmaps:definition} and using the
+central finite difference scheme of
+\eqref{eq:distance-maps:alignment:dmaps:1st-deriv:numerical-derivation},
+respectively.
+The Hessian matrix $\mathbf{H}_{\mathcal{D}}(\mathbf{y})$ is not precomputed nor
+stored explicitly. This value may be recovered at query time through its
+analytical expression or through the central finite difference approximation
+from neighbor cells of the normalized gradient discussed in
+\secref{sec:distance-maps:alignment:dmaps:derivation}.
+
+\paragraph{Level~2 -- $\mathcal{M}_2$
+(distance, first-, and second-order derivatives)}
+Although the analysis in \secref{sec:distance-maps:alignment:dmaps:derivation}
+demonstrates that the analytical expression for $\mathbf{H}_{\mathcal{D}}$
+leads to a symmetric matrix, its centered finite difference approximation
+presented in \eqref{eq:distance-maps:alignment:dmaps:2nd-deriv:H:numerical} does
+not ensure that property.
+Therefore, each cell of $\mathcal{M}_2$ additionally stores
+all entries of the approximated Hessian matrix
+$\mathbf{H}_{\mathcal{D}}(\mathbf{y})\in\mathbb{R}^{2\times2}$, as shown in
+\eqref{eq:distance-maps:alignment:dmaps:representations:level2}.
+Similarly to $\mathcal{M}_1$, the integer index $k^*(\mathbf{y})$
+(see \eqref{eq:distance-maps:alignment:dmaps:representations:level0})
+is optional for the $\mathcal{M}_2$ representation level.
+\begin{equation}
+\label{eq:distance-maps:alignment:dmaps:representations:level2}
+\mathcal{M}_2(\mathbf{y}) =
+\left(
+    \mathcal{D}(\mathbf{y}),
+    \frac{\partial \mathcal{D}}{\partial y_1}(\mathbf{y}),
+    \frac{\partial \mathcal{D}}{\partial y_2}(\mathbf{y}),
+    \frac{\partial^2 \mathcal{D}}{\partial y_1^2}(\mathbf{y}),
+    \frac{\partial^2 \mathcal{D}}{\partial y_1 \partial y_2}(\mathbf{y}),
+    \frac{\partial^2 \mathcal{D}}{\partial y_2 \partial y_1}(\mathbf{y}),
+    \frac{\partial^2 \mathcal{D}}{\partial y_2^2}(\mathbf{y})
+\right)
+\end{equation}
+
+The representation level $\mathcal{M}_2$ makes available all values throughout
+the registration process, thanks to the precomputation of the scalar distance
+$\mathcal{D}(\mathbf{y})$ stored in the discrete grid of the distance and based
+on \eqref{eq:distance-maps:alignment:dmaps:definition}, while both the
+gradient vector $\bm{\nabla}\mathcal{D}(\mathbf{y})$ and the Hessian matrix
+$\mathbf{H}_{\mathcal{D}}(\mathbf{y})$ are computed by centered finite
+differences from neighbor cells based on
+\eqref{eq:distance-maps:alignment:dmaps:1st-deriv:numerical-derivation} and
+\eqref{eq:distance-maps:alignment:dmaps:2nd-deriv:H:numerical}, respectively.
 
 \section{Distance Maps}\label{sec:distance-maps}
 
