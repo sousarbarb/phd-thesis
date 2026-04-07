@@ -1216,6 +1216,73 @@ differences from neighbor cells based on
 \eqref{eq:distance-maps:alignment:dmaps:1st-deriv:numerical-derivation} and
 \eqref{eq:distance-maps:alignment:dmaps:2nd-deriv:H:numerical}, respectively.
 
+\subsubsection{Computation and data structures}
+\label{sec:distance-maps:alignment:dmaps:computation}
+Independently of the representation level, the computation of $\mathcal{M}_l$
+is based on a wavefront propagation algorithm using a best-first priority queue,
+analogous to Dijkstra's shortest-path algorithm~\cite{dijkstra:nm:1959}.
+All variants considered in our approach share the same high-level pipeline:
+\begin{enumerate}[nosep]
+\item initialize the grid based on its resolution $\delta$ (m/px),
+      the bounding box of $\mathcal{P}$, optional fixed map size (m), and
+      optional truncation distance $d_{\max}$ (m);
+\item seed the priority queue with the grid cells occupied by reference
+      points, initializing their distance to zero;
+\item propagate the integer index $k^*(\mathbf{y})$ of the nearest
+      reference point and its corresponding distance value outward via
+      best-first wavefront expansion through the $\mathcal{N}_8$ neighborhood
+      (8-connectivity) of each cell in the priority queue for the whole map or
+      until $d_{\max}$ is achieved from the nearest reference point;
+\item depending on the required representation level
+      $\mathcal{M}_l$, execute post-processing passes to compute the
+      gradient $\bm{\nabla}\mathcal{D}$ and the Hessian
+      $\mathbf{H}_{\mathcal{D}}$ through centered finite differences
+      (see \secref{sec:distance-maps:alignment:dmaps:derivation}).
+\end{enumerate}
+
+\paragraph{Coordinates conversion}
+All implemented variants in our approach for distance map-based representations
+use the same affine mapping between metric coordinates
+$\mathbf{y}\in\mathbb{R}^2$ \gls{wrt} the sensor coordinate frame and
+integer grid indices $(r,c)\in\mathbb{Z}^2$,
+and vice-versa. Given $\mathbf{y}_{\mathcal{M},\min}\in\mathbb{R}^2$,
+the metric coordinates corresponding to the cell
+$(r,c)_{\mathcal{M},\min}=(0,0)$ of the grid, determined during
+the initialization procedure of the representation level $\mathcal{M}_l$,
+\eqref{eq:distance-maps:alignment:dmaps:conversion:global2local} defines
+the mapping from the sensor coordinates to the grid indices.
+Note that negative indices or values that exceed the grid size
+represent invalid cells outside the data structure.
+\begin{equation}
+\label{eq:distance-maps:alignment:dmaps:conversion:global2local}
+(r, c) =
+\left\lfloor\frac{\mathbf{y} - \mathbf{y}_{\mathcal{M},\min}}{\delta}\right\rfloor
+\in\mathbb{Z}^2
+\end{equation}
+
+Furthermore,
+\eqref{eq:distance-maps:alignment:dmaps:conversion:global2local:real}
+formulates a sub-pixel (non-integer) version of
+\eqref{eq:distance-maps:alignment:dmaps:conversion:global2local}, omitting
+the floor operator. We use this version for bilinear interpolation at
+query time, enabling sub-pixel accuracy for the distance and derivatives
+values returned to the registration optimizer.
+\begin{equation}
+\label{eq:distance-maps:alignment:dmaps:conversion:global2local:real}
+(r, c)_{\mathbb{R}} =
+\frac{\mathbf{y} - \mathbf{y}_{\mathcal{M},\min}}{\delta}
+\in \mathbb{R}
+\end{equation}
+
+Lastly, the inverse mapping from grid indices to metric coordinates is obtained
+by multiplying the indices by the resolution $\delta$ and offsetting by
+$\mathbf{y}_{\mathcal{D},\min}$, as formulated in
+\eqref{eq:distance-maps:alignment:dmaps:conversion:local2global}.
+\begin{equation}
+\label{eq:distance-maps:alignment:dmaps:conversion:local2global}
+\mathbf{y} = \delta \cdot (r, c)^T + \mathbf{y}_{\mathcal{M},\min} \in \mathbb{R}^2
+\end{equation}
+
 \section{Distance Maps}\label{sec:distance-maps}
 
 TBC (unsigned distance map structure,
