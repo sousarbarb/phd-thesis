@@ -1,0 +1,43 @@
+\begin{table}[!t]
+\centering
+\caption[Comparison of the three distance map variants
+         (\emph{Nano}, \emph{Standard}, and \emph{Sparse}) considered in the
+         scope this PhD~Thesis]{Comparison of the three distance map variants
+         (\emph{Nano}, \emph{Standard}, and \emph{Sparse}) considered in the
+         scope this PhD~Thesis. $N_G$ denotes the total number of grid cells;
+         $N_d \leq N_G$ represents the number of populated cells
+         within the truncation distance $d_{\max}$.}
+\label{tab:distance-maps:alignment:dmaps}
+\begin{tabular}{lcccc}
+\hline
+\textbf{Variant} & \textbf{Storage} & \textbf{Values/cell} &
+\textbf{Query lookup} & \textbf{Truncation} \\
+\hline
+\emph{Nano} ($\mathcal{M}_{0}$) &
+    Dense (array) &
+    $1$ (\texttt{int}) &
+    $O(1)$ &
+    optional \\
+\emph{Standard} ($\mathcal{M}_{1,2}$) &
+    Dense (array) &
+    $3$--$8^{\star}$ &
+    $O(1)$ &
+    optional \\
+\emph{Sparse} ($\mathcal{M}_{1,2}$) &
+    Hash (\texttt{std::unordered\_map}) &
+    $3$--$8^{\star}$ &
+    $O(1)^{\dagger}$ &
+    advisable \\
+\hline
+\multicolumn{5}{l}{%
+    \footnotesize
+    $^{\star}$ Depends on the representation level:
+    $3$ values for $\mathcal{M}_1$,
+    $7$ for $\mathcal{M}_2$,
+    $+1$ if the optional \gls{nn} index $k^*(\mathbf{y})$ is stored.} \\
+\multicolumn{5}{l}{%
+    \footnotesize
+    $^{\dagger}$ $O(1)$ average case; worst-case $O(N_d)$ under hash
+    collision, mitigated by the post-propagation rehash.}\\
+\end{tabular}
+\end{table}

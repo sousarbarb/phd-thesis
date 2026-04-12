@@ -1318,9 +1318,146 @@ iterate over all stored entries.
 \bigl(\texttt{uint64}(c) \;\&\; \texttt{0xFFFFFFFF}\bigr)
 \end{equation}
 
-\paragraph{Computation of the representation levels}
+\paragraph{Computation of the data structures}
 
-\todo{TBC}
+First, \algref{alg:distance-maps:alignment:dmaps:initialization} details the
+initialization procedure for the grid data structure.
+This structure is parametrized by a map size ($L$) and a truncation distance
+($d_{\max}$). If $L > 0$, the metric bounding box \gls{wrt} the local coordinate
+frame of the sensor for the distance map is symmetrically defined as
+$[-L, L]$. Otherwise, the bounding box is computed directly from
+the reference point cloud $\mathcal{P}$ by iterating over all valid points and
+accumulating the minimum and maximum coordinates.
+Then, the grid dimensions in pixels are derived from the bounding box.
+If $d_{\max} > 0$ is set and no explicit map size was
+provided, the bounding box is expanded by $d_{\max}$ on both sides before
+converting to pixel cells, ensuring that the truncation band is fully covered
+around the point cloud boundary.
+Otherwise, the bounding box is converted to pixel cell counts using
+the resolution $\delta$ based on the original metric bounding box limits.
+Finally, the grid is resized to the computed dimensions. The subsequent
+initialization of cell values depends on the underlying data structure, as
+detailed in \algref{alg:distance-maps:alignment:dmaps:nano},
+\algref{alg:distance-maps:alignment:dmaps:dense}, and
+\algref{alg:distance-maps:alignment:dmaps:sparse}.
+
+\input{algorithms/distance-maps/distance-map_init.tex}
+
+Next, \algref{alg:distance-maps:alignment:dmaps:nano},
+\algref{alg:distance-maps:alignment:dmaps:dense}, and
+\algref{alg:distance-maps:alignment:dmaps:sparse} present the computation
+procedure for each type of distance map structures considered in the scope of
+this PhD~Thesis: \emph{Nano} ($\mathcal{M}_0$, dense storage), \emph{Standard}
+($\mathcal{M}_1$ or $\mathcal{M}_2$, dense storage), and \emph{Sparse}
+($\mathcal{M}_1$ or $\mathcal{M}_2$, sparse storage), respectively.
+Although the $\mathcal{M}_0$ representation could be implemented using
+a sparse storage layout, the overhead of \texttt{std::unordered\_map},
+which may reserve significantly more hash table buckets than
+the number of elements actually stored, does not justify a sparse structure for
+a single integer index per cell.
+
+\input{algorithms/distance-maps/distance-map_nano.tex}
+\input{algorithms/distance-maps/distance-map_standard.tex}
+\input{algorithms/distance-maps/distance-map_sparse.tex}
+
+Furthermore, \algref{alg:distance-maps:alignment:dmaps:nano} details
+the full construction of the \emph{Nano} variant.
+First, the entire grid $\mathcal{M}_0$ is filled with $-1$, representing
+unvisited cells, and the priority queue $\mathcal{Q}$ is cleared.
+Next, the reference point cloud $\mathcal{P}$ is projected onto the grid
+using the coordinate conversion $\mathrm{global2local}(\cdot)$ of
+\eqref{eq:distance-maps:alignment:dmaps:conversion:global2local}.
+Invalid points and points whose projected cell $(r, c)$ lies outside
+the grid are skipped. For each remaining point $\mathbf{p}_i$,
+the corresponding cell is assigned the index $i$.
+A pointer to the cell is then pushed into $\mathcal{Q}$ with distance
+$d = 0$, which sets the priority of the queue entry.
+Since $\mathcal{M}_0$ does not store the distance value, the queue
+entry must carry it explicitly alongside the cell pointer, so that
+$\mathcal{Q}$ correctly orders cells during wavefront propagation.
+
+At each iteration of the wavefront propagation, the element $q_k$ with
+the smallest distance is popped from $\mathcal{Q}$. A negative stored \gls{nn}
+index ($k < 0$) indicates an entry overwritten by a closer parent that surpasses
+the truncation distance $d_{\max}$ when set ($d_{\max} > 0$), and is therefore
+discarded. For each cell $(r', c')$ in the $\mathcal{N}_8(r_k, c_k)$
+neighborhood, the neighbor cell is updated to the closer parent provided
+the truncation condition is satisfied, \ie,
+\ $d_k < d_{\max}$ when truncation is enabled, or
+unconditionally true when the full map is computed.
+The first case is when the cell is unvisited ($o < 0$). The other case is
+if already visited ($o \geq 0$) but with a stored distance greater than
+the candidate ($d_o > d_k$). In both cases, the updated cell is pushed into
+$\mathcal{Q}$, allowing the wavefront propagation to correct sub-optimal
+assignments from earlier iterations.
+
+The \emph{Standard} variant detailed in
+\algref{alg:distance-maps:alignment:dmaps:dense} follows a similar construction
+pipeline as the \emph{Nano} variant
+(see \algref{alg:distance-maps:alignment:dmaps:nano}), with two key
+differences arising from the more complete cell data structure.
+Since the distance is now part of the cell itself in $\mathcal{M}_1$ and
+$\mathcal{M}_2$ representation levels, the priority queue $\mathcal{Q}$
+does not need to carry the distance separately, accessing directly from the
+representation of the distance map.
+The other difference is the distinction between unvisited and already-visited
+neighbor cells, which required an explicit branch in
+\algref{alg:distance-maps:alignment:dmaps:nano}, is no longer necessary.
+Since all cells are initialized with $+\inf$, the single condition
+$\left(d_k < d_{\max} \textbf{ or } d_{\max} \leq 0\right) \textbf{ and }d_o > d_k$
+handles both cases uniformly, where an unvisited cell holds a $+\inf$ distance,
+while a previously visited cell is updated only if a strictly closer parent
+is found.
+After the wavefront terminates, the gradient
+$\bm{\nabla}\mathcal{D}$ is computed over the entire dense grid via the
+central finite difference scheme of
+\eqref{eq:distance-maps:alignment:dmaps:1st-deriv:numerical-derivation}.
+If the $\mathcal{M}_2$ representation is requested, a second
+post-processing pass computes the Hessian $\mathbf{H}_{\mathcal{D}}$
+via \eqref{eq:distance-maps:alignment:dmaps:2nd-deriv:H:numerical}.
+Both passes use one-sided (forward or backward) differences at grid borders.
+
+As for the distance computation on the \emph{Sparse} variant described in
+\algref{alg:distance-maps:alignment:dmaps:sparse}, its construction differs
+from the \emph{Standard} variant
+(see \algref{alg:distance-maps:alignment:dmaps:dense}) in three steps arising
+from the \texttt{std::unordered\_map} storage layout. The
+\texttt{std::unordered\_map} is not pre-allocated for the entire map, in order
+to maintain a sparse storage layout when the truncation distance is set
+($d_{\max} > 0$). Instead, the implemented wrapper around
+\texttt{std::unordered\_map} defines a default cell whenever a queried index
+$(r, c)$ is not yet present in the hash table.
+Next, each entry pushed into the priority queue $\mathcal{Q}$ carries more
+information than in the \emph{Standard} variant: a pointer to the
+cell $\mathcal{M}_{1,2}(r, c)$, the current cell index
+$\{(r, c)\}$, and the parent \gls{nn} index $\{(r_p, c_p)\}$.
+This implementation avoids additional hash queries at every propagation step.
+Lastly, once the wavefront terminates and before precomputing the derivatives,
+a rehash call is issued to consolidate the internal bucket layout of the
+\texttt{std::unordered\_map} to match the final number of populated
+cells, minimizing the load factor and reducing hash collision overhead
+for the subsequent read-intensive derivative passes.
+
+Table~\ref{tab:distance-maps:alignment:dmaps} summarizes
+the three distance map variants considered in this PhD~Thesis in
+terms of storage layout, memory occupation, query lookup complexity, and
+truncation requirements.
+The \emph{Nano} variant stores a single integer index per cell, resulting
+in the lowest memory footprint of $O(N_G)$.
+Both the \emph{Standard} and \emph{Sparse} variants store between $3$
+and $8$ scalar values per cell depending on the representation level
+$\mathcal{M}_{1,2}$ and whether the optional \gls{nn} index
+$k^*(\mathbf{y})$ is included.
+While the \emph{Standard} variant allocates the full grid as a dense
+array with $O(N_G)$ memory, the \emph{Sparse} variant backed by
+\texttt{std::unordered\_map} populates only the $N_d \leq N_G$ cells
+within the truncation band, making it the most memory-efficient choice
+when $d_{\max}$ is set.
+All three variants provide $O(1)$ query lookup, though the \emph{Sparse}
+variant achieves this only on average, with worst-case $O(N_d)$ under
+hash collision, mitigated by the post-propagation rehash discussed previously.
+
+\input{tables/distance-maps/variants.tex}
 
 \section{Distance Maps}\label{sec:distance-maps}
 

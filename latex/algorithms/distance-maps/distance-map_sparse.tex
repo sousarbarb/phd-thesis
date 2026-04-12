@@ -1,0 +1,43 @@
+\begin{algorithm}[!t]
+\DontPrintSemicolon
+\caption[Computation of the \emph{Sparse} distance map]{%
+         Computation of the \emph{Sparse} distance map:
+         representation level $\mathcal{M}_{1}$ or $\mathcal{M}_{2}$,
+         sparse storage layout.}
+\label{alg:distance-maps:alignment:dmaps:sparse}
+\KwIn{Reference point cloud $\mathcal{P} = \{\mathbf{p}_i\}_{i=1}^{n}$,
+Resized grid $\mathcal{M}_{1,2}$}
+\KwOut{Sparse data structure $\mathcal{M}_{1,2}$
+(see \eqref{eq:distance-maps:alignment:dmaps:representations:level1} and
+\eqref{eq:distance-maps:alignment:dmaps:representations:level2})}
+$\mathcal{M}_{1,2}$.fill($\{-1,+\inf\}$)\tcp*{Initialization}
+$\mathcal{Q}$.clear()\;
+\For(\tcp*[f]{Seeding}){$i = 1$ \KwTo $n$}{
+  \If{$\mathbf{p}_i$ is not a valid point}{
+    \textbf{continue}\;
+  }
+  $(r, c) = \mathrm{global2local}(\mathbf{p}_i)$\;
+  \If{$(r, c)$ is not inside the grid}{
+    \textbf{continue}\;
+  }
+  $\mathcal{M}_0(r, c) = \{i,0\}$\;
+  $\mathcal{Q}.\mathrm{push}\left(\&\mathcal{M}_0(r, c),\{(r, c)\},\{(r, c)\}\right)$\;
+}
+\While(\tcp*[f]{Wavefront propagation}){$\mathcal{Q}$ is not empty}{
+  $q_k = \mathcal{Q}$.pop()\;
+  $m = q_k$.cell()\;
+  $k = m$.index()\;
+  \If{$k < 0$}{\textbf{continue}}
+  $(r_k,c_k) = q_k$.cell\_idx()\;
+  $(r_p,c_p) = q_k$.parent\_idx()\;
+  \ForEach{$(r', c') \in \mathcal{N}_8(r_k,c_k)$}{
+    $d_o = m$.dist()\;
+    $d_k = \| (r', c')^T - (r_p,c_p)^T \|_2 \cdot \delta$\;
+    \If(\tcp*[f]{Update if closer parent exists}){$(d_k < d_{\max}$ \textbf{or} $d_{\max} \leq 0)$ \textbf{and} $d_o > d_k$}{
+      $\mathcal{M}_0(r', c') = \{k,d_k\}$\;
+      $\mathcal{Q}.\mathrm{push}\left(\&\mathcal{M}_0(r', c'),\{(r', c')\},\{(r_p,c_p)\}\right)$\;
+    }
+  }
+}
+$\mathcal{M}_{1,2}$.rehash($\mathcal{M}_{1,2}$.size())
+\end{algorithm}

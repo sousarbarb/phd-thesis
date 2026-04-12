@@ -1,0 +1,38 @@
+\begin{algorithm}[!t]
+\DontPrintSemicolon
+\caption[Initialization procedure to resize the distance map data structures]{%
+Initialization procedure to resize the distance map data structures.}
+\label{alg:distance-maps:alignment:dmaps:initialization}
+\KwIn{Reference point cloud $\mathcal{P} = \{\mathbf{p}_i\}_{i=1}^{n}$,
+grid resolution $\delta > 0$ (m/px),
+map size $L$ (m),
+truncation distance $d_{\max}$ (m)}
+\KwOut{Resized grid $\mathcal{M}_l$}
+\uIf(\tcp*[f]{Compute metric bounding box of the occupied area}){$L>0$}{
+  $\mathbf{y}_{\mathcal{P},\min} = \left(-L,-L\right)$\;
+  $\mathbf{y}_{\mathcal{P},\max} = \left( L, L\right)$\;
+}
+\Else{
+  $\mathbf{y}_{\mathcal{P},\min} = \left(+\inf,+\inf\right)$\;
+  $\mathbf{y}_{\mathcal{P},\max} = \left(-\inf,-\inf\right)$\;
+  \ForAll{$i=1,\ldots,n$}{
+    \If{$\mathbf{p}_i$ is not a valid point}{
+      \textbf{continue}\;
+    }
+    $\mathbf{y}_{\mathcal{P},\min}=\min\{\mathbf{y}_{\mathcal{P},\min},\mathbf{p}_i\}$\;
+    $\mathbf{y}_{\mathcal{P},\max}=\max\{\mathbf{y}_{\mathcal{P},\max},\mathbf{p}_i\}$\;
+  }
+}
+$\mathbf{y}_{\mathcal{P},\Delta} = \mathbf{y}_{\mathcal{P},\max} - \mathbf{y}_{\mathcal{P},\min}$\;
+\uIf(\tcp*[f]{Compute size of the grid data structure}){$d_{\max} > 0$ \textbf{and} $L \leq 0$}{
+  $\mathrm{rows} = \lfloor\frac{\mathbf{y}_{\mathcal{P},\Delta,x}+2\cdot d_{\max}}{\delta}\rfloor+1$\;
+  $\mathrm{cols} = \lfloor\frac{\mathbf{y}_{\mathcal{P},\Delta,y}+2\cdot d_{\max}}{\delta}\rfloor+1$\;
+  $\mathbf{y}_{\mathcal{M},\min} = \mathbf{y}_{\mathcal{P},\min} - d_{\max}$\;
+}
+\Else{
+  $\mathrm{rows} = \lfloor\frac{\mathbf{y}_{\mathcal{P},\Delta,x}}{\delta}\rfloor+1$\;
+  $\mathrm{cols} = \lfloor\frac{\mathbf{y}_{\mathcal{P},\Delta,y}}{\delta}\rfloor+1$\;
+  $\mathbf{y}_{\mathcal{M},\min} = \mathbf{y}_{\mathcal{P},\min}$\;
+}
+$\mathcal{M}$.resize(rows,cols)\;
+\end{algorithm}

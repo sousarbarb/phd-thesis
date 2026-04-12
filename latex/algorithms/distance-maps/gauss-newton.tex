@@ -1,0 +1,26 @@
+\begin{algorithm}[!t]
+\DontPrintSemicolon
+\caption[Gauss-Newton minimization algorithm for Euclidean measurement and state
+spaces]{Gauss-Newton minimization algorithm for Euclidean measurement and
+state spaces (a single iteration of the iterative procedure)}
+\label{alg:distance-maps:background:least-squares:gauss-newton}
+\KwIn{Current state estimation $\mathbf{x}_k$,
+measurements $\mathcal{C} = \{\langle  \mathbf{z}^{[i]} , \mathbf{\Omega}^{[i]} \rangle\}$}
+\KwOut{State estimation for the next iteration step $\mathbf{x}_{k+1}$}
+$\mathbf{b} \leftarrow \mathbf{0}_{n \times 1}$\;
+$\mathbf{H} \leftarrow \mathbf{0}_{n \times n}$\;
+\ForAll{$i=1,\ldots,M$}{
+  $\mathbf{e}^{[i]} \leftarrow \mathbf{h}^{[i]}(\mathbf{x}_k) - \mathbf{z}^{[i]}$\;
+  $\mathbf{J}^{[i]} \leftarrow
+      \left.\dfrac{\partial\mathbf{e}^{[i]}(\mathbf{x})}{\partial \mathbf{x}}
+      \right|_{\mathbf{x}=\mathbf{x}_k}$\;
+  $\mathbf{H} \leftarrow \mathbf{H} + {\mathbf{J}^{[i]}}^T
+      \mathbf{\Omega}^{[i]} \mathbf{J}^{[i]}$\;
+  $\mathbf{b} \leftarrow \mathbf{b} + {\mathbf{J}^{[i]}}^T
+      \mathbf{\Omega}^{[i]} \mathbf{e}^{[i]}$\;
+}
+$\mathbf{\Delta x}_k \leftarrow \mathrm{solve}
+  \!\left(\mathbf{H} \mathbf{\Delta x}_k = -\mathbf{b}\right)$\;
+$\mathbf{x}_{k+1} \leftarrow \mathbf{x}_{k} + \mathbf{\Delta x}_k$\;
+\Return{$\mathbf{x}_{k+1}$}\;
+\end{algorithm}

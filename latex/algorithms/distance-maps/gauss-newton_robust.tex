@@ -1,0 +1,31 @@
+\begin{algorithm}[!t]
+\DontPrintSemicolon
+\caption[Gauss-Newton minimization algorithm with robust estimators for
+Euclidean measurement and state spaces]{Gauss-Newton minimization algorithm with
+robust estimators for Euclidean measurement and state spaces
+(a single iteration of the iterative procedure)}
+\label{alg:distance-maps:background:least-squares:gauss-newton:robust}
+\KwIn{Current state estimation $\mathbf{x}_k$,
+measurements $\mathcal{C} = \{\langle  \mathbf{z}^{[i]} , \mathbf{\Omega}^{[i]} \rangle\}$,
+robust loss function $\rho$}
+\KwOut{State estimation for the next iteration step $\mathbf{x}_{k+1}$}
+$\mathbf{\tilde{b}} \leftarrow \mathbf{0}_{n \times 1}$\;
+$\mathbf{\tilde{H}} \leftarrow \mathbf{0}_{n \times n}$\;
+\ForAll{$i=1,\ldots,M$}{
+  $\mathbf{e}^{[i]} \leftarrow \mathbf{h}^{[i]}(\mathbf{x}_k) - \mathbf{z}^{[i]}$\;
+  $\mathbf{J}^{[i]} \leftarrow
+      \left.\dfrac{\partial\mathbf{e}^{[i]}(\mathbf{x})}{\partial \mathbf{x}}
+      \right|_{\mathbf{x}=\mathbf{x}_k}$\;
+  $s^{[i]} \leftarrow \sqrt{{\mathbf{e}^{[i]}}^T \mathbf{\Omega}^{[i]} \mathbf{e}^{[i]}}$\;
+  $w^{[i]} \leftarrow \dfrac{\rho'\!\left(s^{[i]}\right)}{2 \cdot s^{[i]}}$\;
+  $\mathbf{\tilde{\Omega}}^{[i]} \leftarrow w^{[i]} \mathbf{\Omega}^{[i]}$\;
+  $\mathbf{\tilde{H}} \leftarrow \mathbf{\tilde{H}} + {\mathbf{J}^{[i]}}^T
+      \mathbf{\tilde{\Omega}}^{[i]} \mathbf{J}^{[i]}$\;
+  $\mathbf{\tilde{b}} \leftarrow \mathbf{\tilde{b}} + {\mathbf{J}^{[i]}}^T
+      \mathbf{\tilde{\Omega}}^{[i]} \mathbf{e}^{[i]}$\;
+}
+$\mathbf{\Delta x}_k \leftarrow \mathrm{solve}
+  \!\left(\mathbf{\tilde{H}} \mathbf{\Delta x}_k = -\mathbf{\tilde{b}}\right)$\;
+$\mathbf{x}_{k+1} \leftarrow \mathbf{x}_{k} + \mathbf{\Delta x}_k$\;
+\Return{$\mathbf{x}_{k+1}$}\;
+\end{algorithm}

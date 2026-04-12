@@ -1,0 +1,48 @@
+\begin{algorithm}[!t]
+\DontPrintSemicolon
+\caption[Computation of the \emph{Nano} distance map]{%
+         Computation of the \emph{Nano} distance map:
+         representation level $\mathcal{M}_0$, dense storage layout.}
+\label{alg:distance-maps:alignment:dmaps:nano}
+\KwIn{Reference point cloud $\mathcal{P} = \{\mathbf{p}_i\}_{i=1}^{n}$,
+Resized grid $\mathcal{M}_0$}
+\KwOut{Dense data structure $\mathcal{M}_0$
+(see \eqref{eq:distance-maps:alignment:dmaps:representations:level0})}
+$\mathcal{M}_0$.fill($-1$)\tcp*{Initialization}
+$\mathcal{Q}$.clear()\;
+\For(\tcp*[f]{Seeding}){$i = 1$ \KwTo $n$}{
+  \If{$\mathbf{p}_i$ is not a valid point}{
+    \textbf{continue}\;
+  }
+  $(r, c) = \mathrm{global2local}(\mathbf{p}_i)$\;
+  \If{$(r, c)$ is not inside the grid}{
+    \textbf{continue}\;
+  }
+  $\mathcal{M}_0(r, c) = i$\;
+  $\mathcal{Q}.\mathrm{push}\left(\&\mathcal{M}_0(r, c), 0\right)$\;
+}
+\While(\tcp*[f]{Wavefront propagation}){$\mathcal{Q}$ is not empty}{
+  $q_k = \mathcal{Q}$.pop()\;
+  $k = q_k$.cell()\;
+  \If{$k < 0$}{\textbf{continue}}
+  $(r_k,c_k) = \mathcal{M}_0$.getCellPos($\&q_k$.cell())\;
+  $(r_p,c_p) = \mathrm{global2local}(\mathbf{p}_{k})$\;
+  \ForEach{$(r', c') \in \mathcal{N}_8(r_k,c_k)$}{
+    $o = \mathcal{M}_0(r',c')$\;
+    $d_k = \| (r', c')^T - (r_p,c_p)^T \|_2 \cdot \delta$\;
+    \If(\tcp*[f]{Unvisited cell}){$o < 0$}{
+      \If{$d_k < d_{\max}$ \textbf{or} $d_{\max} \leq 0$}{
+        $\mathcal{M}_0(r', c') = k$\;
+        $\mathcal{Q}.\mathrm{push}\left(\&\mathcal{M}_0(r', c'), d_k\right)$\;
+      }
+      \textbf{continue}\;
+    }
+    $(r_o,c_o) = \mathrm{global2local}(\mathbf{p}_{o})$\;
+    $d_o = \| (r_o,c_o)^T - (r_p,c_p)^T \|_2 \cdot \delta$\;
+    \If(\tcp*[f]{Update if closer parent exists}){$(d_k < d_{\max}$ \textbf{or} $d_{\max} \leq 0)$ \textbf{and} $d_o > d_k$}{
+      $\mathcal{M}_0(r', c') = k$\;
+      $\mathcal{Q}.\mathrm{push}\left(\&\mathcal{M}_0(r', c'), d_k\right)$\;
+    }
+  }
+}
+\end{algorithm}
