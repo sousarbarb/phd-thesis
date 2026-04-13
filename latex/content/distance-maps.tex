@@ -1595,10 +1595,29 @@ $\mathbf{v}$ under an infinitesimal positive rotation. This skew operator
 appears in all Jacobian matrices of the 2D~point cloud registration problem
 derived in \secref{sec:distance-maps:alignment}, corresponding to the column
 associated with the rotational degree of freedom $\Delta\theta$ of
-the perturbation $\Delta\mathbf{x}$.
+the perturbation $\mathbf{\Delta x}$.
 
 \subsection{Point-to-point error formulation}
 \label{sec:distance-maps:alignment:pt2pt}
+
+In terms of defining the error, first,
+we propose a point-to-point error defined as the scalar value returned by
+the distance map when the transformed moving point $\mathbf{z}_i$ is projected
+onto the reference sensor coordinate frame $S$. Let
+$\tilde{\mathbf{z}}_i = \mathbf{T}_R^S \mathbf{x}_R \mathbf{T}_S^R \mathbf{z}_i
+\in \mathbb{R}^2$ denote the moving point transformed by the current pose
+estimate $\mathbf{x}_R$ and expressed in the reference sensor frame $S$.
+The point-to-point scalar residual $e_i(\mathbf{x})\in\mathbb{R}$ is
+then given by \eqref{eq:distance-maps:alignment:pt2pt:error}.
+This scalar residual measures the Euclidean distance from the transformed moving
+point $\tilde{\mathbf{z}}_i$ to its nearest reference point in $\mathcal{P}$,
+as encoded by the precomputed distance map $\mathcal{D}$.
+\begin{equation}
+\label{eq:distance-maps:alignment:pt2pt:error}
+e_i(\mathbf{x}) =
+\mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right) =
+\mathcal{D}\!\left(\mathbf{T}_R^S \mathbf{x}_R \mathbf{T}_S^R \mathbf{z}_i\right)
+\end{equation}
 
 \subsubsection{Jacobian matrix via right-sided perturbation}
 
