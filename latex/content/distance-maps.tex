@@ -922,10 +922,22 @@ in \eqref{eq:distance-maps:background:least-squares:manifold-update}.
 \right)\right)
 \end{equation}
 
-\section{2D Point Cloud Registration with Distance Maps}
+\section{Registration Methodology}
 \label{sec:distance-maps:alignment}
 
-\todo{TBC}
+This section presents the proposed approach for 2D~point cloud registration
+using distance maps, formulated as a non-linear least-squares problem and
+solved via the Gauss-Newton algorithm on the $SE(2)$ manifold.
+First, \secref{sec:distance-maps:alignment:dmaps} introduces the distance map
+representation, its spatial derivatives, the associated representation
+levels, and the data structures used for computation and querying.
+Next, \secref{sec:distance-maps:alignment:problem} states the registration
+problem, defining the pose parametrization and the manifold update. Then,
+\secref{sec:distance-maps:alignment:pt2pt} derives the point-to-point error
+formulation and its Jacobian matrix via right-sided perturbation on $SE(2)$.
+Lastly, \secref{sec:distance-maps:alignment:pt2pl} derives the point-to-plane
+error formulation and its Jacobian, together with the surface normal
+estimation procedure used to extract normals from the moving point cloud.
 
 \subsection{Distance maps}
 \label{sec:distance-maps:alignment:dmaps}
