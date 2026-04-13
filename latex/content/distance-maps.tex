@@ -1490,7 +1490,7 @@ hash collision, mitigated by the post-propagation rehash discussed previously.
 Let $\mathbf{z}_i\in\mathbb{R}^2$, $i = 1, \dots, M$, represent
 the 2D~point measurements from the moving (current) point cloud.
 Similarly to the reference cloud $\mathcal{P}$, the moving cloud is also
-acquired by a 2D~laser scanner and expressed in the sensor coordinate frame.
+acquired by a 2D~laser scanner and expressed in the sensor coordinate frame $S$.
 The goal of 2D~point cloud registration is to find the robot pose
 $\mathbf{x} \in SE(2)$ that best aligns the moving cloud to the reference cloud.
 The robot pose is represented as a homogeneous transformation on the $SE(2)$
@@ -1543,7 +1543,7 @@ Since the optimization variable $\mathbf{x}$ lives on the $SE(2)$ manifold,
 incremental updates cannot be performed by simple Euclidean addition,
 as discussed in \secref{sec:distance-maps:background:least-squares:manifold}.
 A perturbation
-$\Delta\mathbf{x} = (\Delta x, \Delta y, \Delta\theta)^T \in \mathbb{R}^3$ is
+$\mathbf{\Delta x} = (\Delta x, \Delta y, \Delta\theta)^T \in \mathbb{R}^3$ is
 defined in the tangent (Euclidean) space with the exponential and logarithmic
 mappings defined as
 \eqref{eq:distance-maps:alignment:problem:x:exp} and
@@ -1551,11 +1551,11 @@ mappings defined as
 Consequently, the manifold update between Gauss-Newton iterations adopt a
 right-sided perturbation update defined in
 \eqref{eq:distance-maps:alignment:problem:gauss-newton:addition}, with the
-corresponding inverse (distance) operation as formulated by
+corresponding inverse (distance) operation, as formulated in
 \eqref{eq:distance-maps:alignment:problem:gauss-newton:subtraction}.
 \begin{equation}
 \label{eq:distance-maps:alignment:problem:x:exp}
-\exp\!\left(\Delta\mathbf{x}\right) =
+\exp\!\left(\mathbf{\Delta x}\right) =
 \left[\mathbf{R}(\Delta\theta) \mid (\Delta x, \Delta y)^T \right] \in SE(2)
 \end{equation}
 \begin{equation}
@@ -1566,12 +1566,12 @@ corresponding inverse (distance) operation as formulated by
 \end{equation}
 \begin{equation}
 \label{eq:distance-maps:alignment:problem:gauss-newton:addition}
-\mathbf{x}_{k+1} = \mathbf{x}_k \oplus \Delta\mathbf{x}
-                 = \mathbf{x}_k \cdot \exp\!\left(\Delta\mathbf{x}\right)
+\mathbf{x}_{k+1} = \mathbf{x}_k \oplus \mathbf{\Delta x}
+                 = \mathbf{x}_k \cdot \exp\!\left(\mathbf{\Delta x}\right)
 \end{equation}
 \begin{equation}
 \label{eq:distance-maps:alignment:problem:gauss-newton:subtraction}
-\Delta\mathbf{x} = \mathbf{x}_1 \ominus \mathbf{x}_2
+\mathbf{\Delta x} = \mathbf{x}_1 \ominus \mathbf{x}_2
                  = \log\!\left(\mathbf{x}_1^{-1}\, \mathbf{x}_2\right)^\vee
 \end{equation}
 
