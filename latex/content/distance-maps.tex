@@ -942,7 +942,31 @@ estimation procedure used to extract normals from the moving point cloud.
 \subsection{Distance maps}
 \label{sec:distance-maps:alignment:dmaps}
 
-\todo{TBC}
+Distance maps, also referred in the literature as distance fields or transforms,
+are scalar fields that associate to every cell of a discrete grid
+the Euclidean distance to the nearest element of a given reference set.
+In the context of point cloud registration, the reference set is
+the target point cloud and the distance map is precomputed only once before
+the iterative optimization begins, in contrast to classical
+\gls{icp} methods~\cite{besl-mckay:tpami:1992,chen-medioni:icra:1991}.
+This precomputation encodes data association implicitly,
+removing the explicit \glslink{nn}{\glsentryfull{nn}} search that traditional
+\gls{icp} methods~\cite{besl-mckay:tpami:1992,chen-medioni:icra:1991} perform at
+every iteration and replacing it with a constant-time grid lookup.
+
+Therefore, \secref{sec:distance-maps:alignment:dmaps:overview} defines the
+distance map over the reference point cloud and discusses how it removes the
+explicit data association step required by classical
+\gls{icp} methods~\cite{besl-mckay:tpami:1992,chen-medioni:icra:1991}.
+\secref{sec:distance-maps:alignment:dmaps:derivation} derives the first- and
+second-order spatial derivatives of the distance map, providing both
+analytical expressions and finite-difference approximations used in
+the implementation of the proposed approach.
+\secref{sec:distance-maps:alignment:dmaps:representation} describes the three
+representation levels of increasing information content considered in this work.
+Lastly, \secref{sec:distance-maps:alignment:dmaps:computation} details the
+computation pipeline and the data structures underlying each variant of
+the distance map representations considered in the scope of this PhD~Thesis.
 
 \subsubsection{Overview}
 \label{sec:distance-maps:alignment:dmaps:overview}
