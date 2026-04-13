@@ -1250,7 +1250,7 @@ analogous to Dijkstra's shortest-path algorithm~\cite{dijkstra:nm:1959}.
 All variants considered in our approach share the same high-level pipeline:
 \begin{enumerate}[nosep]
 \item initialize the grid based on its resolution $\delta$ (m/px),
-      the bounding box of $\mathcal{P}$, optional fixed map size (m), and
+      the bounding box of $\mathcal{P}$, optional fixed map size $L$ (m), and
       optional truncation distance $d_{\max}$ (m);
 \item seed the priority queue with the grid cells occupied by reference
       points, initializing their distance to zero;
@@ -1302,7 +1302,7 @@ values returned to the registration optimizer.
 
 Lastly, the inverse mapping from grid indices to metric coordinates is obtained
 by multiplying the indices by the resolution $\delta$ and offsetting by
-$\mathbf{y}_{\mathcal{D},\min}$, as formulated in
+$\mathbf{y}_{\mathcal{M},\min}$, as formulated in
 \eqref{eq:distance-maps:alignment:dmaps:conversion:local2global}.
 \begin{equation}
 \label{eq:distance-maps:alignment:dmaps:conversion:local2global}
@@ -1355,7 +1355,7 @@ $[-L, L]$. Otherwise, the bounding box is computed directly from
 the reference point cloud $\mathcal{P}$ by iterating over all valid points and
 accumulating the minimum and maximum coordinates.
 Then, the grid dimensions in pixels are derived from the bounding box.
-If $d_{\max} > 0$ is set and no explicit map size was
+If $d_{\max} > 0$ is set and no explicit map size is
 provided, the bounding box is expanded by $d_{\max}$ on both sides before
 converting to pixel cells, ensuring that the truncation band is fully covered
 around the point cloud boundary.
@@ -1373,12 +1373,12 @@ Next, \algref{alg:distance-maps:alignment:dmaps:nano},
 \algref{alg:distance-maps:alignment:dmaps:dense}, and
 \algref{alg:distance-maps:alignment:dmaps:sparse} present the computation
 procedure for each type of distance map structures considered in the scope of
-this PhD~Thesis: \emph{Nano} ($\mathcal{M}_0$, dense storage), \emph{Standard}
-($\mathcal{M}_1$ or $\mathcal{M}_2$, dense storage), and \emph{Sparse}
-($\mathcal{M}_1$ or $\mathcal{M}_2$, sparse storage), respectively.
+this PhD~Thesis: \emph{Nano} ($\mathcal{M}_{0,\mathrm{dense}}$), \emph{Standard}
+($\mathcal{M}_{1,\mathrm{dense}}$ or $\mathcal{M}_{2,\mathrm{dense}}$), and
+\emph{Sparse} ($\mathcal{M}_{1,\mathrm{sparse}}$ or $\mathcal{M}_{2,\mathrm{sparse}}$), respectively.
 Although the $\mathcal{M}_0$ representation could be implemented using
 a sparse storage layout, the overhead of \texttt{std::unordered\_map},
-which may reserve significantly more hash table buckets than
+which may reserve more hash table buckets than
 the number of elements actually stored, does not justify a sparse structure for
 a single integer index per cell.
 
@@ -1388,7 +1388,7 @@ a single integer index per cell.
 
 Furthermore, \algref{alg:distance-maps:alignment:dmaps:nano} details
 the full construction of the \emph{Nano} variant.
-First, the entire grid $\mathcal{M}_0$ is filled with $-1$, representing
+First, the entire grid $\mathcal{M}_{0,\mathrm{dense}}$ is filled with $-1$, representing
 unvisited cells, and the priority queue $\mathcal{Q}$ is cleared.
 Next, the reference point cloud $\mathcal{P}$ is projected onto the grid
 using the coordinate conversion $\mathrm{global2local}(\cdot)$ of
@@ -1398,7 +1398,7 @@ the grid are skipped. For each remaining point $\mathbf{p}_i$,
 the corresponding cell is assigned the index $i$.
 A pointer to the cell is then pushed into $\mathcal{Q}$ with distance
 $d = 0$, which sets the priority of the queue entry.
-Since $\mathcal{M}_0$ does not store the distance value, the queue
+Since $\mathcal{M}_{0,\mathrm{dense}}$ does not store the distance value, the queue
 entry must carry it explicitly alongside the cell pointer, so that
 $\mathcal{Q}$ correctly orders cells during wavefront propagation.
 
@@ -1422,8 +1422,8 @@ The \emph{Standard} variant detailed in
 pipeline as the \emph{Nano} variant
 (see \algref{alg:distance-maps:alignment:dmaps:nano}), with two key
 differences arising from the more complete cell data structure.
-Since the distance is now part of the cell itself in $\mathcal{M}_1$ and
-$\mathcal{M}_2$ representation levels, the priority queue $\mathcal{Q}$
+Since the distance is now part of the cell itself in $\mathcal{M}_{1,\mathrm{dense}}$ and
+$\mathcal{M}_{2,\mathrm{dense}}$ representation levels, the priority queue $\mathcal{Q}$
 does not need to carry the distance separately, accessing directly from the
 representation of the distance map.
 The other difference is the distinction between unvisited and already-visited
@@ -1432,13 +1432,12 @@ neighbor cells, which required an explicit branch in
 Since all cells are initialized with $+\inf$, the single condition
 $\left(d_k < d_{\max} \textbf{ or } d_{\max} \leq 0\right) \textbf{ and }d_o > d_k$
 handles both cases uniformly, where an unvisited cell holds a $+\inf$ distance,
-while a previously visited cell is updated only if a strictly closer parent
-is found.
+while a previously visited cell is updated only if a closer parent is found.
 After the wavefront terminates, the gradient
 $\bm{\nabla}\mathcal{D}$ is computed over the entire dense grid via the
 central finite difference scheme of
 \eqref{eq:distance-maps:alignment:dmaps:1st-deriv:numerical-derivation}.
-If the $\mathcal{M}_2$ representation is requested, a second
+If the $\mathcal{M}_{2,\mathrm{dense}}$ representation is requested, a second
 post-processing pass computes the Hessian $\mathbf{H}_{\mathcal{D}}$
 via \eqref{eq:distance-maps:alignment:dmaps:2nd-deriv:H:numerical}.
 Both passes use one-sided (forward or backward) differences at grid borders.
@@ -1455,7 +1454,7 @@ to maintain a sparse storage layout when the truncation distance is set
 $(r, c)$ is not yet present in the hash table.
 Next, each entry pushed into the priority queue $\mathcal{Q}$ carries more
 information than in the \emph{Standard} variant: a pointer to the
-cell $\mathcal{M}_{1,2}(r, c)$, the current cell index
+cell $\mathcal{M}_{1|2,\mathrm{sparse}}(r, c)$, the current cell index
 $\{(r, c)\}$, and the parent \gls{nn} index $\{(r_p, c_p)\}$.
 This implementation avoids additional hash queries at every propagation step.
 Lastly, once the wavefront terminates and before precomputing the derivatives,
@@ -1472,13 +1471,13 @@ The \emph{Nano} variant stores a single integer index per cell, resulting
 in the lowest memory footprint of $O(N_G)$.
 Both the \emph{Standard} and \emph{Sparse} variants store between $3$
 and $8$ scalar values per cell depending on the representation level
-$\mathcal{M}_{1,2}$ and whether the optional \gls{nn} index
+$\mathcal{M}_{1|2}$ and whether the optional \gls{nn} index
 $k^*(\mathbf{y})$ is included.
 While the \emph{Standard} variant allocates the full grid as a dense
 array with $O(N_G)$ memory, the \emph{Sparse} variant backed by
 \texttt{std::unordered\_map} populates only the $N_d \leq N_G$ cells
 within the truncation band, making it the most memory-efficient choice
-when $d_{\max}$ is set.
+when $d_{\max}$ is set, in general.
 All three variants provide $O(1)$ query lookup, though the \emph{Sparse}
 variant achieves this only on average, with worst-case $O(N_d)$ under
 hash collision, mitigated by the post-propagation rehash discussed previously.

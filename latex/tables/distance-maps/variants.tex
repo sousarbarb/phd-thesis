@@ -13,17 +13,17 @@
 \textbf{Variant} & \textbf{Storage} & \textbf{Values/cell} &
 \textbf{Query lookup} & \textbf{Truncation} \\
 \hline
-\emph{Nano} ($\mathcal{M}_{0}$) &
+\emph{Nano} ($\mathcal{M}_{0,\mathrm{dense}}$) &
     Dense (array) &
     $1$ (\texttt{int}) &
     $O(1)$ &
     optional \\
-\emph{Standard} ($\mathcal{M}_{1,2}$) &
+\emph{Standard} ($\mathcal{M}_{1|2,\mathrm{dense}}$) &
     Dense (array) &
     $3$--$8^{\star}$ &
     $O(1)$ &
     optional \\
-\emph{Sparse} ($\mathcal{M}_{1,2}$) &
+\emph{Sparse} ($\mathcal{M}_{1|2,\mathrm{sparse}}$) &
     Hash (\texttt{std::unordered\_map}) &
     $3$--$8^{\star}$ &
     $O(1)^{\dagger}$ &
