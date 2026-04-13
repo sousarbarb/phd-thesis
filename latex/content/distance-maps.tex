@@ -31,7 +31,21 @@ conclusions and directions for future work.
 
 \section{Background}\label{sec:distance-maps:background}
 
-\todo{TBC}
+Point cloud registration is a fundamental problem in mobile robotics,
+consisting of estimating the rigid-body transformation that best aligns
+two point clouds acquired by a range sensor. This problem arises in a wide range
+of applications, including \gls{slam}, odometry estimation, and map-based
+localization. Thus, this section introduces the background underpinning
+the proposed distance map-based registration approach.
+\secref{sec:distance-maps:background:registration} reviews 2D~and
+3D~point cloud registration methods from the literature,
+ranging from classical \gls{icp} variants to probabilistic and
+precomputed spatial gradient formulations, motivating the use of
+distance maps as a unified and correspondence-free registration framework.
+\secref{sec:distance-maps:background:least-squares} presents the
+non-linear least-squares framework used throughout this chapter,
+covering the Gauss-Newton algorithm, uncertainty estimation,
+robust estimators, and the generalization to non-Euclidean state spaces.
 
 \subsection{Point cloud registration}\label{sec:distance-maps:background:registration}
 One of the most popular approaches for point cloud registration is
