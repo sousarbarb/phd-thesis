@@ -974,20 +974,20 @@ the distance map representations considered in the scope of this PhD~Thesis.
 Let $\mathcal{P} = \{\mathbf{p}_1, \mathbf{p}_2, \dots, \mathbf{p}_n\} \subset \mathbb{R}^2$
 represent a reference 2D~point cloud,
 comprising $n$ 2D~points acquired by a planar laser scanner.
-These points are expressed in the sensor coordinate frame $L$,
+These points are expressed in the sensor coordinate frame $S$,
 where each point is $\mathbf{p}_i = (x_i, y_i)^T$.
 The distance map $\mathcal{D}: \mathbb{R}^2\to\mathbb{R}_0^+$ is defined
 as the function that maps any query point $\mathbf{y}\in\mathbb{R}^2$ to
 its Euclidean distance to the nearest point in $\mathcal{P}$, as formulated in
 \eqref{eq:distance-maps:alignment:dmaps:definition},
 where $\mathbf{p}^*(\mathbf{y}) = \argmin_{\mathbf{p}_i \in \mathcal{P}}
-\|\mathbf{y} - \mathbf{p}_i\|_2$ is the \glslink{nn}{\glsentryfull{nn}} in
+\|\mathbf{y} - \mathbf{p}_i\|_2$ is the \gls{nn} in
 the reference cloud $\mathcal{P}$.
 Note that $\mathcal{D}(\mathbf{y}) \geq 0$ for all $\mathbf{y}$, making
 this an \emph{unsigned distance function}, as opposed to
 \glspl{sdf} used in volumetric reconstruction. An important property of
 \emph{unsigned distance fields} is that they are continuous everywhere,
-but is not everywhere differentiable~\cite{jones:tvcg:2006}.
+but not everywhere differentiable~\cite{jones:tvcg:2006}.
 \begin{equation}
 \label{eq:distance-maps:alignment:dmaps:definition}
 \mathcal{D}(\mathbf{y}) =
@@ -995,8 +995,9 @@ but is not everywhere differentiable~\cite{jones:tvcg:2006}.
 \end{equation}
 
 As discussed in \secref{sec:distance-maps:background:registration},
-classical \gls{icp}-based registration methods implement a two-step
-iterative process: data association and optimization steps.
+classical \gls{icp}-based registration
+approaches~\cite{besl-mckay:tpami:1992,chen-medioni:icra:1991} implement a
+two-step iterative process: data association and optimization steps.
 These methods require reevaluating the correspondences at every iteration,
 since the pose estimate evolves and changes the transformed positions of the
 moving points, potentially altering the data association results.
@@ -1017,7 +1018,14 @@ in $O(1)$,  with no explicit correspondence search.
 \subsubsection{Spatial derivatives}
 \label{sec:distance-maps:alignment:dmaps:derivation}
 
-\todo{TBC}
+While the distance map $\mathcal{D}$ is continuous everywhere but not everywhere
+differentiable~\cite{jones:tvcg:2006}, its spatial derivatives
+exist almost everywhere and are central to the registration error formulations
+derived in \secref{sec:distance-maps:alignment:pt2pt} and
+\secref{sec:distance-maps:alignment:pt2pl}.
+This subsubsection derives the first- and second-order spatial derivatives
+of $\mathcal{D}$, providing both analytical expressions and their
+finite-difference approximations used in our implementation.
 
 \paragraph{First-order derivative (gradient vector)}
 The gradient $\bm{\nabla}\mathcal{D}(\mathbf{y}) \in \mathbb{R}^2$ of the
