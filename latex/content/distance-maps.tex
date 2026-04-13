@@ -15,12 +15,11 @@ the proposed formulation provides both point-to-point and point-to-plane error
 formulations compatible with Gauss-Newton optimization on the $SE(2)$ manifold.
 The proposed approach does not require explicit data association at each iteration.
 
-This chapter is organized as follows.
-\secref{sec:distance-maps:background} surveys the relevant background,
-covering point cloud registration methods from the literature and
+This chapter is organized as follows. \secref{sec:distance-maps:background}
+covers point cloud registration methods from the literature and
 the non-linear least-squares framework used throughout this work.
 \secref{sec:distance-maps:alignment} formulates the proposed approach,
-introducing the distance map representation and associated data structures,
+introducing the distance map representation,
 the registration problem on the $SE(2)$ manifold, and both
 point-to-point and point-to-plane error formulations with their Jacobians.
 \secref{sec:distance-maps:results} presents experimental results on
@@ -53,7 +52,7 @@ the \glslink{icp}{\glsentryfull{icp}} algorithm.
 Besl and McKay~\cite{besl-mckay:tpami:1992} address registration of 3D~shapes
 represented as point clouds, introducing the standard \gls{icp} algorithm.
 The following two steps can summarize this algorithm:
-(i) compute correspondences between the source ($p_i$) and target ($z_i$)
+(i) compute correspondences between the source ($\mathbf{p}_i$) and target ($\mathbf{z}_i$)
 cloud points (closest nearest neighbor based on Euclidean distance); and
 (ii) estimate the rigid transformation of the source \gls{wrt} target cloud
 ($\mathbf{x}$) that minimizes a point-to-point distance measure between
@@ -61,7 +60,7 @@ corresponding points (see \eqref{eq:distance-maps:background:point-to-point}).
 Chen and Medioni~\cite{chen-medioni:icra:1991} exploit the tendency of
 most range data to be locally planar and introduce a point-to-plane variant
 of \gls{icp}. The proposed method exploits surface normal information
-on the target cloud ($n_{z_i}$).
+on the target cloud ($\mathbf{n}_{z_i}$).
 Instead of minimizing the difference between the projected source and
 the target points, the point-to-plane error metric minimizes
 the squared dot product of the surface normal with
@@ -75,11 +74,11 @@ error metrics. The point-to-plane~\cite{chen-medioni:icra:1991}
 metric demonstrated significantly better performance than
 the point-to-point~\cite{besl-mckay:tpami:1992} formulation in the experiments.
 \begin{equation}\label{eq:distance-maps:background:point-to-point}
-\mathbf{x} = \argmin_\mathbf{x} \sum_{i=1}^M \| \mathbf{x} p_i - z_i \|^2
+\mathbf{x} = \argmin_\mathbf{x} \sum_{i=1}^M \| \mathbf{x} \mathbf{p}_i - \mathbf{z}_i \|^2
 \end{equation}
 \begin{equation}\label{eq:distance-maps:background:point-to-plane}
-\mathbf{x} = \argmin_\mathbf{x} \sum_{i=1}^M \| n_{z_i}^T \cdot
-\left( \mathbf{x} p_i - z_i \right) \|^2
+\mathbf{x} = \argmin_\mathbf{x} \sum_{i=1}^M \| \mathbf{n}_{z_i}^T \cdot
+\left( \mathbf{x} \mathbf{p}_i - \mathbf{z}_i \right) \|^2
 \end{equation}
 
 Unlike traditional \gls{icp} methods, which rely on explicit point
@@ -92,7 +91,7 @@ the mean and covariance of the cell points,
 which provide information about the surface those points represent.
 Then, Biber and Strasser~\cite{biber-strasser:iros:2003} formulate
 2D~point cloud registration as the minimization of an error function
-derived from these distributions, optimized using the Gauss--Newton algorithm.
+derived from these distributions, optimized using the Gauss-Newton algorithm.
 Experimental results showed that \gls{ndt}~\cite{biber-strasser:iros:2003} was
 able to map large areas without requiring odometry.
 Magnusson~\etal~\cite{magnusson:jfr:2007} later extended \gls{ndt} to
@@ -179,7 +178,7 @@ registration without requiring explicit point-to-point correspondences.
 HectorSLAM~\cite{kohlbrecher:ssr:2011} uses spatial gradients over the
 2D~occupancy grid map ($\mathcal{M}$).
 The scan matching finds the pose that maximizes
-the occupancy probability of where the beam endpoints $z_i$ land on occupied
+the occupancy probability of where the beam endpoints $\mathbf{z}_i$ land on occupied
 cells (see \eqref{eq:distance-maps:background:hectorslam}).
 The method uses bilinear interpolation over the occupancy map and approximates
 its spatial derivatives, applying then a Gauss-Newton update.
@@ -213,11 +212,11 @@ than \gls{icp}~\cite{besl-mckay:tpami:1992} and
 
 \begin{equation}\label{eq:distance-maps:background:hectorslam}
 \mathbf{x} = \argmin_\mathbf{x} \sum_{i=1}^M
-\left[ 1 - \mathcal{M}\!\left(\mathbf{x} z_i\right) \right]^2
+\left[ 1 - \mathcal{M}\!\left(\mathbf{x} \mathbf{z}_i\right) \right]^2
 \end{equation}
 \begin{equation}\label{eq:distance-maps:background:perfectmatch}
 \mathbf{x} = \argmin_\mathbf{x} \sum_{i=1}^M
-\rho\!\left( \mathcal{D}_\mathcal{M}\!\left( \mathbf{x} z_i \right) \right)
+\rho\!\left( \mathcal{D}_\mathcal{M}\!\left( \mathbf{x} \mathbf{z}_i \right) \right)
 \end{equation}
 
 Overall, most \gls{icp} methods rely on explicit point-to-point correspondences,
@@ -263,7 +262,7 @@ Sobreira~\etal~\cite{sobreira:jint:2019}.
 State estimation in mobile robotics requires inferring an unknown state
 from noisy sensor measurements~\cite{grisetti:itsm:2010,grisetti:robotics:2020}.
 First, \secref{sec:distance-maps:background:least-squares:problem-formulation}
-formulates the problem as a \glslink{map}{\glsentryfull{map}} inference problem
+formulates the problem as a \gls{map} inference problem
 and demonstrates how, under Gaussian noise assumptions, it reduces to
 a non-linear least-squares problem. Next,
 \secref{sec:distance-maps:background:least-squares:gn} shows how
@@ -285,7 +284,7 @@ Least-squares minimization arises in robotics when estimating an unknown state
 from noisy sensor measurements~\cite{grisetti:robotics:2020}.
 Let $\mathbf{x}$ denote non-observable
 state variables and $\mathbf{z}$ the measurements.
-In the scope of this PhD~Thesis, the measurements are the observations of the
+In the scope of this PhD~Thesis, the measurements in this chapter are the observations of the
 environment acquired by the robot's on-board 2D~laser scanner.
 The state is assumed to follow a prior distribution $p(\mathbf{x})$,
 while the conditional distribution of the measurements given the state,
@@ -345,11 +344,10 @@ p(\mathbf{z}^{[i]}|\mathbf{x})
 \end{equation}
 
 Furthermore, \eqref{eq:distance-maps:background:least-squares:error} defines
-the residual error $\mathbf{e}^{[i]}(\mathbf{x})$ for each measurement. Then,
-the squared Mahalanobis distance ${\chi^2}^{[i]}(\mathbf{x})$ of the residual
+the residual error $\mathbf{e}^{[i]}(\mathbf{x})$ for each measurement.
+The squared Mahalanobis distance ${\chi^2}^{[i]}(\mathbf{x})$ of the residual
 error is formulated in \eqref{eq:distance-maps:background:least-squares:chi2}.
-Consequently,
-\eqref{eq:distance-maps:background:least-squares:measurement-detailed}
+Thus, \eqref{eq:distance-maps:background:least-squares:measurement-detailed}
 illustrates the proportionality of the individual likelihoods
 $p(\mathbf{z}^{[i]}|\mathbf{x})$ over the squared Mahalanobis distance
 ${\chi^2}^{[i]}(\mathbf{x})$.
@@ -380,7 +378,7 @@ the original \gls{map} problem formulated in
 an \gls{mle} problem that maximizes the probability of the measurements given
 the state $p(\mathbf{z}^{[i]}|\mathbf{x})$
 (see \eqref{eq:distance-maps:background:least-squares:mle-log-likelihood}).
-Thus, through the negative log-likelihood
+Through the negative log-likelihood
 (see \defref{def:literature:slam:log-likelihood}), dropping constant factors,
 and assuming the measurements under Gaussian noise,
 the original \gls{map} problem for robotics state estimation reduces to a
@@ -445,10 +443,8 @@ $\mathbf{\Delta x}^T {\mathbf{J}^{[i]}}^T \mathbf{\Omega}^{[i]}
 \mathbf{J}^{[i]} \mathbf{\Delta x}$ has been used to combine the two
 cross-terms. Also, note that $\mathbf{b}^{[i]} = {\mathbf{J}^{[i]}}^T
 \mathbf{\Omega}^{[i]} \mathbf{e}^{[i]} \in \mathbb{R}^{n}$ is defined as
-a column vector, consistent with the accumulation
-$\mathbf{b} = \sum_{i=1}^M \mathbf{b}^{[i]}$. The notation
-${\mathbf{b}^{[i]}}^T \mathbf{\Delta x}$ in the expansion below reflects the
-transpose of that column vector.
+a column vector. The notation ${\mathbf{b}^{[i]}}^T \mathbf{\Delta x}$ in
+the expansion below reflects the transpose of that column vector.
 \begin{equation}
 \label{eq:distance-maps:background:least-squares:products-expansion}
 \begin{aligned}
@@ -623,7 +619,7 @@ p(\mathbf{\Delta x}) = \mathcal{N}\!\left(\mathbf{\Delta x};\mathbf{0},\mathbf{\
 \end{pmatrix}
 \end{equation}
 
-When conditioning the state posterior $x$ on the measurements $z$ from the joint
+When conditioning the state posterior $\mathbf{x}$ on the measurements $\mathbf{z}$ from the joint
 probability and under the Gaussian assumption,
 Sch\"{o}n and Lindsten~\cite{schon-lindsten:tech-report:2011}
 demonstrate that the mean and the covariance matrix for the state posterior
