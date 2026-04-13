@@ -471,32 +471,7 @@ steps for a single iteration of the minimization procedure.
 \mathbf{H} \mathbf{\Delta x}_k = -\mathbf{b}
 \end{equation}
 
-\begin{algorithm}[!t]
-\DontPrintSemicolon
-\caption[Gauss-Newton minimization algorithm for Euclidean measurement and state
-spaces]{Gauss-Newton minimization algorithm for Euclidean measurement and
-state spaces (a single iteration of the iterative procedure)}
-\label{alg:distance-maps:background:least-squares:gauss-newton}
-\KwIn{Current state estimation $\mathbf{x}_k$,
-measurements $\mathcal{C} = \{\langle  \mathbf{z}^{[i]} , \mathbf{\Omega}^{[i]} \rangle\}$}
-\KwOut{State estimation for the next iteration step $\mathbf{x}_{k+1}$}
-$\mathbf{b} \leftarrow \mathbf{0}_{n \times 1}$\;
-$\mathbf{H} \leftarrow \mathbf{0}_{n \times n}$\;
-\ForAll{$i=1,\ldots,M$}{
-  $\mathbf{e}^{[i]} \leftarrow \mathbf{h}^{[i]}(\mathbf{x}_k) - \mathbf{z}^{[i]}$\;
-  $\mathbf{J}^{[i]} \leftarrow
-      \left.\dfrac{\partial\mathbf{e}^{[i]}(\mathbf{x})}{\partial \mathbf{x}}
-      \right|_{\mathbf{x}=\mathbf{x}_k}$\;
-  $\mathbf{H} \leftarrow \mathbf{H} + {\mathbf{J}^{[i]}}^T
-      \mathbf{\Omega}^{[i]} \mathbf{J}^{[i]}$\;
-  $\mathbf{b} \leftarrow \mathbf{b} + {\mathbf{J}^{[i]}}^T
-      \mathbf{\Omega}^{[i]} \mathbf{e}^{[i]}$\;
-}
-$\mathbf{\Delta x}_k \leftarrow \mathrm{solve}
-  \!\left(\mathbf{H} \mathbf{\Delta x}_k = -\mathbf{b}\right)$\;
-$\mathbf{x}_{k+1} \leftarrow \mathbf{x}_{k} + \mathbf{\Delta x}_k$\;
-\Return{$\mathbf{x}_{k+1}$}\;
-\end{algorithm}
+\input{algorithms/distance-maps/gauss-newton.tex}
 
 \subsubsection{Least-squares and uncertainty}
 \label{sec:distance-maps:background:least-squares:uncertainty}
@@ -774,37 +749,7 @@ with robust estimators.
   \mathbf{e}^{[i]}(\mathbf{x}_k).
 \end{equation}
 
-\begin{algorithm}[!t]
-\DontPrintSemicolon
-\caption[Gauss-Newton minimization algorithm with robust estimators for
-Euclidean measurement and state spaces]{Gauss-Newton minimization algorithm with
-robust estimators for Euclidean measurement and state spaces
-(a single iteration of the iterative procedure)}
-\label{alg:distance-maps:background:least-squares:gauss-newton:robust}
-\KwIn{Current state estimation $\mathbf{x}_k$,
-measurements $\mathcal{C} = \{\langle  \mathbf{z}^{[i]} , \mathbf{\Omega}^{[i]} \rangle\}$,
-robust loss function $\rho$}
-\KwOut{State estimation for the next iteration step $\mathbf{x}_{k+1}$}
-$\mathbf{\tilde{b}} \leftarrow \mathbf{0}_{n \times 1}$\;
-$\mathbf{\tilde{H}} \leftarrow \mathbf{0}_{n \times n}$\;
-\ForAll{$i=1,\ldots,M$}{
-  $\mathbf{e}^{[i]} \leftarrow \mathbf{h}^{[i]}(\mathbf{x}_k) - \mathbf{z}^{[i]}$\;
-  $\mathbf{J}^{[i]} \leftarrow
-      \left.\dfrac{\partial\mathbf{e}^{[i]}(\mathbf{x})}{\partial \mathbf{x}}
-      \right|_{\mathbf{x}=\mathbf{x}_k}$\;
-  $s^{[i]} \leftarrow \sqrt{{\mathbf{e}^{[i]}}^T \mathbf{\Omega}^{[i]} \mathbf{e}^{[i]}}$\;
-  $w^{[i]} \leftarrow \dfrac{\rho'\!\left(s^{[i]}\right)}{2 \cdot s^{[i]}}$\;
-  $\mathbf{\tilde{\Omega}}^{[i]} \leftarrow w^{[i]} \mathbf{\Omega}^{[i]}$\;
-  $\mathbf{\tilde{H}} \leftarrow \mathbf{\tilde{H}} + {\mathbf{J}^{[i]}}^T
-      \mathbf{\tilde{\Omega}}^{[i]} \mathbf{J}^{[i]}$\;
-  $\mathbf{\tilde{b}} \leftarrow \mathbf{\tilde{b}} + {\mathbf{J}^{[i]}}^T
-      \mathbf{\tilde{\Omega}}^{[i]} \mathbf{e}^{[i]}$\;
-}
-$\mathbf{\Delta x}_k \leftarrow \mathrm{solve}
-  \!\left(\mathbf{\tilde{H}} \mathbf{\Delta x}_k = -\mathbf{\tilde{b}}\right)$\;
-$\mathbf{x}_{k+1} \leftarrow \mathbf{x}_{k} + \mathbf{\Delta x}_k$\;
-\Return{$\mathbf{x}_{k+1}$}\;
-\end{algorithm}
+\input{algorithms/distance-maps/gauss-newton_robust.tex}
 
 At convergence, the robust approximate Hessian $\mathbf{\tilde{H}}$ provides
 a covariance estimate analogous to
@@ -963,7 +908,7 @@ as the function that maps any query point $\mathbf{y}\in\mathbb{R}^2$ to
 its Euclidean distance to the nearest point in $\mathcal{P}$, as formulated in
 \eqref{eq:distance-maps:alignment:dmaps:definition},
 where $\mathbf{p}^*(\mathbf{y}) = \argmin_{\mathbf{p}_i \in \mathcal{P}}
-\|\mathbf{y} - \mathbf{p}_i\|_2$ is the  \glslink{nn}{\glsentryfull{nn}} in
+\|\mathbf{y} - \mathbf{p}_i\|_2$ is the \glslink{nn}{\glsentryfull{nn}} in
 the reference cloud $\mathcal{P}$.
 Note that $\mathcal{D}(\mathbf{y}) \geq 0$ for all $\mathbf{y}$, making
 this an \emph{unsigned distance function}, as opposed to
@@ -1458,6 +1403,130 @@ variant achieves this only on average, with worst-case $O(N_d)$ under
 hash collision, mitigated by the post-propagation rehash discussed previously.
 
 \input{tables/distance-maps/variants.tex}
+
+\subsection{Problem formulation}
+\label{sec:distance-maps:alignment:problem}
+
+Let $\mathbf{z}_i\in\mathbb{R}^2$, $i = 1, \dots, M$, represent
+the 2D~point measurements from the moving (current) point cloud.
+Similarly to the reference cloud $\mathcal{P}$, the moving cloud is also
+acquired by a 2D~laser scanner and expressed in the sensor coordinate frame.
+The goal of 2D~point cloud registration is to find the robot pose
+$\mathbf{x} \in SE(2)$ that best aligns the moving cloud to the reference cloud.
+The robot pose is represented as a homogeneous transformation on the $SE(2)$
+manifold, as formulates in \eqref{eq:distance-maps:alignment:problem:x:pose},
+where $\mathbf{R}(\theta) \in SO(2)$ is the 2D orthonormal rotation matrix
+(see \eqref{eq:distance-maps:alignment:problem:x:rotation}) and
+$\mathbf{t} = (t_x, t_y)^T \in \mathbb{R}^2$ is the translation vector.
+\begin{equation}
+\label{eq:distance-maps:alignment:problem:x:pose}
+\mathbf{x} = \left[\mathbf{R} \mid \mathbf{t}\right] \in SE(2)
+\end{equation}
+\begin{equation}
+\label{eq:distance-maps:alignment:problem:x:rotation}
+\mathbf{R}(\theta) =
+\begin{bmatrix} r_{1,1} & r_{1,2} \\ r_{2,1} & r_{2,2} \end{bmatrix} =
+\begin{bmatrix} \cos(\theta) & -\sin(\theta) \\ \sin(\theta) & \cos(\theta) \end{bmatrix} \in SO(2)
+\end{equation}
+
+Furthermore, let $\mathbf{T}_S^R \in SE(2)$ denote the known rigid-body
+transformation of the sensor \gls{wrt} the robot frame (the extrinsic
+calibration of the laser scanner), as formulated in
+\eqref{eq:distance-maps:alignment:problem:sensor}. Then,
+\eqref{eq:distance-maps:alignment:problem:sensor:inv} formulates the inverse
+transformation for the extrinsic parameters of the sensor ($\mathbf{T}_R^S$).
+As a result, the moving point $\mathbf{z}_i$ expressed in the robot frame is
+formulated by \eqref{eq:distance-maps:alignment:problem:moving-pt:robot}, while
+the same point transformed by the current pose estimate $\mathbf{x}$ is defined
+by \eqref{eq:distance-maps:alignment:problem:moving-pt:projected}.
+\begin{equation}
+\label{eq:distance-maps:alignment:problem:sensor}
+\mathbf{T}_S^R = \left[\mathbf{R}_S^R \mid \mathbf{t}_S^R\right] \in SE(2)
+\end{equation}
+\begin{equation}
+\label{eq:distance-maps:alignment:problem:sensor:inv}
+\mathbf{T}_R^S =
+\left[\mathbf{R}_R^S \mid \mathbf{t}_R^S\right] =
+\left[{\mathbf{R}_S^R}^T \mid -{\mathbf{R}_S^R}^T\mathbf{t}_S^R\right]
+\in SE(2)
+\end{equation}
+\begin{equation}
+\label{eq:distance-maps:alignment:problem:moving-pt:robot}
+\mathbf{z}_{R,i} = \mathbf{T}_S^R \mathbf{z}_i
+\end{equation}
+\begin{equation}
+\label{eq:distance-maps:alignment:problem:moving-pt:projected}
+\tilde{\mathbf{z}}_{R,i} = \mathbf{x}_R \mathbf{T}_S^R \mathbf{z}_i
+\end{equation}
+
+Since the optimization variable $\mathbf{x}$ lives on the $SE(2)$ manifold,
+incremental updates cannot be performed by simple Euclidean addition,
+as discussed in \secref{sec:distance-maps:background:least-squares:manifold}.
+A perturbation
+$\Delta\mathbf{x} = (\Delta x, \Delta y, \Delta\theta)^T \in \mathbb{R}^3$ is
+defined in the tangent (Euclidean) space with the exponential and logarithmic
+mappings defined as
+\eqref{eq:distance-maps:alignment:problem:x:exp} and
+\eqref{eq:distance-maps:alignment:problem:x:log}, respectively.
+Consequently, the manifold update between Gauss-Newton iterations adopt a
+right-sided perturbation update defined in
+\eqref{eq:distance-maps:alignment:problem:gauss-newton:addition}, with the
+corresponding inverse (distance) operation as formulated by
+\eqref{eq:distance-maps:alignment:problem:gauss-newton:subtraction}.
+\begin{equation}
+\label{eq:distance-maps:alignment:problem:x:exp}
+\exp\!\left(\Delta\mathbf{x}\right) =
+\left[\mathbf{R}(\Delta\theta) \mid (\Delta x, \Delta y)^T \right] \in SE(2)
+\end{equation}
+\begin{equation}
+\label{eq:distance-maps:alignment:problem:x:log}
+\log(\mathbf{x})_{\mathbf{x} \in SE(2)} =
+    \left(t_x,t_y,\atan2\!\left(r_{2,1},\, r_{1,1}\right)\right)^T
+    \in \mathbb{R}^3
+\end{equation}
+\begin{equation}
+\label{eq:distance-maps:alignment:problem:gauss-newton:addition}
+\mathbf{x}_{k+1} = \mathbf{x}_k \oplus \Delta\mathbf{x}
+                 = \mathbf{x}_k \cdot \exp\!\left(\Delta\mathbf{x}\right)
+\end{equation}
+\begin{equation}
+\label{eq:distance-maps:alignment:problem:gauss-newton:subtraction}
+\Delta\mathbf{x} = \mathbf{x}_1 \ominus \mathbf{x}_2
+                 = \log\!\left(\mathbf{x}_1^{-1}\, \mathbf{x}_2\right)^\vee
+\end{equation}
+
+Lastly, the cross-product matrix (hat operator) in 3D maps a vector
+$\mathbf{v} \in \mathbb{R}^3$ to a $3\times 3$ skew-symmetric matrix and gives
+the rotational sensitivity of a rotated vector. In 2D, an analogous operator
+is defined for a vector $\mathbf{v} = (v_x, v_y)^T \in \mathbb{R}^2$, as shown
+in \eqref{eq:distance-maps:alignment:problem:skew}.
+\begin{equation}
+\label{eq:distance-maps:alignment:problem:skew}
+\lfloor \mathbf{v} \rfloor =
+\left.\frac{\partial\mathbf{R}(\theta)\mathbf{v}}{\partial \theta}
+\right|_{\theta=0} =
+\begin{bmatrix} 0 & -1 \\ 1 & \phantom{-}0 \end{bmatrix} \cdot \mathbf{v} =
+\begin{pmatrix} -v_y \\ v_x \end{pmatrix}
+\end{equation}
+
+Intuitively, $\lfloor \mathbf{v} \rfloor$ is the 90\textdegree{}
+counter-clockwise rotation of $\mathbf{v}$, \ie\ the instantaneous velocity of
+$\mathbf{v}$ under an infinitesimal positive rotation. This skew operator
+appears in all Jacobian matrices of the 2D~point cloud registration problem
+derived in \secref{sec:distance-maps:alignment}, corresponding to the column
+associated with the rotational degree of freedom $\Delta\theta$ of
+the perturbation $\Delta\mathbf{x}$.
+
+\subsection{Point-to-point error formulation}
+\label{sec:distance-maps:alignment:pt2pt}
+
+\subsubsection{Jacobian matrix via right-sided perturbation}
+
+\subsection{Point-to-plane error formulation}
+\label{sec:distance-maps:alignment:pt2pl}
+
+\subsubsection{Jacobian matrix via right-sided perturbation}
+\subsubsection{Normals estimation}
 
 \section{Distance Maps}\label{sec:distance-maps}
 
