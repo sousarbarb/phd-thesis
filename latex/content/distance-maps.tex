@@ -1,6 +1,33 @@
-\chapter{Data Registration with Distance Maps}\label{chap:distance-maps}
+\chapter{Point Cloud Registration with Distance Maps}\label{chap:distance-maps}
 
-\todo{TBC}
+This chapter presents a novel approach for 2D~point cloud registration
+using distance maps, developed within the scope of this PhD~Thesis
+in collaboration with Prof.~Dr.~Giorgio~Grisetti from
+Sapienza Università di Roma.
+Distance maps encode the Euclidean distance to the nearest reference point
+at every cell of a precomputed discrete grid, decoupling data association
+from the iterative optimization loop.
+By replacing the explicit nearest-neighbour search performed at every
+iteration of classical
+\glslink{icp}{\glsentryfull{icp}}~\cite{besl-mckay:tpami:1992,chen-medioni:icra:1991}
+with a constant-time grid lookup on distance map-based data structures,
+the proposed formulation provides both point-to-point and point-to-plane error
+formulations compatible with Gauss-Newton optimization on the $SE(2)$ manifold.
+The proposed approach does not require explicit data association at each iteration.
+
+This chapter is organized as follows.
+\secref{sec:distance-maps:background} surveys the relevant background,
+covering point cloud registration methods from the literature and
+the non-linear least-squares framework used throughout this work.
+\secref{sec:distance-maps:alignment} formulates the proposed approach,
+introducing the distance map representation and associated data structures,
+the registration problem on the $SE(2)$ manifold, and both
+point-to-point and point-to-plane error formulations with their Jacobians.
+\secref{sec:distance-maps:results} presents experimental results on
+synthetic and real-world data, evaluating registration accuracy and
+computational performance.
+Lastly, \secref{sec:distance-maps:conclusions} summarizes the main
+conclusions and directions for future work.
 
 \section{Background}\label{sec:distance-maps:background}
 
