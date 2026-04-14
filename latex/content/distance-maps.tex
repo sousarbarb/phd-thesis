@@ -1799,49 +1799,196 @@ retrieved at $O(1)$ cost from the $\mathcal{M}_2$ representation discussed in
 \secref{sec:distance-maps:alignment:dmaps:representation}.
 
 \subsubsection{Normals estimation}
+\label{sec:distance-maps:alignment:pt2pl:normals}
 
-\section{Distance Maps}\label{sec:distance-maps}
+Surface normals $\mathbf{n}_{z_i} \in \mathbb{R}^2$ are estimated
+on the moving point cloud prior to the registration optimization in the scope
+of this PhD~Thesis. This precomputation is performed once per scan,
+independently of the iterative Gauss-Newton solver.
+Since a 2D laser scanner produces an angular-ordered sequence of range
+measurements, the moving cloud $\{\mathbf{z}_i\}_{i=1}^{M}$ constitutes a
+1D-organized array of range observations in the sensor frame, where the $i$-th
+range encodes spatial adjacency along the scan arc.
+The normal estimation exploits this ordering to collect a spatially coherent
+local neighborhood for each point, as described below.
 
-TBC (unsigned distance map structure,
-types of distance map formulations -- only NN, NN + distance,
-NN + 1st derivative, NN + 1st and 2nd derivative).
+\paragraph{Radius neighborhood search}
+For each point $\mathbf{z}_i$, the neighborhood $\mathcal{N}_r(\mathbf{z}_i)$
+is formed by collecting all points $\mathbf{z}_j$ whose Euclidean distance to
+$\mathbf{z}_i$ does not exceed the radius $r > 0$ (m), as formulated in
+\eqref{eq:distance-maps:alignment:pt2pl:normals:neighbourhood}.
+Rather than a kd-tree search~\cite{bentley:cacm:1975} in the 2D~point cloud,
+the 1D~organization of the scan is exploited:
+indices are traversed in both directions from $i$ along the ordered
+scan sequence, wrapping circularly at the scan boundaries to handle
+360\textdegree{} sensors, and halted when the Euclidean distance to
+$\mathbf{z}_i$ exceeds $r$.
+\begin{equation}
+\label{eq:distance-maps:alignment:pt2pl:normals:neighbourhood}
+\mathcal{N}_r(\mathbf{z}_i) =
+\left\{\mathbf{z}_j \mid \| \mathbf{z}_j - \mathbf{z}_i\| _2 \leq r \right\}
+\end{equation}
 
-\section{Data Registration}\label{sec:distance-maps:data-registration}
+If the cardinality $|\mathcal{N}_r(\mathbf{z}_i)|$ falls below a minimum
+threshold $N_{\min} \geq 3$, the neighborhood is deemed insufficient for a
+reliable normal estimate. With fewer than three points, the $2\times 2$
+covariance matrix $\mathbf{C}_i$ is at most rank-1, and its eigen-decomposition
+does not yield a geometrically valid surface normal direction.
+In such cases, the normal $\mathbf{n}_{z_i}$ is set to zero, marking the point
+as invalid for the point-to-plane error term.
 
-TBC
+\paragraph{Covariance-based normal estimation via \glslink{pca}{\glsentryfull{pca}}}
+For each valid neighborhood $\mathcal{N}_r(\mathbf{z}_i)$, the $2\times2$
+covariance matrix $\mathbf{C}_i$ is computed as formulated in
+\eqref{eq:distance-maps:alignment:pt2pl:normals:covariance}, where
+$N_i = |\mathcal{N}_r(\mathbf{z}_i)|$ and $\bar{\mathbf{z}}_i$ is the sample
+mean. This formulation admits a single-pass accumulation of
+$\sum \mathbf{z}_j \mathbf{z}_j^T$ and $\sum \mathbf{z}_j$ without storing the
+neighborhood explicitly, and is equivalent to the standard population covariance.
+\begin{equation}
+\label{eq:distance-maps:alignment:pt2pl:normals:covariance}
+\bar{\mathbf{z}}_i =
+\frac{1}{N_i}
+\sum_{\mathbf{z}_j \in \mathcal{N}_r(\mathbf{z}_i)} \mathbf{z}_j,
+\quad
+\mathbf{C}_i =
+% \left(
+  \frac{1}{N_i}
+  \sum_{\mathbf{z}_j \in \mathcal{N}_r(\mathbf{z}_i)}
+  \mathbf{z}_j \mathbf{z}_j^T
+% \right)
+- \bar{\mathbf{z}}_i \bar{\mathbf{z}}_i^T
+\in \mathbb{R}^{2 \times 2}
+\end{equation}
 
-\subsection{Least-squares on manifolds}
+Since $\mathbf{C}_i$ is real symmetric and positive semi-definite, its
+eigen-decomposition yields two orthogonal eigenvectors. The eigenvector
+$\mathbf{v}_{\min}$ associated with the smallest eigenvalue $\lambda_{\min}$
+corresponds to the direction of least variance within
+$\mathcal{N}_r(\mathbf{z}_i)$, which is the local surface normal direction,
+as given by \eqref{eq:distance-maps:alignment:pt2pl:normals:eigenvector}.
+\begin{equation}
+\label{eq:distance-maps:alignment:pt2pl:normals:eigenvector}
+\mathbf{n}_{z_i} = \pm\mathbf{v}_{\min},
+\quad
+\lambda_{\min} = \min\!\left(\lambda_1, \lambda_2\right),
+\quad
+\mathbf{C}_i\,\mathbf{v}_{\min} = \lambda_{\min}\,\mathbf{v}_{\min}
+\end{equation}
 
-TBC
-
-\subsection{Optimization algorithm}
-\subsection{Covariance estimation}
-
-\subsection{Problem formulation -- point-to-point error formulation}
-
-TBC
-
-\subsubsection{State space}
-\subsubsection{Measurement space}
-\subsubsection{Prediction function}
-\subsubsection{Error function}
-
-\subsection{Problem formulation -- point-to-plane error formulation}
-
-TBC
-
-\subsubsection{State space}
-\subsubsection{Measurement space}
-\subsubsection{Prediction function}
-\subsubsection{Error function}
+\paragraph{Normal orientation}
+The eigenvector $\mathbf{v}_{\min}$ is defined only up to a sign ambiguity.
+To ensure a consistent orientation convention, the normal is flipped so that
+it points toward the sensor origin, \ie\ so that
+$\mathbf{n}_{z_i}^T \mathbf{z}_i \leq 0$, as formulated in
+\eqref{eq:distance-maps:alignment:pt2pl:normals:orientation}.
+This convention reflects the fact that, for a 2D laser scanner, surface normals
+on obstacle boundaries consistently face the sensor.
+\begin{equation}
+\label{eq:distance-maps:alignment:pt2pl:normals:orientation}
+\mathbf{n}_{z_i} \leftarrow
+\begin{cases}
+-\mathbf{v}_{\min} & \text{if } \mathbf{v}_{\min}^T \mathbf{z}_i > 0, \\
+\phantom{-}\mathbf{v}_{\min} & \text{otherwise.}
+\end{cases}
+\end{equation}
 
 \section{Experimental Results and Discussion}\label{sec:distance-maps:results}
 
-TBC
+% Brief introductory paragraph: state the four methods being compared,
+% the two evaluation axes (accuracy/covariance and odometry drift),
+% and forward-reference the subsections.
 
-\subsection{Alignment results}
-\subsection{Covariance estimation}
-\subsection{Computation performance}
+\subsection{Synthetic benchmarks}
+\label{sec:distance-maps:results:synthetic}
+
+% Describe the four synthetic environments: square, circle, corridor,
+% random. One sentence each on why each geometry is informative —
+% especially corridor as the degenerate case.
+%
+% Pose accuracy: report mean/std of translation and rotation error
+% across N trials (with noise model described here) for each method
+% and geometry. A table with methods as columns and geometries as rows
+% works well.
+%
+% Information matrix eigenanalysis: for each geometry, show the dominant
+% eigenvectors of the information matrix from the Gauss-Newton solver.
+% Compare across the four methods. The corridor case is the key result:
+% discuss which method(s) correctly identify the degenerate direction
+% and whether the near-zero eigenvalue is consistent.
+%
+% Keep point-to-point random environment results here; note it is the
+% only geometry evaluated for that case and explain why (isotropy
+% argument, or lack of sufficient structure for point-to-plane).
+
+\subsection{Real-world laser odometry evaluation}
+\label{sec:distance-maps:results:iilabs3d}
+
+% Dataset description: IILABS3D, OptiTrack ground truth, sensor setup,
+% environment characteristics (indoor, structured, corridor-heavy?).
+% Cite the dataset paper if available.
+%
+% Evaluation protocol: frame-splitting criterion (distance threshold?
+% angle threshold? fixed stride?), scan-to-scan odometry, EVO framework.
+% State which EVO metrics are reported (APE, RPE — translation and
+% rotation separately).
+%
+% Results: one table with methods as columns, EVO metrics as rows.
+% If sequences vary significantly, consider one table per sequence or
+% a multi-row table with sequence as an additional grouping.
+%
+% Brief per-method commentary on drift behaviour; save deeper
+% cross-method interpretation for \subsecref{...}{discussion}.
+
+\subsection{Computational performance}
+\label{sec:distance-maps:results:computational}
+
+% Three-axis evaluation: (1) map construction time, (2) per-query
+% lookup time, (3) total registration time per scan pair.
+% Compare across the three data structure variants: Nano (M0, dense),
+% Standard (M1/M2, dense), Sparse (M1/M2, hash-table).
+%
+% State hardware and compiler settings (CPU model, -O2/-O3, etc.)
+% for reproducibility.
+%
+% A table with data structures as rows and the three timing axes as
+% columns is natural here. If map size varies, report as a function
+% of grid resolution or point count.
+%
+% Memory consumption can be added as a fourth column; it connects back
+% to the complexity table already in the computation section.
+%
+% Note any non-obvious interaction: e.g. Sparse may win on memory for
+% large, mostly-empty environments but lose on lookup latency due to
+% hash collisions.
+
+\subsection{Discussion}
+\label{sec:distance-maps:results:discussion}
+
+% Cross-cutting interpretation that cannot be said cleanly inside any
+% single preceding subsection.
+%
+% Point-to-point vs point-to-plane: when does the surface normal
+% information in p2plane yield measurably better accuracy or
+% covariance? Does the advantage persist in real data or only
+% in synthetic environments with clean normals?
+%
+% ICP with M0 association vs full distance-map formulation: is the
+% data-association improvement from M0 sufficient, or does the
+% closed-form gradient/Hessian from the distance map give additional
+% gains beyond better correspondences?
+%
+% Covariance reliability: do the dominant eigenvectors from the
+% information matrix reflect the true uncertainty directions
+% (validated against the synthetic ground truth)? Implications for
+% downstream fusion (e.g. pose-graph SLAM).
+%
+% Sparse data structure trade-offs: in what regime (environment size,
+% map density) does Sparse beat Standard, and vice versa?
+%
+% Limitations and failure modes: mention scenarios where the distance
+% map formulation underperforms (e.g. dynamic environments, very
+% sparse scans).
 
 \section{Summary and Conclusions}\label{sec:distance-maps:conclusions}
 
