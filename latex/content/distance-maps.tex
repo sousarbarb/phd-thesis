@@ -1607,14 +1607,14 @@ onto the reference sensor coordinate frame $S$. Let
 $\tilde{\mathbf{z}}_i = \mathbf{T}_R^S \mathbf{x} \mathbf{T}_S^R \mathbf{z}_i
 \in \mathbb{R}^2$ denote the moving point transformed by the current pose
 estimate $\mathbf{x}$ and expressed in the reference sensor frame $S$.
-The point-to-point scalar residual $e_i(\mathbf{x})\in\mathbb{R}$ is
+The point-to-point scalar residual $e_i^{\mathrm{p2p}}(\mathbf{x})\in\mathbb{R}$ is
 then given by \eqref{eq:distance-maps:alignment:pt2pt:error}.
 This scalar residual measures the Euclidean distance from the transformed moving
 point $\tilde{\mathbf{z}}_i$ to its nearest reference point in $\mathcal{P}$,
 as encoded by the precomputed distance map $\mathcal{D}$.
 \begin{equation}
 \label{eq:distance-maps:alignment:pt2pt:error}
-e_i(\mathbf{x}) =
+e_i^{\mathrm{p2p}}(\mathbf{x}) =
 \mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right) =
 \mathcal{D}\!\left(\mathbf{T}_R^S \cdot \mathbf{x} \cdot \mathbf{T}_S^R \mathbf{z}_i\right) \in \mathbb{R}
 \end{equation}
@@ -1629,7 +1629,7 @@ the perturbed error for the proposed point-point error formulation based on
 distance maps is given by \eqref{eq:distance-maps:alignment:pt2pt:perturbed}.
 \begin{equation}
 \label{eq:distance-maps:alignment:pt2pt:perturbed}
-e_i\!\left(\mathbf{x} \oplus \mathbf{\Delta x}\right) =
+e_i^{\mathrm{p2p}}\!\left(\mathbf{x} \oplus \mathbf{\Delta x}\right) =
 \mathcal{D}\!\left(
   \mathbf{T}_R^S \cdot \mathbf{x} \cdot \exp\!\left(\mathbf{\Delta x}\right)
   \cdot \mathbf{T}_S^R\,\mathbf{z}_i
@@ -1659,7 +1659,7 @@ defined in \eqref{eq:distance-maps:alignment:problem:skew}.
 \begin{equation}
 \label{eq:distance-maps:alignment:pt2pt:jacobian}
 \mathbf{J}_i^{\mathrm{p2p}} =
-\left.\frac{\partial e_i\!\left(\mathbf{x} \oplus \mathbf{\Delta x}\right)}
+\left.\frac{\partial e_i^{\mathrm{p2p}}\!\left(\mathbf{x} \oplus \mathbf{\Delta x}\right)}
            {\partial \mathbf{\Delta x}}\right|_{\mathbf{\Delta x}=\mathbf{0}}
 = \bm{\nabla}\mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right)^T \cdot
   \underbrace{
@@ -1704,15 +1704,15 @@ $\hat{\bm{\nabla}}\mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right)
 \cdot \mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right)$
 recovers the displacement vector from the projected moving point
 $\tilde{\mathbf{z}}_i$ to its nearest reference point in $\mathcal{P}$.
-The point-to-plane error $e_i(\mathbf{x})$ projects this displacement onto
+The point-to-plane error $e_i^{\mathrm{p2pl}}(\mathbf{x})$ projects this displacement onto
 the surface normal rotated to the reference sensor frame, as formulated in
 \eqref{eq:distance-maps:alignment:pt2pl:error}.
 \begin{equation}
 \label{eq:distance-maps:alignment:pt2pl:error}
-e_i(\mathbf{x}) =
-\left(\mathbf{R}(\theta)\,\mathbf{n}_{z_i}\right)^T
-\hat{\bm{\nabla}}\mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right)
-\,\mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right)
+e_i^{\mathrm{p2pl}}(\mathbf{x}) =
+\left(\mathbf{R}(\theta)\,\mathbf{n}_{z_i}\right)^T \cdot
+\hat{\bm{\nabla}}\mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right) \cdot
+\mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right)
 \end{equation}
 
 The normal $\mathbf{n}_{z_i}$ is expressed in the sensor frame of
@@ -1724,6 +1724,80 @@ $\mathbf{R}_R^S\,\mathbf{R}(\theta)\,\mathbf{R}_S^R =
 and \eqref{eq:distance-maps:alignment:pt2pl:error} follows directly.
 
 \subsubsection{Jacobian matrix via right-sided perturbation}
+\label{sec:distance-maps:alignment:pt2pl:jacobian}
+
+Applying the right-sided perturbation
+$\mathbf{x} \oplus \mathbf{\Delta x} = \mathbf{x} \cdot \exp(\mathbf{\Delta x})$
+as defined in \eqref{eq:distance-maps:alignment:problem:gauss-newton:addition},
+the perturbed error on the proposed point-to-plane formulation is given by
+\eqref{eq:distance-maps:alignment:pt2pl:perturbed},
+where $\tilde{\mathbf{z}}_i' =
+\mathbf{T}_R^S\,\mathbf{x}\,\exp(\mathbf{\Delta x})\,\mathbf{T}_S^R\,\mathbf{z}_i$
+is the perturbed projected point.
+\begin{equation}
+\label{eq:distance-maps:alignment:pt2pl:perturbed}
+e_i^{\mathrm{p2pl}}\!\left(\mathbf{x} \oplus \mathbf{\Delta x}\right) =
+\left(\mathbf{R}(\theta) \mathbf{R}(\Delta\theta)
+\mathbf{n}_{z_i}\right)^T \cdot
+\hat{\bm{\nabla}}\mathcal{D}\!\left(\tilde{\mathbf{z}}_i'\right) \cdot
+\mathcal{D}\!\left(\tilde{\mathbf{z}}_i'\right)
+\end{equation}
+
+When differentiating \gls{wrt} $\mathbf{\Delta x}$ at
+$\mathbf{\Delta x} = \mathbf{0}$,
+the product rule yields three additive contributions to the $1 \times 3$
+Jacobian $\mathbf{J}_i^{\mathrm{p2pl}}$, as formulated in
+\eqref{eq:distance-maps:alignment:pt2pl:jacobian}.
+The first term accounts for the rotation of the normal under the perturbation
+$\Delta\theta$.
+The second and third terms account for the change in the gradient direction and
+the change in the distance value, respectively, as the projected point moves
+under $\mathbf{\Delta x}$. Both terms share the factor
+$\mathbf{J}_i^{\mathrm{p2p,ICP}} \in \mathbb{R}^{2\times3}$ defined in
+\eqref{eq:distance-maps:alignment:pt2pt:jacobian}.
+\begin{equation}
+\begin{aligned}
+\label{eq:distance-maps:alignment:pt2pl:jacobian}
+\mathbf{J}_i^{\mathrm{p2pl}} =
+\left.\frac{\partial e_i^{\mathrm{p2pl}}\!\left(\mathbf{x} \oplus \mathbf{\Delta x}\right)}
+           {\partial \mathbf{\Delta x}}\right|_{\mathbf{\Delta x}=\mathbf{0}}
+& =
+\underbrace{
+  \mathbf{n}_{z_i}^{T}
+  \left(\mathbf{0}_{2\times2} \mid
+    \left\lfloor \mathbf{R}(\theta)^T \cdot
+      \hat{\bm{\nabla}}\mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right) \cdot
+      \mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right)
+    \right\rfloor
+  \right)
+}_{\text{rotation of the normal}}
+\\
+&\quad+
+\underbrace{
+  \left(\mathbf{R}(\theta)\,\mathbf{n}_{z_i}\right)^T \cdot
+  \mathbf{H}_{\mathcal{D}}\!\left(\tilde{\mathbf{z}}_i\right) \cdot
+  \mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right) \cdot
+  \mathbf{J}_i^{\mathrm{p2p,ICP}}
+}_{\text{change in gradient direction}}
+\\
+&\quad+
+\underbrace{
+  \left(\mathbf{R}(\theta)\,\mathbf{n}_{z_i}\right)^T \cdot
+  \hat{\bm{\nabla}}\mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right) \cdot
+  \bm{\nabla}\mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right)^T \cdot
+  \mathbf{J}_i^{\mathrm{p2p,ICP}}
+}_{\text{change in distance value}}
+\end{aligned}
+\end{equation}
+
+The first term in \eqref{eq:distance-maps:alignment:pt2pl:jacobian} is non-zero
+only in the rotational column ($\Delta\theta$), since the translational
+perturbation does not rotate the normal. The second and third terms contribute
+to all three columns and require the precomputed Hessian
+$\mathbf{H}_{\mathcal{D}}$ and gradient $\bm{\nabla}\mathcal{D}$, both
+retrieved at $O(1)$ cost from the $\mathcal{M}_2$ representation discussed in
+\secref{sec:distance-maps:alignment:dmaps:representation}.
+
 \subsubsection{Normals estimation}
 
 \section{Distance Maps}\label{sec:distance-maps}
