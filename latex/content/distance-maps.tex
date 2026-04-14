@@ -1681,6 +1681,48 @@ level $\mathcal{M}_1$ or $\mathcal{M}_2$, as discussed in
 \subsection{Point-to-plane error formulation}
 \label{sec:distance-maps:alignment:pt2pl}
 
+Furthermore, we propose a point-to-plane variant for the distance map-based
+formulation of the 2D~point cloud registration problem.
+This variant  incorporates surface normal information to improve
+convergence in environments dominated by planar or locally smooth structures,
+analogously to the classical formulation of
+Chen and Medioni~\cite{chen-medioni:icra:1991}.
+Here, normals $\mathbf{n}_{z_i} \in \mathbb{R}^2$ are estimated
+on the moving point cloud in the sensor frame, as detailed in
+\secref{sec:distance-maps:alignment:pt2pl:normals}.
+
+Let $\hat{\bm{\nabla}}\mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right) =
+\bm{\nabla}\mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right) /
+\|\bm{\nabla}\mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right)\|_2$
+denote the normalized spatial gradient of the distance map at the projected
+point $\tilde{\mathbf{z}}_i$, obtained by normalizing the finite-difference
+gradient stored in $\mathcal{M}_1$ or $\mathcal{M}_2$ at query time or from
+the gradient's analytical expression when using the $\mathcal{M}_0$
+representation level (see \secref{sec:distance-maps:alignment:dmaps:derivation}).
+Then, the product
+$\hat{\bm{\nabla}}\mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right)
+\cdot \mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right)$
+recovers the displacement vector from the projected moving point
+$\tilde{\mathbf{z}}_i$ to its nearest reference point in $\mathcal{P}$.
+The point-to-plane error $e_i(\mathbf{x})$ projects this displacement onto
+the surface normal rotated to the reference sensor frame, as formulated in
+\eqref{eq:distance-maps:alignment:pt2pl:error}.
+\begin{equation}
+\label{eq:distance-maps:alignment:pt2pl:error}
+e_i(\mathbf{x}) =
+\left(\mathbf{R}(\theta)\,\mathbf{n}_{z_i}\right)^T
+\hat{\bm{\nabla}}\mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right)
+\,\mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right)
+\end{equation}
+
+The normal $\mathbf{n}_{z_i}$ is expressed in the sensor frame of
+the moving cloud and must be rotated to the reference sensor frame before
+the projection. Since all rotations in $SO(2)$ are planar and therefore
+commutative, the extrinsic calibration cancels itself,
+$\mathbf{R}_R^S\,\mathbf{R}(\theta)\,\mathbf{R}_S^R =
+{\mathbf{R}_S^R}^T\,\mathbf{R}_S^R\,\mathbf{R}(\theta) = \mathbf{R}(\theta)$,
+and \eqref{eq:distance-maps:alignment:pt2pl:error} follows directly.
+
 \subsubsection{Jacobian matrix via right-sided perturbation}
 \subsubsection{Normals estimation}
 
