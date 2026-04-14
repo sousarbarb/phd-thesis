@@ -1536,7 +1536,7 @@ by \eqref{eq:distance-maps:alignment:problem:moving-pt:projected}.
 \end{equation}
 \begin{equation}
 \label{eq:distance-maps:alignment:problem:moving-pt:projected}
-\tilde{\mathbf{z}}_{R,i} = \mathbf{x}_R \mathbf{T}_S^R \mathbf{z}_i
+\tilde{\mathbf{z}}_{R,i} = \mathbf{x} \mathbf{T}_S^R \mathbf{z}_i
 \end{equation}
 
 Since the optimization variable $\mathbf{x}$ lives on the $SE(2)$ manifold,
@@ -1561,7 +1561,7 @@ corresponding inverse (distance) operation, as formulated in
 \begin{equation}
 \label{eq:distance-maps:alignment:problem:x:log}
 \log(\mathbf{x})_{\mathbf{x} \in SE(2)} =
-    \left(t_x,t_y,\atan2\!\left(r_{2,1},\, r_{1,1}\right)\right)^T
+    \left(t_x,t_y,\atan2\!\left(r_{2,1}, r_{1,1}\right)\right)^T
     \in \mathbb{R}^3
 \end{equation}
 \begin{equation}
@@ -1572,7 +1572,7 @@ corresponding inverse (distance) operation, as formulated in
 \begin{equation}
 \label{eq:distance-maps:alignment:problem:gauss-newton:subtraction}
 \mathbf{\Delta x} = \mathbf{x}_1 \ominus \mathbf{x}_2
-                 = \log\!\left(\mathbf{x}_1^{-1}\, \mathbf{x}_2\right)^\vee
+                 = \log\!\left(\mathbf{x}_1^{-1} \mathbf{x}_2\right)^\vee
 \end{equation}
 
 Lastly, the cross-product matrix (hat operator) in 3D maps a vector
@@ -1604,9 +1604,9 @@ In terms of defining the error, first,
 we propose a point-to-point error defined as the scalar value returned by
 the distance map when the transformed moving point $\mathbf{z}_i$ is projected
 onto the reference sensor coordinate frame $S$. Let
-$\tilde{\mathbf{z}}_i = \mathbf{T}_R^S \mathbf{x}_R \mathbf{T}_S^R \mathbf{z}_i
+$\tilde{\mathbf{z}}_i = \mathbf{T}_R^S \mathbf{x} \mathbf{T}_S^R \mathbf{z}_i
 \in \mathbb{R}^2$ denote the moving point transformed by the current pose
-estimate $\mathbf{x}_R$ and expressed in the reference sensor frame $S$.
+estimate $\mathbf{x}$ and expressed in the reference sensor frame $S$.
 The point-to-point scalar residual $e_i(\mathbf{x})\in\mathbb{R}$ is
 then given by \eqref{eq:distance-maps:alignment:pt2pt:error}.
 This scalar residual measures the Euclidean distance from the transformed moving
@@ -1616,10 +1616,67 @@ as encoded by the precomputed distance map $\mathcal{D}$.
 \label{eq:distance-maps:alignment:pt2pt:error}
 e_i(\mathbf{x}) =
 \mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right) =
-\mathcal{D}\!\left(\mathbf{T}_R^S \mathbf{x}_R \mathbf{T}_S^R \mathbf{z}_i\right)
+\mathcal{D}\!\left(\mathbf{T}_R^S \cdot \mathbf{x} \cdot \mathbf{T}_S^R \mathbf{z}_i\right) \in \mathbb{R}
 \end{equation}
 
 \subsubsection{Jacobian matrix via right-sided perturbation}
+\label{sec:distance-maps:alignment:pt2pt:jacobian}
+
+Applying a right-sided perturbation
+$\mathbf{x} \oplus \mathbf{\Delta x} = \mathbf{x} \cdot \exp(\mathbf{\Delta x})$
+as defined in \eqref{eq:distance-maps:alignment:problem:gauss-newton:addition},
+the perturbed error for the proposed point-point error formulation based on
+distance maps is given by \eqref{eq:distance-maps:alignment:pt2pt:perturbed}.
+\begin{equation}
+\label{eq:distance-maps:alignment:pt2pt:perturbed}
+e_i\!\left(\mathbf{x} \oplus \mathbf{\Delta x}\right) =
+\mathcal{D}\!\left(
+  \mathbf{T}_R^S \cdot \mathbf{x} \cdot \exp\!\left(\mathbf{\Delta x}\right)
+  \cdot \mathbf{T}_S^R\,\mathbf{z}_i
+\right)
+\end{equation}
+
+Then, the $1 \times 3$ Jacobian matrix $\mathbf{J}_i^{\mathrm{p2p}}$ is obtained
+by differentiating \eqref{eq:distance-maps:alignment:pt2pt:perturbed} \gls{wrt}
+$\mathbf{\Delta x}$ via the chain rule, evaluating at
+$\mathbf{\Delta x} = \mathbf{0}$, as formulated in
+\eqref{eq:distance-maps:alignment:pt2pt:jacobian}.
+The chain rule decomposes the derivative into two factors.
+The first is the spatial gradient
+$\bm{\nabla}\mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right)^T \in
+\mathbb{R}^{1 \times 2}$ over the distance map, evaluated at the projected point
+$\tilde{\mathbf{z}}_i$ (see \eqref{eq:distance-maps:alignment:pt2pt:error}).
+The second is the Jacobian of $\tilde{\mathbf{z}}_i$ \gls{wrt}
+$\mathbf{\Delta x}$ at $\mathbf{\Delta x} = \mathbf{0}$, denoted
+$\mathbf{J}_i^{\mathrm{p2p},\mathrm{ICP}} \in \mathbb{R}^{2 \times 3}$
+and defined by the underbrace in
+\eqref{eq:distance-maps:alignment:pt2pt:jacobian}.
+This second factor coincides with the Jacobian of the classical
+point-to-point \gls{icp} error, where
+$\mathbf{z}_{R,i} = \mathbf{T}_S^R\,\mathbf{z}_i$ is the moving point
+expressed in the robot frame and $\lfloor\cdot\rfloor$ is the 2D skew operator
+defined in \eqref{eq:distance-maps:alignment:problem:skew}.
+\begin{equation}
+\label{eq:distance-maps:alignment:pt2pt:jacobian}
+\mathbf{J}_i^{\mathrm{p2p}} =
+\left.\frac{\partial e_i\!\left(\mathbf{x} \oplus \mathbf{\Delta x}\right)}
+           {\partial \mathbf{\Delta x}}\right|_{\mathbf{\Delta x}=\mathbf{0}}
+= \bm{\nabla}\mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right)^T \cdot
+  \underbrace{
+    \mathbf{R}_R^S \mathbf{R}(\theta)
+    \cdot \left(\mathbf{I}_{2\times2} \mid \lfloor\mathbf{z}_{R,i}\rfloor\right)
+  }_{\mathbf{J}_i^{\mathrm{p2p},\mathrm{ICP}}}
+\in \mathbb{R}^{1\times3}
+\end{equation}
+
+The translational columns of $\mathbf{J}_i^{\mathrm{p2p}}$, associated with
+$\Delta x$ and $\Delta y$, arise from the identity block $\mathbf{I}_{2\times2}$,
+while the rotational column, associated with $\Delta\theta$, arises from
+$\lfloor\mathbf{z}_{R,i}\rfloor$.
+The spatial gradient $\bm{\nabla}\mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right)$
+is retrieved at $O(1)$ cost from the precomputed distance map at representation
+level $\mathcal{M}_1$ or $\mathcal{M}_2$, as discussed in
+\secref{sec:distance-maps:alignment:dmaps:representation}.
 
 \subsection{Point-to-plane error formulation}
 \label{sec:distance-maps:alignment:pt2pl}
