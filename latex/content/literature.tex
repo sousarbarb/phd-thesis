@@ -11,10 +11,11 @@ chapter's discussion. While this chapter adopts a similar systematic
 methodology, the discussion focuses on the scope of this PhD~Thesis, namely,
 how the literature addresses scene dynamics in
 localization and mapping processes. As a result,
-this chapter extends the discussion of dynamics modelling presented in
-the review article~\cite{sousa:jfr:2023} and updates the results of the
-latest full search inquiry to scientific databases, yielding an analysis of
-53~studies, compared with the 32~originally covered in the review.
+this chapter extends the discussion of dynamics modelling
+presented in the review~\cite{sousa:jfr:2023} and updates the
+results of the search inquiry to scientific databases,
+yielding an analysis of 53~studies, compared with the 32~originally
+covered in that review related to dynamics modelling.
 
 Hence, this chapter is divided into four sections.
 First, \secref{sec:literature:slam} formulates the traditional \gls{slam}
@@ -66,8 +67,8 @@ given the goal to compute a posterior over the entire path ($x_{1:t}$)
 along with the map, as formulated in \ref{eq:literature:slam:full},
 instead of just the current pose ($x_t$).
 The difference between online and full \gls{slam} is
-that the former results in an integration of the past poses
-from the full \gls{slam} problem~\cite{thrun:book:2005}.
+that the former is obtained by marginalizing out the past poses
+($x_{1:t-1}$) from the full \gls{slam} posterior~\cite{thrun:book:2005}.
 \begin{equation}\label{eq:literature:slam:online}
 p\left(x_t,m \;\vert\; z_{1:t},u_{1:t}\right)
 \end{equation}
@@ -84,13 +85,18 @@ p\left(x_{1:t},m \;\vert\; z_{1:t},u_{1:t}\right)
   \label{fig:literature:slam:full}}
   \caption[Graphical model of the \glsentryfull{slam} problem]{%
   Graphical model of the \glslink{slam}{\glsentryfull{slam}} problem:
-  (a) online SLAM; (b) full SLAM~\cite{thrun:book:2005}.}
+  (a) online SLAM; (b) full SLAM~\cite{thrun:book:2005}.
+  Light gray circles represent observed inputs (measurements~$z_{1:t}$
+  and control variables~$u_{1:t}$), while nodes enclosed in a rounded
+  rectangle indicate the jointly estimated variables: in~(a), only the
+  current pose~$x_t$ and the map~$m$; in~(b), the entire
+  trajectory~$x_{1:t}$ alongside the map~$m$.}
   \label{fig:literature:slam}
 \end{figure}
 
-In the case of the algorithm also estimating correspondences
+In the case of the algorithm requiring correspondences
 between measurements and map landmarks,
-the explicit inclusion of the correspondence variables ($c_t$ or $c_{1:t}$)
+the inclusion of the correspondence variables ($c_t$ or $c_{1:t}$)
 in the estimation problem may be useful for reasoning
 if the perceived feature is the same one as previously detected
 and already represented in the map or if it is a new landmark.
@@ -211,15 +217,15 @@ The decomposition and factoring of the posterior probability
 followed by the FastSLAM~\cite{montemerlo:aaai:2002,montemerlo:ijcai:2003}
 algorithm is shown in \eqref{eq:literature:slam:fast-slam:factoring}.
 The algorithm assumes the conditional independence of the features ($m_n$)
-given the robot path ($x_{1:t}^{\left[N\right]}$), \ie,
+given the robot path ($x_{1:t}^{\left[M\right]}$), \ie,
 knowing the location of one feature does not add any additional information
 about the location of other features if the robot path is known.
 Moreover, \figref{fig:literature:slam:fastslam} represents the composition of
 particles implemented in FastSLAM. Each particle $k$ contains an estimate of
 the robot path until the current time instant $t$ and
-a set of \glspl{ekf} with a mean ($\mu_j^{\left[k\right]}$) and
-covariance ($\sum_j^{\left[k\right]}$) of the estimation,
-one for each feature $j=1..N$ represented in the map $m$.
+a set of \glspl{ekf} with a mean ($\mu_n^{\left[k\right]}$) and
+covariance ($\sum_n^{\left[k\right]}$) of the estimation,
+one for each feature $n=1..N$ represented in the map $m$.
 The basic steps of the FastSLAM~\cite{montemerlo:aaai:2002,montemerlo:ijcai:2003}
 algorithm are the following ones~\cite{thrun:book:2005}:
 \begin{itemize}
@@ -233,13 +239,13 @@ algorithm are the following ones~\cite{thrun:book:2005}:
   (the improved version, FastSLAM~2.0~\cite{montemerlo:ijcai:2003},
   incorporates also the sensor measurements $z_t^i$ in the prediction step);
   \item \textbf{measurement update:} for each observed feature obtained from a
-  measurement $z_t^i$, identify the correspondence $j$ in the particle map,
+  measurement $z_t^i$, identify the correspondence $n$ in the particle map,
   and incorporate $z_t^i$ into the corresponding \gls{ekf},
-  updating the mean ($\mu_j^{\left[k\right]}$) and
-  covariance ($\sum_j^{\left[k\right]}$) of the
+  updating the mean ($\mu_n^{\left[k\right]}$) and
+  covariance ($\sum_n^{\left[k\right]}$) of the
   corresponding map feature accordingly;
   \item \textbf{importance weight:} compute the importance weight
-  $w^{\left[k\right]}$ for the new particle.
+  $w^{\left[k\right]}$ for the particle.
   \end{enumerate}
 \item \textbf{resampling:} sample, with replacement, the $M$ particles,
 where the probability of sampling being proportional to $w^{\left[k\right]}$, to
@@ -333,7 +339,7 @@ optimization frameworks more specific for the pose graph formulation, namely,
 \gls{isam}~\cite{kaess:tro:2008,kaess:icra:2011},
 \gls{gtsam}~\cite{dellaert:tech:2012,dellaert-kaess:ftr:2017},
 $g^2o$~\cite{kummerle:icra:2011}, or
-\texttt{srrg2\_solver}~\cite{grisetti:robotics:2020}.
+srrg2\_solver~\cite{grisetti:robotics:2020}.
 
 Furthermore, the edge connection in GraphSLAM between vertexes $x_i$ and $x_j$
 is illustrated in \figref{fig:literature:slam:graph-slam}.
@@ -881,7 +887,7 @@ From 2009 onwards, the topic has also gained relevance,
 achieving a maximum of 53~and 35~published works in 2025 for
 Scopus~\cite{scopus} and Web~of~Science~\cite{wos}, respectively.
 Although the overall number of publications related to dynamic environments
-is lower than for the broader long-term topic,
+is lower than for the broader long-term topic as expected,
 the growing interest in addressing the challenges of
 localization and mapping in dynamic environments
 underscores the relevance of this PhD~Thesis.
@@ -985,7 +991,7 @@ from 2D~laser scans probabilistically.
 The dynamics of the environment are represented by using 5~different timescales,
 where the smallest one ($\sim$3.1 s) represents an \gls{stm} map
 updated at every instant, and the other 4~timescales
-($\sim$0.43 runs, 0.43 days, 3.1 days, and 13.5 days) are \gls{ltm} submaps
+($\sim$0.43 operation runs, 0.43 days, 3.1 days, and 13.5 days) are \gls{ltm} submaps
 updated after each session or daily.
 Instead of focusing only on the \gls{ltm} maps as in
 Dayoub~\etal~\cite{dayoub:ras:2011} and Bacca~\etal~\cite{bacca:ras:2013},
