@@ -65,7 +65,8 @@ multiple purposes, such as path planning, providing a visual reference for
 human operators, while allowing the robot to reset its localization error when
 revisiting known areas~\cite{cadena:tro:2016}.
 
-In a static scene, the robot would only need to map once because the map and
+In a static scene, where all elements of the environment remain fixed and
+unchanging over time, the robot would only need to map once because the map and
 sensor data would remain consistent with the environment throughout time.
 However, industrial and intralogistics locations, agricultural sites,
 warehouses, and service-oriented applications, such as shopping centers and
@@ -81,8 +82,10 @@ after a certain time?). This challenge is also known as the stability-plasticity
 dilemma, where a lifelong~\gls{slam} system should both adapt to new environment
 changes and preserve old states over time~\cite{biber-duckett:ijrr:2009}.
 Furthermore, the map would grow indefinitely when gathering new information from
-the environment without any map management system. This ever-growing problem
-poses another challenge for the \gls{slam} system in the long-term due to the
+the environment without any map management system, raising the question of how
+to bound map size (discard old information, compress representations, or limit
+the map growth?). This ever-growing problem
+poses another challenge for long-term \gls{slam} due to the
 limited computational resources of the mapping vehicle. Indeed, the map size
 should be dependent on the environment area and not on the trajectory length of
 the mapping process nor operation time, only growing when the robot would
@@ -167,7 +170,7 @@ and manually operated mobile machines.
 Additionally, logistics warehouse environments may have featureless
 characteristics that make it difficult for \glspl{amr} to localize within the
 environment over time.
-One situation that is particularly critical to address in dynamic logistics
+One situation that is particularly critical to address in logistics
 environments involving robots' localization is cases involving random slotting
 warehouse strategies, which optimize space and enhance efficiency in modern
 operations.
@@ -223,8 +226,10 @@ changes between running sessions, \ie, changes occurring outside of the sensors'
 \gls{fov} at different time instants that, when observed again by the sensors,
 appear static but elements were effectively moved in the scene -- or only
 dealing with highly dynamic elements (\eg, moving persons or objects).
-Instead, this thesis studies the detection of dynamic changes by comparing the
-current observation with a local reference map representation.
+Instead, this thesis studies the detection and removal of dynamic observations
+from the latest sensor data by comparing them against a local reference map,
+addressing both online removal and offline annotation of dynamic elements
+to prevent their integration into the map.
 
 In terms of the sensor setup, this PhD~Thesis assumes that the robot is equipped
 with at least one 2D~laser scanner and, optionally, wheeled odometry data.
@@ -270,21 +275,26 @@ to process over time. As the robot moves,
 the accumulation of data from sensors can lead to redundant information,
 especially in environments where sensor noise, matching errors, or
 outlier observations occur frequently.
-Consequently, the appearance of ``fat'' walls in the map representation
-obtained from \gls{slam} can occur.
-Another consequence of this issue is that,
-while the map may appear fine locally,
-distortions and inaccuracies can accumulate at the global level,
-leading to inconsistencies between the map representation
-and the real environment itself.
+This redundancy manifests in the map as artificially thickened structures,
+commonly referred to as ``fat'' walls, where repeated scans acquired under
+slightly misaligned pose estimates cause point smearing along surfaces that
+should appear as sharp, thin boundaries in the map.
+Furthermore, as local pose errors accumulate over the robot's trajectory,
+global map consistency degrades, reducing the likelihood of successfully
+closing loops when the robot revisits a previously mapped area. As a result,
+the global map may diverge over time from the true environment layout.
 
 Given the previous challenges, we propose research hypotheses aimed at
 improving mapping results during \gls{slam} in dynamic indoor environments.
-The primary focus is on removing outdated or redundant observations from the
+Dynamic observations, such as moving persons or displaced objects, act as
+outliers in the scan matching process, corrupting the pose estimation and
+increasing the drift accumulated over the robot's trajectory.
+The primary focus is therefore on removing dynamic observations from the
 environment representation to reduce the noise introduced by both the sensor
 and the matching process, continuously updating the map with the latest sensor
-observations to increase the inliers matching ratio, while exploring
-concurrently offline global bundle adjustment techniques
+observations to increase the inliers matching ratio related to the
+correspondence between the current observation and the reference representation,
+while exploring concurrently offline global bundle adjustment techniques
 to remove distortions from the global map.
 
 \begin{hypothesis}\label{hypothesis:mapping:ray-tracing}
