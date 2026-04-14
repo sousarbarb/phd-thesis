@@ -136,7 +136,7 @@ Thus, we propose a corner-like detection method based on local line fitting,
 without requiring global line detection or recursive data search.
 Also, the experiments presented in \secref{sec:features:results} demonstrate
 the ability of the proposed detector to extract more points of interest
-from the scan in addition to environment corners.
+from the scan compared to the algorithms presented previously.
 
 \subsection{Curvature-based detection}\label{sec:features:background:curvature}
 
@@ -295,8 +295,8 @@ the fitting \glslink{rmse}{\glsentryfull{rmse}}, $\varepsilon_{RMSE}$,
 for lines with an inclination angle between -90º and 90º and a simulation step
 of 0.25º, a set of 100 data points equally distributed along each line,
 a distance Gaussian noise added to the data point coordinates of zero mean
-and 0.03~m standard deviation, and 1000 simulation samples per
-line~\cite{sousa:icara:2024}.}
+and 0.03~m standard deviation (same specifications as the Hokuyo UST-10LX
+sensor), and 1000~simulation samples per line~\cite{sousa:icara:2024}.}
 \label{fig:feature:model-error-analysis}
 \end{figure}
 
@@ -404,6 +404,9 @@ the intersection centroid of 0.025~m,
 and maximum distance of the intersection point to the scan point
 being evaluated of 0.05~m.
 The latter indicator avoids having features not representing physical points.
+The indicator thresholds were determined empirically through extensive
+testing across multiple environments, selecting values that maximize
+the number of detected features while maintaining geometric consistency.
 Then, the candidate keypoint is validated if the point passes
 all previous indicators in a minimum number of 3 consecutive scales,
 to improve robustness to noise on the laser data. The scales considered in the
