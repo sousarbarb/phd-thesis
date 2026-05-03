@@ -82,35 +82,35 @@
   & \xmark & -- &       % wo/voxelization
 0.003 & 1939.01 &       % circle
 0.003 & 0.02 & 0.02 &   % square
-0.001 & 0.02 & 82.58 &  % corridor
+\bfseries 0.001 & 0.02 & 82.58 &  % corridor
 0.005 & 0.01 & 0.03 \\  % random
 & & \cmark & -- &       % w/voxelization
 0.003 & 1921.69 &       % circle
 0.003 & 0.02 & 0.02 &   % square
-0.001 & 0.02 & 83.18 &  % corridor
+\bfseries 0.001 & 0.02 & 83.18 &  % corridor
 0.005 & 0.01 & 0.03 \\  % random
 \cline{2-15}
 & \multirow{4}{*}{$\mathcal{M}_1$}
   & \xmark & \xmark &   % wo/voxelization, wo/bi-linear interpolation (sub-pixel)
 0.003 & 1296.20 &       % circle
-0.003 & 0.02 & 0.01 &   % square
-0.001 & 0.01 & 33.56 &  % corridor
+0.003 & 0.02 & \bfseries 0.01 &   % square
+\bfseries 0.001 & \bfseries 0.01 & 33.56 &  % corridor
 0.010 & 0.02 & 0.10 \\  % random
 & & \xmark & \cmark &   % wo/voxelization, w/bi-linear interpolation (sub-pixel)
 0.008 & 1086.28 &       % circle
 0.007 & 0.02 & 0.03 &   % square
-0.005 & 0.01 & 23.64 &  % corridor
+0.005 & \bfseries 0.01 & 23.64 &  % corridor
 0.016 & 0.02 & 0.21 \\  % random
 % \cline{3-15}
 & & \cmark & \xmark &   % w/voxelization, wo/bi-linear interpolation (sub-pixel)
 0.003 & 1295.32 &       % circle
-0.003 & 0.02 & 0.01 &   % square
-0.001 & 0.01 & 33.53 &  % corridor
+0.003 & 0.02 & \bfseries 0.01 &   % square
+\bfseries 0.001 & \bfseries 0.01 & 33.53 &  % corridor
 0.010 & 0.02 & 0.10 \\  % random
 & & \cmark & \cmark &   % w/voxelization, w/bi-linear interpolation (sub-pixel)
 0.008 & 1086.28 &       % circle
 0.007 & 0.02 & 0.03 &   % square
-0.005 & 0.01 & 23.64 &  % corridor
+0.005 & \bfseries 0.01 & 23.64 &  % corridor
 0.016 & 0.02 & 0.21 \\  % random
 % \cline{2-15}
 % & \multirow{4}{*}{$\mathcal{M}_2$}
@@ -145,13 +145,13 @@
 \multirow{6}{*}{$\mathcal{D}_\mathrm{p2pl}$} & \multirow{2}{*}{$\mathcal{M}_0$}
   & \xmark & -- &       % wo/voxelization
 0.003 & 128.55 &        % circle
-0.002 & 0.01 & 0.01 &   % square
-0.001 & 0.01 & 12.37 &  % corridor
+\bfseries 0.002 & \bfseries 0.01 & \bfseries 0.01 &   % square
+\bfseries 0.001 & \bfseries 0.01 & \bfseries 12.37 &  % corridor
 {--} & {--} & {--} \\   % random
 & & \cmark & -- &       % w/voxelization
 0.003 & 127.80 &        % circle
-0.002 & 0.01 & 0.01 &   % square
-0.001 & 0.01 & 12.50 &  % corridor
+\bfseries 0.002 & \bfseries 0.01 & \bfseries 0.01 &   % square
+\bfseries 0.001 & \bfseries 0.01 & 12.50 &  % corridor
 {--} & {--} & {--}\\    % random
 % \cline{2-15}
 % & \multirow{4}{*}{$\mathcal{M}_1$}
@@ -211,13 +211,13 @@
   & \xmark & -- &       % wo/voxelization
 0.003 & 4219.62 &       % circle
 0.003 & 0.02 & 0.04 &   % square
-0.001 & 0.02 & 288.70 & % corridor
-0.001 & 0.00 & 0.00 \\  % random
+\bfseries 0.001 & 0.02 & 288.70 & % corridor
+\bfseries 0.001 & \bfseries 0.00 & \bfseries 0.00 \\  % random
 & & \cmark & -- &       % w/voxelization
 0.004 & 4214.30 &       % circle
 0.003 & 0.02 & 0.04 &   % square
-0.001 & 0.02 & 289.79 & % corridor
-0.001 & 0.00 & 0.00 \\  % random
+\bfseries 0.001 & 0.02 & 289.79 & % corridor
+\bfseries 0.001 & \bfseries 0.00 & \bfseries 0.00 \\  % random
 
 \hline
 
@@ -228,14 +228,14 @@
 \multirow{2}{*}{\shortstack[l]{$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$\\(\cite{chen-medioni:icra:1991})}}
 & \multirow{2}{*}{$\mathcal{M}_0$}
   & \xmark & -- &       % wo/voxelization
-0.002 & 128.56 &        % circle
-0.002 & 0.01 & 0.01 &   % square
-0.001 & 0.01 & 12.37 &  % corridor
+\bfseries 0.002 & 128.56 &        % circle
+\bfseries 0.002 & \bfseries 0.01 & \bfseries 0.01 &   % square
+\bfseries 0.001 & \bfseries 0.01 & \bfseries 12.37 &  % corridor
 {--} & {--} & {--} \\   % random
 & & \cmark & -- &       % w/voxelization
-0.003 & 127.77 &        % circle
-0.002 & 0.01 & 0.01 &   % square
-0.001 & 0.01 & 12.50 &  % corridor
+0.003 & \bfseries 127.77 &        % circle
+\bfseries 0.002 & \bfseries 0.01 & \bfseries 0.01 &   % square
+\bfseries 0.001 & \bfseries 0.01 & 12.50 &  % corridor
 {--} & {--} & {--} \\   % random
 
 \hline
