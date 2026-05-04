@@ -1,0 +1,122 @@
+using namespace inesctec_mrdt_slam_distmap_2d;
+using namespace slam;
+
+using PointCloudType = pcl::PointNormal2fVectorCloud;
+using PointCloudTypePtr = std::shared_ptr<PointCloudType>;
+
+using VariableTypeICPp2p =
+    srrg2_solver::VariableSE2DistanceMapNanoStaticPointNormal2fVectorCloudRight;
+using VariableTypeICPp2pl =
+    srrg2_solver::VariableSE2DistanceMapNanoStaticPointNormal2fVectorCloudRight;
+using VariableTypeDistMapp2p =
+    // srrg2_solver::VariableSE2DistanceMapNanoStaticPointNormal2fVectorCloudRight;
+    srrg2_solver::VariableSE2DistanceMapStaticPointNormal2fVectorCloudRight;
+using VariableTypeDistMapp2pl =
+    // srrg2_solver::VariableSE2DistanceMapNanoStaticPointNormal2fVectorCloudRight;
+    srrg2_solver::
+        VariableSE2DistanceMapSparseStaticWith2ndDerivPointNormal2fVectorCloudRight;
+
+using EstimateType = geometry::Isometry2f;
+using EstimateVectorType = geometry::Vector3f;
+using EstimateInfoType = geometry::Matrix3f;
+
+using AlignerTypeICPp2p =
+    slam::AlignerDistanceMapICPPointPoint_<VariableTypeICPp2p>;
+using AlignerTypeICPp2pl =
+    slam::AlignerDistanceMapICPPointPlane_<VariableTypeICPp2pl>;
+using AlignerTypeDistMapp2p =
+    slam::AlignerDistanceMapPointPoint_<VariableTypeDistMapp2p>;
+using AlignerTypeDistMapp2pl =
+    slam::AlignerDistanceMapPointPlane_<VariableTypeDistMapp2pl>;
+
+using AlignerTypeBaseParamICPp2p = AlignerTypeICPp2p::BaseType::Param;
+using AlignerTypeBaseParamICPp2pl = AlignerTypeICPp2pl::BaseType::Param;
+using AlignerTypeBaseParamDistMapp2p = AlignerTypeDistMapp2p::BaseType::Param;
+using AlignerTypeBaseParamDistMapp2pl = AlignerTypeDistMapp2pl::BaseType::Param;
+
+using AlignerTypeParamICPp2p = AlignerTypeICPp2p::DistMapParam;
+using AlignerTypeParamICPp2pl = AlignerTypeICPp2pl::DistMapParam;
+using AlignerTypeParamDistMapp2p = AlignerTypeDistMapp2p::DistMapParam;
+using AlignerTypeParamDistMapp2pl = AlignerTypeDistMapp2pl::DistMapParam;
+
+using OGLAppType = AlignerTypeDistMapp2p::OGLAppType;
+using OGLAppTypePtr = AlignerTypeDistMapp2p::OGLAppTypePtr;
+using OGLViewerType = AlignerTypeDistMapp2p::OGLViewerType;
+using OGLViewerTypePtr = AlignerTypeDistMapp2p::OGLViewerTypePtr;
+using OGLCanvasType = AlignerTypeDistMapp2p::OGLCanvasType;
+using OGLCanvasTypePtr = AlignerTypeDistMapp2p::OGLCanvasTypePtr;
+
+using NormalsComputatorType =
+    pcl::NormalComputatorNearestPoints1D_<PointCloudType>;
+
+constexpr float kDistMapParamDistMapRes = .05f;
+constexpr float kPointCloudNoiseStd = .03f;
+constexpr bool kEnableVoxelization = true;
+
+constexpr bool kModeManual = false;
+constexpr bool kEnableSaveDistanceMapExamples = false;
+
+constexpr bool kParamDebug = false;
+constexpr bool kParamSolverVerbose = false;
+constexpr float kParamSolverDamping = 1.f;
+constexpr int kParamSolverMaxIterations = 50;
+constexpr char kParamSolverCriteriaType[] = "stepnorm";
+constexpr float kParamSolverCriteriaEpsilon = 1e-5;
+constexpr char kParamSolverRobustifierType[] = "";
+constexpr int kParamSolverRobustifierNumIterationsCoarse = -1;
+constexpr float kParamSolverRobustifierThresholdCoarse = -1.f;
+constexpr float kParamSolverRobustifierThresholdFine = -1.f;
+constexpr float kParamFailureRatioInliers = -1.f;
+constexpr float kParamFailureChiInliers = -1.f;
+constexpr int64_t kParamDbgOglInterval = 100;
+constexpr char kParamDbgOglMode[] = "iterationend";
+constexpr bool kParamDbgOglShowCorrespondences = true;
+constexpr bool kParamDbgOglShowNormals = false;
+
+constexpr float kDistMapParamDistMapSize = -1.f;
+constexpr float kDistMapParamDistMapMaxDist = 5.f;
+constexpr bool kDistMapParamSolverRegularizeCorrespondences = false;
+
+constexpr int kParamNormalComputatorMinPts = 3;
+constexpr float kParamNormalComputatorRadius = .15f;
+
+struct BenchmarkConfig
+{
+  // Number of trials for the benchmark
+  int m_num_trials = 100;   //!< number of trials (>= 100, to have top 5% & 1%)
+  int m_cout_feedback = 1;  //!< feedback per iterations (m_num_trials >...> 0)
+
+  // Parametrization of the random number generator limits for its uniform dist
+  float m_circ_max_rng_x = 1.5f;  //!< max x rng (m) (circle)
+  float m_circ_max_rng_y = 1.5f;  //!< max y rng (m) (circle)
+  float m_circ_max_rng_th =
+      geometry::degToRad(20.f);  //!< max th rng (rad) (circle)
+
+  float m_sqr_max_rng_x = 1.5f;  //!< max x rng (m) (square)
+  float m_sqr_max_rng_y = 1.5f;  //!< max y rng (m) (square)
+  float m_sqr_max_rng_th =
+      geometry::degToRad(20.f);  //!< max th rng (rad) (square)
+
+  float m_corr_max_rng_x = 1.5f;  //!< max x rng (m) (corridor)
+  float m_corr_max_rng_y = 0.5f;  //!< max y rng (m) (corridor)
+  float m_corr_max_rng_th =
+      geometry::degToRad(10.f);  //!< max th rng (rad) (corridor)
+
+  float m_rand_max_rng_x = 0.15f;  //!< max x rng (m) (random)
+  float m_rand_max_rng_y = 0.15f;  //!< max y rng (m) (random)
+  float m_rand_max_rng_th =
+      geometry::degToRad(5.f);  //!< max th rng (rad) (random)
+
+  // Parametrization of the laser scanner model
+  float m_ang_res = geometry::degToRad(0.25f);  //!< angular resolution (rad)
+  float m_fov = 2 * M_PIf32;                    //!< field of view (rad)
+  float m_max_range = 30.f;                     //!< maximum range (m)
+
+  // Parametrization of the scenes (laser scan generation)
+  float m_circ_radius = 8.f;   //!< circle radius (m)
+  float m_sqr_side = 10.f;     //!< square half-side (m)
+  float m_corr_width = 5.f;    //!< corridor half-width (m)
+  float m_corr_length = 10.f;  //!< corridor half-length (m)
+
+  float m_noise_std = kPointCloudNoiseStd;
+};
