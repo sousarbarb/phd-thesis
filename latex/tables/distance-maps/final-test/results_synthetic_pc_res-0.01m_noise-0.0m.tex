@@ -1,0 +1,197 @@
+{\setlength{\tabcolsep}{3pt}
+\begin{table}[!t]
+\centering
+\caption[%
+    Synthetic benchmark results for point cloud alignment using
+    distance map-based error formulations and distance map-guided
+    \glsentryfull{icp} baselines
+    (cell resolution $\delta = \SI{0.01}{\metre}$;
+    no noise added to the point cloud data)]{%
+    Synthetic benchmark results for point cloud alignment using
+    distance map-based error formulations and distance map-guided
+    \glslink{icp}{\glsentryfull{icp}}
+    baselines~\cite{besl-mckay:tpami:1992,chen-medioni:icra:1991}
+    (cell resolution $\delta = \SI{0.01}{\metre}$;
+    no noise added to the point cloud data).
+    Legend:
+    distance map representation level~($\mathcal{M}_l$);
+    point cloud voxelization~(V);
+    sub-pixelization~(S) (bi-linear interpolation);
+    enabled~(\cmark), disabled~(\xmark), not applicable~(--);
+    translation error $\varepsilon_t$~(m);
+    rotation error $\varepsilon_\theta$~(\textdegree{});
+    Mahalanobis-squared consistency metric
+    $\chi^2 = \mathbf{e}^T\mathbf{\Omega}\,\mathbf{e}$~(dimensionless).
+    For the circle scene, only the translation error is reported, as
+    rotational alignment is degenerate.
+    Similarly, for the corridor scenes, only the observable translation
+    component $\varepsilon_y$ and rotational alignment error
+    $\varepsilon_\theta$ are reported, as the $x$~axis is degenerate.%
+}
+\label{tab:distance-maps:results:synthetic:accuracy:res-0.01m_noise-0.00m}
+\begin{tabular}{
+    l     % method family  (multirow label)
+    l     % level          (M_0 / M_1 / M_2)
+    cc |  % variant flags  (V - voxelization, S - sub pixelization)
+    % 4 scene groups
+    S[table-format=1.3] S[table-format=4.2]                     |   % circle
+    S[table-format=1.3] S[table-format=1.2] S[table-format=1.2] |   % square
+    S[table-format=1.3] S[table-format=1.2] S[table-format=3.2] |   % corridor
+    S[table-format=1.3] S[table-format=1.2] S[table-format=1.2]     % random
+}
+\hline
+\multicolumn{4}{c|}{} &
+\multicolumn{2}{c|}{\textbf{Circle}} &
+\multicolumn{3}{c|}{\textbf{Square}} &
+\multicolumn{3}{c|}{\textbf{Corridor}} &
+\multicolumn{3}{c}{\textbf{Random}}\\
+\multicolumn{4}{c|}{} &
+\multicolumn{1}{c}{$\varepsilon_t$} &
+\multicolumn{1}{c|}{$\chi^2$} &
+\multicolumn{1}{c}{$\varepsilon_t$} &
+\multicolumn{1}{c}{$\varepsilon_\theta$} &
+\multicolumn{1}{c|}{$\chi^2$} &
+\multicolumn{1}{c}{$\varepsilon_y$} &
+\multicolumn{1}{c}{$\varepsilon_\theta$} &
+\multicolumn{1}{c|}{$\chi^2$} &
+\multicolumn{1}{c}{$\varepsilon_t$} &
+\multicolumn{1}{c}{$\varepsilon_\theta$} &
+\multicolumn{1}{c}{$\chi^2$}\\
+\multicolumn{1}{l}{\textbf{Meth.}} &
+\multicolumn{1}{c}{$\mathbf{\mathcal{M}_l}$} &
+\multicolumn{1}{c}{\textbf{V?}} &
+\multicolumn{1}{c|}{\textbf{S?}} &
+\multicolumn{1}{c}{(m)} &
+\multicolumn{1}{c|}{} &
+\multicolumn{1}{c}{(m)} &
+\multicolumn{1}{c}{(\textdegree{})} &
+\multicolumn{1}{c|}{} &
+\multicolumn{1}{c}{(m)} &
+\multicolumn{1}{c}{(\textdegree{})} &
+\multicolumn{1}{c|}{} &
+\multicolumn{1}{c}{(m)} &
+\multicolumn{1}{c}{(\textdegree{})} &
+\multicolumn{1}{c}{}\\
+\hline
+
+% ==============================================================================
+% DISTANCE MAP POINT-TO-POINT ERROR FORMULATION
+% ==============================================================================
+
+\multirow{6}{*}{$\mathcal{D}_\mathrm{p2p}$} & \multirow{2}{*}{$\mathcal{M}_0$}
+  & \xmark & -- &       % wo/voxelization
+0.001 & 6404.92 &       % circle
+0.001 & 0.02 & 0.01 &   % square
+0.004 & 0.11 & 543.09 & % corridor
+0.001 & \bfseries 0.00 & \bfseries 0.00 \\  % random
+& & \cmark & -- &       % w/voxelization
+0.003 & 5727.27 &       % circle
+0.001 & 0.02 & 0.01 &   % square
+0.004 & 0.10 & 531.00 & % corridor
+0.002 & \bfseries 0.00 & \bfseries 0.00 \\  % random
+\cline{2-15}
+& \multirow{4}{*}{$\mathcal{M}_1$}
+  & \xmark & \xmark &   % wo/voxelization, wo/bi-linear interpolation (sub-pixel)
+0.003 & 2741.96 &       % circle
+0.008 & 0.02 & 0.04 &   % square
+0.006 & 0.16 & 190.41 & % corridor
+0.009 & \bfseries 0.00 & 0.02 \\  % random
+& & \xmark & \cmark &   % wo/voxelization, w/bi-linear interpolation (sub-pixel)
+0.010 & 1684.46 &       % circle
+0.002 & 0.02 & 0.01 &   % square
+0.004 & 0.17 & 154.93 & % corridor
+0.010 & \bfseries 0.00 & 0.05 \\  % random
+% \cline{3-15}
+& & \cmark & \xmark &   % w/voxelization, wo/bi-linear interpolation (sub-pixel)
+0.003 & 2734.18 &       % circle
+0.008 & 0.02 & 0.04 &   % square
+0.006 & 0.16 & 190.54 & % corridor
+0.009 & \bfseries 0.00 & 0.02 \\  % random
+& & \cmark & \cmark &   % w/voxelization, w/bi-linear interpolation (sub-pixel)
+0.010 & 1684.46 &       % circle
+0.002 & 0.02 & 0.01 &   % square
+0.004 & 0.17 & 154.93 & % corridor
+0.010 & \bfseries 0.00 & 0.05 \\  % random
+
+\hline
+
+% ==============================================================================
+% DISTANCE MAP POINT-TO-PLANE ERROR FORMULATION
+% ==============================================================================
+
+\multirow{6}{*}{$\mathcal{D}_\mathrm{p2pl}$} & \multirow{2}{*}{$\mathcal{M}_0$}
+  & \xmark & -- &       % wo/voxelization
+\bfseries 0.000 & 54.04 &         % circle
+\bfseries 0.000 & \bfseries 0.00 & \bfseries 0.00 &   % square
+\bfseries 0.000 & \bfseries 0.00 & \bfseries 5.72 &   % corridor
+{--} & {--} & {--}\\    % random
+& & \cmark & -- &       % w/voxelization
+\bfseries 0.000 & \bfseries 53.98 &         % circle
+\bfseries 0.000 & \bfseries 0.00 & \bfseries 0.00 &   % square
+\bfseries 0.000 & \bfseries 0.00 & \bfseries 5.72 &   % corridor
+{--} & {--} & {--}\\    % random
+\cline{2-15}
+& \multirow{4}{*}{$\mathcal{M}_2$}
+  & \xmark & \xmark &   % wo/voxelization, wo/bi-linear interpolation (sub-pixel)
+\bfseries 0.000 & 545.13 &        % circle
+0.007 & 0.02 & 0.06 &   % square
+0.004 & 0.01 & 37.56 &  % corridor
+{--} & {--} & {--}\\    % random
+& & \xmark & \cmark &   % wo/voxelization, w/bi-linear interpolation (sub-pixel)
+0.007 & 322.07 &        % circle
+0.002 & \bfseries 0.00 & 0.01 &   % square
+0.003 & \bfseries 0.00 & 31.27 &  % corridor
+{--} & {--} & {--}\\    % random
+% \cline{3-15}
+& & \cmark & \xmark &   % w/voxelization, wo/bi-linear interpolation (sub-pixel)
+\bfseries 0.000 & 545.38 &        % circle
+0.007 & 0.02 & 0.06 &   % square
+0.003 & 0.01 & 32.89 &  % corridor
+{--} & {--} & {--}\\    % random
+& & \cmark & \cmark &   % w/voxelization, w/bi-linear interpolation (sub-pixel)
+0.007 & 322.22 &        % circle
+0.002 & \bfseries 0.00 & 0.01 &   % square
+0.003 & \bfseries 0.00 & 31.26 &  % corridor
+{--} & {--} & {--}\\    % random
+
+\hline
+
+% ==============================================================================
+% ICP POINT-TO-POINT ERROR FORMULATION W/ DISTANCE MAP DATA CORRESPONDENCE
+% ==============================================================================
+
+\multirow{2}{*}{\shortstack[l]{$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$\\(\cite{besl-mckay:tpami:1992})}}
+& \multirow{2}{*}{$\mathcal{M}_0$}
+  & \xmark & -- &       % wo/voxelization
+0.001 & 6665.84 &       % circle
+0.001 & 0.02 & 0.02 &   % square
+\bfseries 0.000 & 0.01 & 833.41 & % corridor
+\bfseries 0.000 & \bfseries 0.00 & \bfseries 0.00 \\  % random
+& & \cmark & -- &       % w/voxelization
+0.003 & 6568.31 &       % circle
+0.001 & 0.02 & 0.02 &   % square
+\bfseries 0.000 & 0.01 & 824.97 & % corridor
+\bfseries 0.000 & \bfseries 0.00 & \bfseries 0.00 \\  % random
+
+\hline
+
+% ==============================================================================
+% ICP POINT-TO-PLANE ERROR FORMULATION W/ DISTANCE MAP DATA CORRESPONDENCE
+% ==============================================================================
+
+\multirow{2}{*}{\shortstack[l]{$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$\\(\cite{chen-medioni:icra:1991})}}
+& \multirow{2}{*}{$\mathcal{M}_0$}
+  & \xmark & -- &       % wo/voxelization
+\bfseries 0.000 & 54.04 &         % circle
+\bfseries 0.000 & \bfseries 0.00 & \bfseries 0.00 &   % square
+\bfseries 0.000 & \bfseries 0.00 & \bfseries 5.72 &   % corridor
+{--} & {--} & {--}\\    % random
+& & \cmark & -- &       % w/voxelization
+\bfseries 0.000 & \bfseries 53.98 &         % circle
+\bfseries 0.000 & \bfseries 0.00 & \bfseries 0.00 &   % square
+\bfseries 0.000 & \bfseries 0.00 & \bfseries 5.72 &   % corridor
+{--} & {--} & {--}\\    % random
+
+\hline
+\end{tabular}
+\end{table}}

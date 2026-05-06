@@ -1,0 +1,253 @@
+
+
+=== 2D Laser Scan Aligners Benchmark --- RESULTS ===
+  scenes      : circle, square, corridor, random
+  trials/scene: 100
+  trials top95: 95
+  dmap res (m): 0.01
+  noise    (m): 0
+  voxelization: not enabled
+
+  variable type icp_p2p  : VariableSE2DistanceMapNanoStaticPointNormal2fVectorCloudRight
+  variable type icp_p2pl : VariableSE2DistanceMapNanoStaticPointNormal2fVectorCloudRight
+  variable type dmap_p2p : VariableSE2DistanceMapStaticPointNormal2fVectorCloudRight
+  variable type dmap_p2pl: VariableSE2DistanceMapStaticWith2ndDerivPointNormal2fVectorCloudRight
+
+[circle] icp_p2p:
+- err trans rmse (m): 0.000624136
+- err x rmse     (m): 0.000444954
+- err y rmse     (m): 0.000437678
+- err rot rmse (deg): 12.3273
+- mean chi sqr      : 6665.84
+- mean chi sqr 95%  : 6081.15
+- time align mean     (ms): 7.25442
+- time align std      (ms): 0.482475
+- time align min      (ms): 2.60261
+- time align max      (ms): 7.51694
+- time dmap mean     (ms): 756.61
+- time dmap std      (ms): 6.32027
+- time dmap min      (ms): 739.117
+- time dmap max      (ms): 767.942
+
+
+[circle] icp_p2pl:
+- err trans rmse (m): 1.47607e-06
+- err x rmse     (m): 1.00589e-06
+- err y rmse     (m): 1.08027e-06
+- err rot rmse (deg): 12.2544
+- mean chi sqr      : 54.0395
+- mean chi sqr 95%  : 43.1571
+- time align mean     (ms): 5.89284
+- time align std      (ms): 0.126885
+- time align min      (ms): 5.28476
+- time align max      (ms): 6.14082
+- time dmap mean     (ms): 757.853
+- time dmap std      (ms): 6.26309
+- time dmap min      (ms): 739.368
+- time dmap max      (ms): 768.667
+
+
+[circle] dmap_p2p:
+- err trans rmse (m): 0.00973811
+- err x rmse     (m): 0.00620773
+- err y rmse     (m): 0.00750299
+- err rot rmse (deg): 12.2632
+- mean chi sqr      : 1684.46
+- mean chi sqr 95%  : 1538.82
+- time align mean     (ms): 5.90171
+- time align std      (ms): 0.0967907
+- time align min      (ms): 5.4225
+- time align max      (ms): 6.2833
+- time dmap mean     (ms): 960.072
+- time dmap std      (ms): 7.78624
+- time dmap min      (ms): 943.114
+- time dmap max      (ms): 1012.82
+
+
+[circle] dmap_p2pl:
+- err trans rmse (m): 0.00709535
+- err x rmse     (m): 0.00502645
+- err y rmse     (m): 0.00500787
+- err rot rmse (deg): 12.3233
+- mean chi sqr      : 322.074
+- mean chi sqr 95%  : 287.364
+- time align mean     (ms): 8.09761
+- time align std      (ms): 0.637011
+- time align min      (ms): 2.64179
+- time align max      (ms): 8.42047
+- time dmap mean     (ms): 1169.25
+- time dmap std      (ms): 11.6293
+- time dmap min      (ms): 1151.19
+- time dmap max      (ms): 1267.5
+
+
+[square] icp_p2p:
+- err trans rmse (m): 0.00134636
+- err x rmse     (m): 0.000974303
+- err y rmse     (m): 0.000929202
+- err rot rmse (deg): 0.0171493
+- mean chi sqr      : 0.0190551
+- mean chi sqr 95%  : 0.0149747
+- time align mean     (ms): 5.85756
+- time align std      (ms): 1.28542
+- time align min      (ms): 2.20129
+- time align max      (ms): 7.96574
+- time dmap mean     (ms): 746.344
+- time dmap std      (ms): 2.69067
+- time dmap min      (ms): 733.819
+- time dmap max      (ms): 750.79
+
+
+[square] icp_p2pl:
+- err trans rmse (m): 5.26351e-05
+- err x rmse     (m): 3.79068e-05
+- err y rmse     (m): 3.65175e-05
+- err rot rmse (deg): 0.000255429
+- mean chi sqr      : 2.84356e-06
+- mean chi sqr 95%  : 2.27575e-06
+- time align mean     (ms): 0.823336
+- time align std      (ms): 0.150468
+- time align min      (ms): 0.466617
+- time align max      (ms): 1.14339
+- time dmap mean     (ms): 743.913
+- time dmap std      (ms): 3.09982
+- time dmap min      (ms): 730.391
+- time dmap max      (ms): 753.986
+
+
+[square] dmap_p2p:
+- err trans rmse (m): 0.00227715
+- err x rmse     (m): 0.00137133
+- err y rmse     (m): 0.00181793
+- err rot rmse (deg): 0.0151905
+- mean chi sqr      : 0.00549083
+- mean chi sqr 95%  : 0.00373212
+- time align mean     (ms): 3.4978
+- time align std      (ms): 1.36765
+- time align min      (ms): 1.46872
+- time align max      (ms): 5.83212
+- time dmap mean     (ms): 789.031
+- time dmap std      (ms): 4.73938
+- time dmap min      (ms): 774.692
+- time dmap max      (ms): 798.79
+
+
+[square] dmap_p2pl:
+- err trans rmse (m): 0.00249911
+- err x rmse     (m): 0.00173509
+- err y rmse     (m): 0.00179862
+- err rot rmse (deg): 0.00280203
+- mean chi sqr      : 0.00544754
+- mean chi sqr 95%  : 0.00520683
+- time align mean     (ms): 8.69114
+- time align std      (ms): 0.688776
+- time align min      (ms): 7.64041
+- time align max      (ms): 11.8803
+- time dmap mean     (ms): 992.956
+- time dmap std      (ms): 5.08134
+- time dmap min      (ms): 972.24
+- time dmap max      (ms): 1004.15
+
+
+[corridor] icp_p2p:
+- err trans rmse (m): 0.804898
+- err x rmse     (m): 0.804898
+- err y rmse     (m): 0.000142692
+- err rot rmse (deg): 0.0100774
+- mean chi sqr      : 833.411
+- mean chi sqr 95%  : 729.4
+- time align mean     (ms): 3.50878
+- time align std      (ms): 1.59073
+- time align min      (ms): 1.14576
+- time align max      (ms): 7.04082
+- time dmap mean     (ms): 1490.74
+- time dmap std      (ms): 11.1038
+- time dmap min      (ms): 1471.16
+- time dmap max      (ms): 1531.44
+
+
+[corridor] icp_p2pl:
+- err trans rmse (m): 0.809219
+- err x rmse     (m): 0.809219
+- err y rmse     (m): 2.77487e-07
+- err rot rmse (deg): 5.02228e-06
+- mean chi sqr      : 5.71714
+- mean chi sqr 95%  : 4.2623
+- time align mean     (ms): 0.45846
+- time align std      (ms): 0.0337666
+- time align min      (ms): 0.391816
+- time align max      (ms): 0.606722
+- time dmap mean     (ms): 1491.63
+- time dmap std      (ms): 10.7346
+- time dmap min      (ms): 1469.35
+- time dmap max      (ms): 1527.63
+
+
+[corridor] dmap_p2p:
+- err trans rmse (m): 0.849131
+- err x rmse     (m): 0.849121
+- err y rmse     (m): 0.0041169
+- err rot rmse (deg): 0.171568
+- mean chi sqr      : 154.933
+- mean chi sqr 95%  : 132.402
+- time align mean     (ms): 5.88022
+- time align std      (ms): 0.233687
+- time align min      (ms): 5.50205
+- time align max      (ms): 6.43172
+- time dmap mean     (ms): 1850.22
+- time dmap std      (ms): 13.1689
+- time dmap min      (ms): 1837.4
+- time dmap max      (ms): 1950.76
+
+
+[corridor] dmap_p2pl:
+- err trans rmse (m): 0.855468
+- err x rmse     (m): 0.855464
+- err y rmse     (m): 0.00267794
+- err rot rmse (deg): 0.00265764
+- mean chi sqr      : 31.2651
+- mean chi sqr 95%  : 25.6547
+- time align mean     (ms): 6.27775
+- time align std      (ms): 0.0983316
+- time align min      (ms): 5.92592
+- time align max      (ms): 6.51602
+- time dmap mean     (ms): 2201.97
+- time dmap std      (ms): 21.4781
+- time dmap min      (ms): 2182.7
+- time dmap max      (ms): 2380.09
+
+
+[random] icp_p2p:
+- err trans rmse (m): 1.78722e-06
+- err x rmse     (m): 1.17405e-06
+- err y rmse     (m): 1.34749e-06
+- err rot rmse (deg): 2.39354e-07
+- mean chi sqr      : 4.60601e-09
+- mean chi sqr 95%  : 1.66981e-09
+- time align mean     (ms): 1.59371
+- time align std      (ms): 0.691332
+- time align min      (ms): 0.724266
+- time align max      (ms): 4.17937
+- time dmap mean     (ms): 5098.53
+- time dmap std      (ms): 381.436
+- time dmap min      (ms): 4642.02
+- time dmap max      (ms): 6934.75
+
+
+[random] dmap_p2p:
+- err trans rmse (m): 0.0102927
+- err x rmse     (m): 0.00721035
+- err y rmse     (m): 0.00734513
+- err rot rmse (deg): 0.00389709
+- mean chi sqr      : 0.0471473
+- mean chi sqr 95%  : 0.043134
+- time align mean     (ms): 7.25122
+- time align std      (ms): 0.370449
+- time align min      (ms): 6.39729
+- time align max      (ms): 8.52259
+- time dmap mean     (ms): 6768.67
+- time dmap std      (ms): 363.044
+- time dmap min      (ms): 6186.73
+- time dmap max      (ms): 7981.17
+
+
