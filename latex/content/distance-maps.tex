@@ -1895,12 +1895,181 @@ on obstacle boundaries consistently face the sensor.
 
 \section{Experimental Results and Discussion}\label{sec:distance-maps:results}
 
-% Brief introductory paragraph: state the four methods being compared,
-% the two evaluation axes (accuracy/covariance and odometry drift),
-% and forward-reference the subsections.
+\todo{TBC}
 
-\subsection{Synthetic benchmarks}
+\subsection{Synthetic benchmark}
 \label{sec:distance-maps:results:synthetic}
+
+The use of synthetic data provides access to accurate ground-truth poses and
+the ability to control testing conditions.
+Thus, we evaluate the proposed distance map-based alignment formulations
+discussed in \secref{sec:distance-maps:alignment} against
+point-to-point~\cite{besl-mckay:tpami:1992} and
+point-to-plane~\cite{chen-medioni:icra:1991} \gls{icp} baselines,
+guided by distance map data association, under consistent conditions with
+2D point cloud synthetic data.
+
+\subsubsection{Experimental setup}
+\label{sec:distance-maps:results:synthetic:setup}
+
+Synthetic data is generated from four planar scenes using
+the 2D~laser scanner range model. The model parametrization is based on
+a real 2D~laser, namely the Hokuyo~UST-10LX sensor, with a
+$\SI{30}{\metre}$ maximum range, $\SI{0.25}{\degree}$ angular resolution,
+and a repeatability of $\SI{0.03}{\metre}$, used here as
+the standard deviation of the Gaussian range noise model.
+These scenes are designed to expose the methods to
+different geometric challenges of the 2D point cloud registration problem.
+The four synthetic scenes considered in this work are defined as follows:
+\begin{itemize}
+\item \textbf{Circle:} a single circular wall of \SI{10}{\metre} radius
+      observed from its interior.
+      The scene is rotationally symmetric.
+      Translations are fully constrained, while rotational alignment is
+      degenerate because any rotation of the resulting scan \gls{wrt}
+      the circle center maps it to an identical observation;
+\item \textbf{Square:} a square room with a \SI{20}{\metre} side length
+      observed from its interior,
+      providing four planar walls in two perpendicular directions ($x, y$).
+      This geometry constrains all three \gls{dof} of the $SE(2)$ pose,
+      up to the rotational symmetry of the square;
+\item \textbf{Corridor:} two parallel walls of \SI{100}{\metre} length
+      separated by \SI{10}{\metre} observed from the in-between the corridor
+      walls, constituting a canonical degenerate scene.
+      Since the \SI{30}{\metre} maximum sensor range does not reach
+      the corridor endpoints, a translation of the sensor along the corridor
+      axis leaves the observed point cloud invariant,
+      making the translation along the $x$ axis unobservable;
+\item \textbf{Random:} a set of random 2D~points sampled from a uniform real
+      distribution along the full range of the sensor ($\SI{30}{\metre}$).
+      This sampling follows the laser scanner range model, retrieving a random
+      sample for each ray, providing an unstructured scene.
+      Because the point cloud carries no local surface structure,
+      the point-to-plane alignment formulations
+      cannot extract surface normals from such data.
+\end{itemize}
+
+Each scene is evaluated over $N=100$ independent trials. In every
+trial, a ground-truth perturbation $\mathbf{T}_\mathrm{gt}\in SE(2)$ is sampled
+from a uniform distribution:
+translations up to $\pm\SI{1.5}{\metre}$ in $x$ and $y$ coordinates
+(reduced to $\pm\SI{0.5}{\metre}$ in $y$ and $\pm\SI{0.15}{\metre}$ in both
+axes for the corridor and random scenes, respectively) and rotations up to
+$\pm\SI{20}{\degree}$ ($\pm\SI{10}{\degree}$ and $\pm\SI{5}{\degree}$ for the
+corridor and random scenes, respectively).
+Both the reference and moving clouds
+are generated from the 2D~laser scanner range model. Then, Gaussian noise with
+zero mean and standard deviation $\sigma\in\{0,\,\SI{0.03}{\metre}\}$
+(modelling the noise-free case and the Hokuyo~UST-10LX sensor, respectively) is
+added independently to each measurement of both scans, as explained previously.
+
+\subsubsection{Evaluation metrics}
+\label{sec:distance-maps:results:synthetic:metrics}
+
+Kümmerle~\etal~\cite{kummerle:ar:2009} refer to a straightforward error metric
+in their work to evaluate \gls{slam} algorithms would be the logarithmic
+mapping of the pose estimate ($\mathbf{x}$) back to the tangent space at the
+reference ground-truth pose ($\mathbf{x}^*$) over the robot trajectory ($1:T$),
+as formulated in \eqref{eq:distance-maps:results:synthetic:kummerle}.
+However, this metric is focused on the robot trajectory, not on single pose
+independent alignments, while also being sub-optimal in \gls{slam} evaluation.
+\begin{equation}
+\label{eq:distance-maps:results:synthetic:kummerle}
+\varepsilon\!\left(\mathbf{x}_{1:T}\right) =
+\sum_{t=1}^{T}\left(\mathbf{x}_t\ominus\mathbf{x}_t^*\right)^2
+\end{equation}
+
+Still, in our case, the goal of the synthetic benchmark for 2D~point cloud
+registration presented in this work is to evaluate independent pairwise
+alignments in the same scene, not throughout a robot trajectory.
+Focusing on a single pairwise alignment,
+\eqref{eq:distance-maps:results:synthetic:pose-error} presents the
+\emph{logarithmic mapping} of the pose error ($\boldsymbol{\varepsilon}_{x}$) on
+the manifold $SE(2)$ between the pose estimate ($\mathbf{x}$) and its true value
+($\mathbf{x}^*$) with respect to the target frame,
+where the rotation matrix ($\mathbf{R}_{\boldsymbol{\varepsilon}_\mathbf{x}}$)
+represents the angle difference error between
+the estimated orientation ($\theta$) and the ground-truth value ($\theta^*$),
+and the translation vector ($\mathbf{t}_{\boldsymbol{\varepsilon}_\mathbf{x}}$)
+represents the $x$ and $y$ error components.
+\begin{equation}
+\label{eq:distance-maps:results:synthetic:pose-error}
+\boldsymbol{\varepsilon}\!\left(\mathbf{x}\right) =
+\log\!\left(\mathbf{x}\cdot{\mathbf{x}^{*}}^{-1}\right)^\vee =
+\log\!\left(\left[\mathbf{R}|\mathbf{t}\right] \cdot
+\left[{\mathbf{R}^*}^T|-{\mathbf{R}^*}^T\mathbf{t}^*\right]\right)^\vee =
+\log\!\left(\left[
+  \mathbf{R}(\theta-\theta^*) |
+  \mathbf{t} - {\mathbf{R}^*}^T\mathbf{t}^*
+\right]\right)^\vee =
+\log\!\left(\left[ \mathbf{R}_{\boldsymbol{\varepsilon}_\mathbf{x}} |
+       \mathbf{t}_{\boldsymbol{\varepsilon}_\mathbf{x}} \right]\right)^\vee
+\end{equation}
+
+\paragraph{Translation error}
+The first metric considered in this work for the synthetic benchmark is
+the translation error~($\varepsilon_t$) formulated in
+\eqref{eq:distance-maps:results:synthetic:trans-error}.
+This translation error is considered for non-degenerate scenes on translation
+(circle, square, random), representing the Euclidean norm of the
+residual translation vector ($\mathbf{t}_{\boldsymbol{\varepsilon}_\mathbf{x}}$).
+\begin{equation}
+\label{eq:distance-maps:results:synthetic:trans-error}
+\varepsilon_t = \|\mathbf{t}_{\boldsymbol{\varepsilon}_\mathbf{x}}\|_2
+\end{equation}
+
+For the corridor scene, the translation along the corridor axis (in our case,
+$x$) is unobservable. So, only the error along the perpendicular
+$y$-axis~($\varepsilon_y$) is reported for that scene, as formulated in
+\eqref{eq:distance-maps:results:synthetic:y-error}.
+\begin{equation}
+\label{eq:distance-maps:results:synthetic:y-error}
+\varepsilon_y = |t_{\boldsymbol{\varepsilon}_\mathbf{x},y}|
+\end{equation}
+
+\paragraph{Rotation error}
+Next, the rotation error is the absolute angular residual extracted from
+$\mathbf{R}_\mathrm{err}$, as formulated in
+\eqref{eq:distance-maps:results:synthetic:rot-error}, where
+$r_{\boldsymbol{\varepsilon}_\mathbf{x},i,j}$ represents the $(i,j)$ element
+of the matrix $\mathbf{R}_{\boldsymbol{\varepsilon}_\mathbf{x}}$.
+For the circle scene, $\varepsilon_\theta$ is not reported because
+the rotational \gls{dof} is degenerate by the scene's symmetry.
+\begin{equation}
+\label{eq:distance-maps:results:synthetic:rot-error}
+\varepsilon_\theta =
+\left|\atan2\!\left(
+  r_{\boldsymbol{\varepsilon}_\mathbf{x},2,1},
+  r_{\boldsymbol{\varepsilon}_\mathbf{x},1,1}\right)\right|
+\end{equation}
+
+\paragraph{Mahalanobis-squared consistency metric}
+Finally, alongside pose accuracy, the internal consistency of each solver's
+uncertainty estimate based on the discussion presented in
+\secref{sec:distance-maps:background:least-squares}
+is assessed via the Mahalanobis-squared error formulated in
+\eqref{eq:distance-maps:results:synthetic:chi2},
+where $\boldsymbol{\varepsilon}\!\left(\mathbf{x}\right)$ is the pose error
+(see \eqref{eq:distance-maps:results:synthetic:pose-error}) and
+$\boldsymbol{\Omega} \in \mathbb{R}^{3 \times 3}$ is the information matrix
+returned by the Gauss--Newton solver (see
+\secref{sec:distance-maps:background:least-squares})~\cite{kummerle:ar:2009}.
+\begin{equation}
+\label{eq:distance-maps:results:synthetic:chi2}
+\chi^2 = \boldsymbol{\varepsilon}\!\left(\mathbf{x}\right)^T \cdot
+         \boldsymbol{\Omega} \cdot
+         \boldsymbol{\varepsilon}\!\left(\mathbf{x}\right)
+\end{equation}
+
+In the ideal case, $\chi^2 = 0$ corresponds to a perfect alignment.
+Large values indicate either poor alignment accuracy, an overconfident
+information matrix $\boldsymbol{\Omega}$, or both.
+In degenerate scenes, $\boldsymbol{\Omega}$ becomes ill-conditioned along
+unobservable directions, inflating $\chi^2$ even when observable
+components of the alignment are accurate.
+Translation and rotation errors are aggregated over the $N=100$ independent
+trials and reported as the \gls{rmse}, whilst $\chi^2$ is reported as the
+mean over trials.
 
 % Describe the four synthetic environments: square, circle, corridor,
 % random. One sentence each on why each geometry is informative —
