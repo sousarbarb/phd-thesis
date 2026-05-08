@@ -2071,6 +2071,72 @@ Translation and rotation errors are aggregated over the $N=100$ independent
 trials and reported as the \gls{rmse}, whilst $\chi^2$ is reported as the
 mean over trials.
 
+\subsubsection{Registration accuracy and uncertainty}
+\label{sec:distance-maps:results:synthetic:registration}
+
+Tables~\ref{tab:distance-maps:results:synthetic:accuracy:res-0.01m_noise-0.00m}--\ref{tab:distance-maps:results:synthetic:accuracy:res-0.05m_noise-0.03m}
+present the synthetic benchmark results for point cloud alignment using
+distance map-based error formulations and distance map-guided \gls{icp}
+baselines~\cite{besl-mckay:tpami:1992,chen-medioni:icra:1991} across
+the four synthetic scenes considered in this work
+(circle, square, corridor, and random).
+Each table corresponds to a specific combination of distance map resolution
+$\delta \in \{\SI{0.01}{\metre},\,\SI{0.03}{\metre},\,\SI{0.05}{\metre}\}$
+and sensor noise standard deviation
+$\sigma \in \{\SI{0.00}{\metre},\,\SI{0.03}{\metre}\}$, where
+$\sigma = \SI{0.00}{\metre}$ represents the noise-free ideal case and
+$\sigma = \SI{0.03}{\metre}$ models the measurement noise of the
+Hokuyo~UST-10LX sensor. The four registration formulations evaluated in
+this benchmark are the following:
+\begin{itemize}
+\item $\mathcal{D}_\mathrm{p2p}$: distance map point-to-point formulation,
+      using the scalar distance $\mathcal{D}$ as the residual
+      (see~\secref{sec:distance-maps:alignment:pt2pt}).
+      Evaluated with representation levels $\mathcal{M}_0$ and $\mathcal{M}_1$;
+\item $\mathcal{D}_\mathrm{p2pl}$: distance map point-to-plane formulation,
+      projecting the displacement vector from the moving point to its
+      nearest reference point onto the rotated surface normal
+      (see~\secref{sec:distance-maps:alignment:pt2pl}).
+      Evaluated with $\mathcal{M}_0$ and $\mathcal{M}_2$;
+\item $\mathrm{ICP}_{\mathcal{D},\mathrm{p2p}}$~\cite{besl-mckay:tpami:1992}:
+      standard point-to-point \gls{icp} error metric, with data association
+      resolved via the representation level $\mathcal{M}_0$ instead of
+      kd-tree searching~\cite{bentley:cacm:1975}.
+\item $\mathrm{ICP}_{\mathcal{D},\mathrm{p2pl}}$~\cite{chen-medioni:icra:1991}:
+      standard point-to-plane \gls{icp} error metric,
+      with $\mathcal{M}_0$-based data association, similarly to the
+      $\mathrm{ICP}_{\mathcal{D},\mathrm{p2p}}$~\cite{besl-mckay:tpami:1992}
+      implementation considered in this work.
+\end{itemize}
+
+% \input{tables/distance-maps/initial-test/results_synthetic_pc_res-0.01m_noise-0.0m.tex}
+% \input{tables/distance-maps/initial-test/results_synthetic_pc_res-0.01m_noise-0.03m.tex}
+% \input{tables/distance-maps/initial-test/results_synthetic_pc_res-0.03m_noise-0.0m.tex}
+% \input{tables/distance-maps/initial-test/results_synthetic_pc_res-0.03m_noise-0.03m.tex}
+% \input{tables/distance-maps/initial-test/results_synthetic_pc_res-0.05m_noise-0.0m.tex}
+% \input{tables/distance-maps/initial-test/results_synthetic_pc_res-0.05m_noise-0.03m.tex}
+
+\input{tables/distance-maps/final-test/results_synthetic_pc_res-0.01m_noise-0.0m.tex}
+\input{tables/distance-maps/final-test/results_synthetic_pc_res-0.01m_noise-0.03m.tex}
+\input{tables/distance-maps/final-test/results_synthetic_pc_res-0.03m_noise-0.0m.tex}
+\input{tables/distance-maps/final-test/results_synthetic_pc_res-0.03m_noise-0.03m.tex}
+\input{tables/distance-maps/final-test/results_synthetic_pc_res-0.05m_noise-0.0m.tex}
+\input{tables/distance-maps/final-test/results_synthetic_pc_res-0.05m_noise-0.03m.tex}
+
+All methods are solved using the same Gauss--Newton optimizer within the
+srrg2\_solver~\cite{grisetti:robotics:2020} framework on the $SE(2)$ manifold,
+with a maximum of 50~iterations and a step-norm convergence threshold of
+$10^{-5}$. For each method and representation level, results are reported with
+and without voxelization of the input point clouds at the distance map cell
+resolution~$\delta$, and with and without bi-linear sub-pixel interpolation
+(applicable only to $\mathcal{M}_1$ and $\mathcal{M}_2$ representations).
+Notably, data association via $\mathcal{M}_0$ avoids the per-point
+kd-tree search~\cite{bentley:cacm:1975} traditionally required at every
+\gls{icp}~\cite{besl-mckay:tpami:1992,chen-medioni:icra:1991} iteration,
+reducing the association step to an $O(1)$ lookup after a one-time map
+construction. Next, the accuracy and uncertainty of the four registration
+formulations are analyzed across the different synthetic configurations.
+
 % Describe the four synthetic environments: square, circle, corridor,
 % random. One sentence each on why each geometry is informative —
 % especially corridor as the degenerate case.
