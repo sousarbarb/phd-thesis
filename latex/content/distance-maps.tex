@@ -7,13 +7,12 @@ Sapienza Università di Roma.
 Distance maps encode the Euclidean distance to the nearest reference point
 at every cell of a precomputed discrete grid, decoupling data association
 from the iterative optimization loop.
-By replacing the explicit nearest-neighbour search performed at every
+By replacing the explicit nearest-neighbor search performed at every
 iteration of classical
 \glslink{icp}{\glsentryfull{icp}}~\cite{besl-mckay:tpami:1992,chen-medioni:icra:1991}
-with a constant-time grid lookup on distance map-based data structures,
+with an $O(1)$ grid lookup on distance map-based data structures,
 the proposed formulation provides both point-to-point and point-to-plane error
 formulations compatible with Gauss-Newton optimization on the $SE(2)$ manifold.
-The proposed approach does not require explicit data association at each iteration.
 
 This chapter is organized as follows. \secref{sec:distance-maps:background}
 covers point cloud registration methods from the literature and
@@ -24,7 +23,16 @@ the registration problem on the $SE(2)$ manifold, and both
 point-to-point and point-to-plane error formulations with their Jacobians.
 \secref{sec:distance-maps:results} presents experimental results on
 synthetic and real-world data, evaluating registration accuracy and
-computational performance.
+uncertainty estimation.
+The real-world data refers to the
+\emph{IILABS 3D -- \underline{i}ilab \underline{I}ndoor
+\underline{L}iD\underline{A}R-\underline{b}ased \underline{S}LAM 3D}
+dataset~\cite{ribeiro:access:2025}, a complimentary contribution of this
+PhD~Thesis (see~\appxref{appx:iilabs3d}).
+The work \emph{Integrating Multimodal Perception into Ground
+Mobile Robots}~\cite{sousa:icarsc:2025}, developed within the scope of this
+PhD~Thesis, describes the platform used to collect the dataset
+(see~\appxref{appx:hangfaq2}).
 Lastly, \secref{sec:distance-maps:conclusions} summarizes the main
 conclusions and directions for future work.
 
