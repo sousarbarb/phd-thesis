@@ -1565,8 +1565,8 @@ incremental updates cannot be performed by simple Euclidean addition,
 as discussed in \secref{sec:distance-maps:background:least-squares:manifold}.
 A perturbation
 $\mathbf{\Delta x} = (\Delta x, \Delta y, \Delta\theta)^T \in \mathbb{R}^3$ is
-defined in the tangent (Euclidean) space with the exponential and logarithmic
-mappings defined as
+defined in the tangent (Euclidean) space with the \emph{exponential} and
+\emph{logarithmic mappings} defined as
 \eqref{eq:distance-maps:alignment:problem:x:exp} and
 \eqref{eq:distance-maps:alignment:problem:x:log}, respectively.
 Consequently, the manifold update between Gauss-Newton iterations adopt a
@@ -1920,7 +1920,25 @@ on obstacle boundaries consistently face the sensor.
 
 \section{Experimental Results and Discussion}\label{sec:distance-maps:results}
 
-\todo{TBC}
+This section evaluates the distance map-based registration formulations proposed
+in this work (see~\secref{sec:distance-maps:alignment}) with synthetic and
+real-world data. First, a synthetic benchmark assesses registration accuracy and
+uncertainty estimation across four planar scenes
+(circle, square, corridor, and random) designed to expose different
+geometric challenges of the 2D~point cloud registration problem.
+Second, a real-world laser odometry evaluation on the IILABS~3D
+dataset~\cite{ribeiro:access:2025} assesses trajectory accuracy against
+millimeter-precision ground-truth from an OptiTrack motion capture system.
+Both experiments compare the proposed distance map point-to-point
+(see~\secref{sec:distance-maps:alignment:pt2pt}) and point-to-plane
+(see~\secref{sec:distance-maps:alignment:pt2pl}) formulations against
+standard point-to-point~\cite{besl-mckay:tpami:1992} and
+point-to-plane~\cite{chen-medioni:icra:1991} \gls{icp} error formulations,
+with data association resolved via the distance map representations
+proposed in this work. While the synthetic benchmark focuses on
+registration accuracy and uncertainty estimation, the real-world evaluation
+extends the analysis to odometric drift across extended trajectories,
+where cumulative alignment errors directly impact localization accuracy.
 
 \subsection{Synthetic benchmark}
 \label{sec:distance-maps:results:synthetic}
@@ -1992,10 +2010,12 @@ added independently to each measurement of both scans, as explained previously.
 \label{sec:distance-maps:results:synthetic:metrics}
 
 Kümmerle~\etal~\cite{kummerle:ar:2009} refer to a straightforward error metric
-in their work to evaluate \gls{slam} algorithms would be the logarithmic
-mapping of the pose estimate ($\mathbf{x}$) back to the tangent space at the
-reference ground-truth pose ($\mathbf{x}^*$) over the robot trajectory ($1:T$),
-as formulated in \eqref{eq:distance-maps:results:synthetic:kummerle}.
+in their work to evaluate \gls{slam} algorithms based on the \emph{logarithmic
+mapping} of the pose estimate ($\mathbf{x}_t$) back to the tangent space at the
+reference ground-truth pose ($\mathbf{x}_t^*$) over the robot trajectory ($1:T$),
+as formulated in \eqref{eq:distance-maps:results:synthetic:kummerle} and similar
+to the inverse distance operation of two $SE(2)$ poses formulated in
+\eqref{eq:distance-maps:alignment:problem:gauss-newton:subtraction}.
 However, this metric is focused on the robot trajectory, not on single pose
 independent alignments, while also being sub-optimal in \gls{slam} evaluation.
 \begin{equation}
@@ -2009,9 +2029,10 @@ registration presented in this work is to evaluate independent pairwise
 alignments in the same scene, not throughout a robot trajectory.
 Focusing on a single pairwise alignment,
 \eqref{eq:distance-maps:results:synthetic:pose-error} presents the
-\emph{logarithmic mapping} of the pose error ($\boldsymbol{\varepsilon}_{x}$) on
+\emph{logarithmic mapping} of the pose error
+$\boldsymbol{\varepsilon}\!\left(\mathbf{x}\right)$ on
 the manifold $SE(2)$ between the pose estimate ($\mathbf{x}$) and its true value
-($\mathbf{x}^*$) with respect to the target frame,
+($\mathbf{x}^*$) \gls{wrt} the target frame,
 where the rotation matrix ($\mathbf{R}_{\boldsymbol{\varepsilon}_\mathbf{x}}$)
 represents the angle difference error between
 the estimated orientation ($\theta$) and the ground-truth value ($\theta^*$),
@@ -2054,7 +2075,7 @@ $y$-axis~($\varepsilon_y$) is reported for that scene, as formulated in
 
 \paragraph{Rotation error}
 Next, the rotation error is the absolute angular residual extracted from
-$\mathbf{R}_\mathrm{err}$, as formulated in
+$\mathbf{R}_{\boldsymbol{\varepsilon}_\mathbf{x}}$, as formulated in
 \eqref{eq:distance-maps:results:synthetic:rot-error}, where
 $r_{\boldsymbol{\varepsilon}_\mathbf{x},i,j}$ represents the $(i,j)$ element
 of the matrix $\mathbf{R}_{\boldsymbol{\varepsilon}_\mathbf{x}}$.
@@ -2078,23 +2099,26 @@ where $\boldsymbol{\varepsilon}\!\left(\mathbf{x}\right)$ is the pose error
 (see \eqref{eq:distance-maps:results:synthetic:pose-error}) and
 $\boldsymbol{\Omega} \in \mathbb{R}^{3 \times 3}$ is the information matrix
 returned by the Gauss--Newton solver (see
-\secref{sec:distance-maps:background:least-squares})~\cite{kummerle:ar:2009}.
+\secref{sec:distance-maps:background:least-squares})
+for the estimated pose $\mathbf{x}$ of the moving \gls{wrt} the target
+frame~\cite{kummerle:ar:2009}.
 \begin{equation}
 \label{eq:distance-maps:results:synthetic:chi2}
-\chi^2 = \boldsymbol{\varepsilon}\!\left(\mathbf{x}\right)^T \cdot
-         \boldsymbol{\Omega} \cdot
-         \boldsymbol{\varepsilon}\!\left(\mathbf{x}\right)
+\chi_{\boldsymbol{\varepsilon}}^2 =
+    \boldsymbol{\varepsilon}\!\left(\mathbf{x}\right)^T \cdot
+    \boldsymbol{\Omega} \cdot
+    \boldsymbol{\varepsilon}\!\left(\mathbf{x}\right)
 \end{equation}
 
-In the ideal case, $\chi^2 = 0$ corresponds to a perfect alignment.
-Large values indicate either poor alignment accuracy, an overconfident
-information matrix $\boldsymbol{\Omega}$, or both.
+In the ideal case, $\chi_{\boldsymbol{\varepsilon}}^2 = 0$ corresponds to a
+perfect alignment. Large values indicate either poor alignment accuracy,
+an overconfident information matrix $\boldsymbol{\Omega}$, or both.
 In degenerate scenes, $\boldsymbol{\Omega}$ becomes ill-conditioned along
-unobservable directions, inflating $\chi^2$ even when observable
-components of the alignment are accurate.
+unobservable directions, inflating $\chi_{\boldsymbol{\varepsilon}}^2$ even when
+observable components of the alignment are accurate.
 Translation and rotation errors are aggregated over the $N=100$ independent
-trials and reported as the \gls{rmse}, whilst $\chi^2$ is reported as the
-mean over trials.
+trials and reported as the \gls{rmse}, whilst
+$\chi_{\boldsymbol{\varepsilon}}^2$ is reported as the mean over trials.
 
 \subsubsection{Registration accuracy and uncertainty}
 \label{sec:distance-maps:results:synthetic:registration}
@@ -2134,24 +2158,33 @@ this benchmark are the following:
       implementation considered in this work.
 \end{itemize}
 
-% \input{tables/distance-maps/initial-test/results_synthetic_pc_res-0.01m_noise-0.0m.tex}
-% \input{tables/distance-maps/initial-test/results_synthetic_pc_res-0.01m_noise-0.03m.tex}
-% \input{tables/distance-maps/initial-test/results_synthetic_pc_res-0.03m_noise-0.0m.tex}
-% \input{tables/distance-maps/initial-test/results_synthetic_pc_res-0.03m_noise-0.03m.tex}
-% \input{tables/distance-maps/initial-test/results_synthetic_pc_res-0.05m_noise-0.0m.tex}
-% \input{tables/distance-maps/initial-test/results_synthetic_pc_res-0.05m_noise-0.03m.tex}
-
-\input{tables/distance-maps/final-test/results_synthetic_pc_res-0.01m_noise-0.0m.tex}
-\input{tables/distance-maps/final-test/results_synthetic_pc_res-0.01m_noise-0.03m.tex}
-\input{tables/distance-maps/final-test/results_synthetic_pc_res-0.03m_noise-0.0m.tex}
-\input{tables/distance-maps/final-test/results_synthetic_pc_res-0.03m_noise-0.03m.tex}
-\input{tables/distance-maps/final-test/results_synthetic_pc_res-0.05m_noise-0.0m.tex}
-\input{tables/distance-maps/final-test/results_synthetic_pc_res-0.05m_noise-0.03m.tex}
+\input{tables/distance-maps/synthetic-benchmark/final-test/results_synthetic_pc_res-0.01m_noise-0.0m.tex}
+\input{tables/distance-maps/synthetic-benchmark/final-test/results_synthetic_pc_res-0.01m_noise-0.03m.tex}
+\input{tables/distance-maps/synthetic-benchmark/final-test/results_synthetic_pc_res-0.03m_noise-0.0m.tex}
+\input{tables/distance-maps/synthetic-benchmark/final-test/results_synthetic_pc_res-0.03m_noise-0.03m.tex}
+\input{tables/distance-maps/synthetic-benchmark/final-test/results_synthetic_pc_res-0.05m_noise-0.0m.tex}
+\input{tables/distance-maps/synthetic-benchmark/final-test/results_synthetic_pc_res-0.05m_noise-0.03m.tex}
 
 All methods are solved using the same Gauss--Newton optimizer within the
 srrg2\_solver~\cite{grisetti:robotics:2020} framework on the $SE(2)$ manifold,
 with a maximum of 50~iterations and a step-norm convergence threshold of
-$10^{-5}$. For each method and representation level, results are reported with
+$10^{-5}$. M-estimators are disabled for all formulations, given that the
+dimension of the error vector differs across methods and the synthetic data
+does not generate outliers. The usage of M-estimators would otherwise prevent
+a fair comparison under a common robust kernel parametrization.
+The distance map size parameter $L$ is disabled, making the map extent
+determined automatically from the bounding box of points with a valid range
+measurement ($\leq \SI{30}{\metre}$). A maximum truncation distance of
+$d_{\max} = \SI{5.00}{\metre}$ is applied to the distance field, limiting data
+association and distance map computation to points within $\SI{5}{\metre}$ of
+the nearest reference surface, which facilitates convergence and
+avoids computing the whole distance map.
+
+Moreover, the surface normals required by point-to-plane formulations are
+estimated via \gls{pca} (see~\secref{sec:distance-maps:alignment:pt2pl:normals})
+on the local neighborhood of each point, with a minimum neighborhood size of
+$N_{\min} = 3$ points and a search radius $=\SI{0.15}{\metre}$.
+For each method and representation level, results are reported with
 and without voxelization of the input point clouds at the distance map cell
 resolution~$\delta$, and with and without bi-linear sub-pixel interpolation
 (applicable only to $\mathcal{M}_1$ and $\mathcal{M}_2$ representations).
