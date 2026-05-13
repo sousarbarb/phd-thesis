@@ -2195,93 +2195,646 @@ reducing the association step to an $O(1)$ lookup after a one-time map
 construction. Next, the accuracy and uncertainty of the four registration
 formulations are analyzed across the different synthetic configurations.
 
-% Describe the four synthetic environments: square, circle, corridor,
-% random. One sentence each on why each geometry is informative —
-% especially corridor as the degenerate case.
-%
-% Pose accuracy: report mean/std of translation and rotation error
-% across N trials (with noise model described here) for each method
-% and geometry. A table with methods as columns and geometries as rows
-% works well.
-%
-% Information matrix eigenanalysis: for each geometry, show the dominant
-% eigenvectors of the information matrix from the Gauss-Newton solver.
-% Compare across the four methods. The corridor case is the key result:
-% discuss which method(s) correctly identify the degenerate direction
-% and whether the near-zero eigenvalue is consistent.
-%
-% Keep point-to-point random environment results here; note it is the
-% only geometry evaluated for that case and explain why (isotropy
-% argument, or lack of sufficient structure for point-to-plane).
+\paragraph{Registration accuracy}
+First, across all six table configurations, point-to-plane formulations
+($\mathcal{D}_\mathrm{p2pl}$ and $\mathrm{ICP}_{\mathcal{D},\mathrm{p2pl}}$)
+consistently achieve lower or equal translation and rotation errors compared to
+their point-to-point counterparts. This result confirms the conclusion of
+Rusinkiewicz and Levoy~\cite{rusinkiewicz-levoy:im:2001} for \gls{icp} variants,
+while demonstrating the same conclusion of point-to-plane compared to
+point-to-point distance map-based formulations for 2D~point cloud registration.
+On all scenes with no noise
+(Tables~\ref{tab:distance-maps:results:synthetic:accuracy:res-0.01m_noise-0.00m},
+\ref{tab:distance-maps:results:synthetic:accuracy:res-0.03m_noise-0.00m}, and
+\ref{tab:distance-maps:results:synthetic:accuracy:res-0.05m_noise-0.00m}),
+the best accuracy results for $\mathcal{D}_\mathrm{p2pl}$ and
+$\mathrm{ICP}_{\mathcal{D},\mathrm{p2pl}}$ ($\mathcal{M}_0$ representation
+level, no interpolation on the distance map, with negligible difference between
+enabling voxelization or not) report $\varepsilon_t=\SI{0.000}{\metre}$ and
+$\varepsilon_\theta=\SI{0.00}{\degree}$.
+In contrast, point-to-point formulations have in most cases a non-zero error
+for translation and/or orientation metrics for scenes with no noise.
+When analyzing the results for scenes with added noise
+$\sigma=\SI{0.03}{\metre}$
+(Tables~\ref{tab:distance-maps:results:synthetic:accuracy:res-0.01m_noise-0.03m},
+\ref{tab:distance-maps:results:synthetic:accuracy:res-0.03m_noise-0.03m}, and
+\ref{tab:distance-maps:results:synthetic:accuracy:res-0.05m_noise-0.03m}),
+the point-to-plane formulations still outperform the point-to-point methods.
+This result is a consequence of point-to-point formulations depending on
+explicit point-to-point associations. Since the synthetic benchmark considered
+in this work employs a 2D~laser scanner model, the point clouds acquired from
+two distinct poses sample the scene surfaces at different angular positions
+and range values, producing point sets that do not coincide even in the absence
+of additive noise. Point-to-point residuals are therefore sensitive to this
+sampling discrepancy, as the association error between non-coincident points
+contributes directly to the alignment error.
+Meanwhile, point-to-plane residuals measure the orthogonal distance from
+each source point to the target surface, a quantity that is invariant to
+the specific point sampling along that surface, and are consequently less
+affected by the inter-scan sampling discrepancy inherent to the laser
+scanner model.
+
+Next, the synthetic experimental results show a numerical equivalence between
+$\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$ and
+$\mathrm{ICP}_{\mathcal{D},\mathrm{p2pl}}$ across all scenes, resolutions, and
+noise levels. This result is confirms the expected theoretical equivalence
+between the original point-to-plane \gls{icp}~\cite{chen-medioni:icra:1991} and
+the point-to-plane formulation based on distance maps proposed in this work
+(see~\secref{sec:distance-maps:alignment:pt2pl}).
+When the $\mathcal{M}_0$ representation is used,
+the point-to-plane residual of the proposed distance map formulation
+(see~\eqref{eq:distance-maps:alignment:pt2pl:error}) reduces to the dot product
+of the rotated normal of the moving point $\mathbf{R}(\theta)\mathbf{n}_{z_i}$
+with the analytical expression of the vector
+$\hat{\bm{\nabla}}\mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right) \cdot
+\mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right)$
+(see Equations~\ref{eq:distance-maps:alignment:dmaps:definition} and
+\ref{eq:distance-maps:alignment:dmaps:1st-deriv:analytical-derivation}),
+equivalent to the vector $(\tilde{\mathbf{z}}_i - \mathbf{p}^*)$, which is
+exactly the original point-to-plane residual~\cite{chen-medioni:icra:1991}.
+The two formulations are therefore analytically identical when using
+$\mathcal{M}_0$, and the numerical agreement in the tables confirms this
+derivation. The same equivalence holds between
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_0)$ and
+$\mathrm{ICP}_{\mathcal{D},\mathrm{p2p}}$ in terms of data association, though
+the two formulations use different residual functions (scalar distance versus
+vector displacement), yielding slightly different pose estimates.
+This result carries an important practical implication. The $\mathcal{M}_0$
+grid can be used as an $O(1)$ drop-in replacement for the kd-tree nearest-neighbor
+search~\cite{bentley:cacm:1975} traditionally required by \gls{icp} methods at
+every iteration~\cite{besl-mckay:tpami:1992,chen-medioni:icra:1991,segal:rss:2009}.
+Classical \gls{icp} methods incur $O(\log n)$ cost per point per iteration.
+The $\mathcal{M}_0$ representation level reduces this cost to $O(1)$ after a
+one-time precomputation, an advantage exploited by all four formulations
+evaluated in this benchmark.
+
+Regarding the point-to-point formulations, whilst registration accuracy at
+representation level~$\mathcal{M}_0$ is comparable between the distance map and
+\gls{icp} variants, a noticeable difference in $\chi_{\boldsymbol{\varepsilon}}^2$ consistency emerges
+between noise-free, noisy conditions, and between point-to-point alignment
+approaches on degenerate scenes. For example, for the distance map
+point-to-point formulation~$\mathcal{D}_\mathrm{p2p}$ without voxelization,
+the $\chi_{\boldsymbol{\varepsilon}}^2$ values on the circle scene are
+$6404.92$, $6234.68$, and $6198.44$ for resolutions
+$\delta \in\{0.01, 0.03, 0.05\}$~m under noise-free conditions, reducing to
+$2980.76$, $3100.86$, and $3913.39$, respectively, when
+$\sigma = \SI{0.03}{\metre}$ Gaussian noise is added to the point cloud.
+These results translate a reduction of approximately 46.54--63.14\% depending on
+resolution. By contrast, the corresponding
+$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$
+values are $6665.84$, $6432.74$, and $6431.42$ without noise, and
+$6584.09$, $6479.07$, and $6541.08$ with noise, showing no meaningful
+reduction in $\chi_{\boldsymbol{\varepsilon}}^2$ under noisy conditions.
+In the corridor scene, $\chi_{\boldsymbol{\varepsilon}}^2$ remains approximately constant between
+noise-free and noisy conditions for both formulations, with
+$\mathcal{D}_\mathrm{p2p}$ consistently producing lower values
+than~$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$.
+This behavior is attributed to the difference in residual dimensionality
+between the two formulations: $\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$
+constructs a two-dimensional coordinate error per correspondence, whereas
+$\mathcal{D}_\mathrm{p2p}$ produces a scalar distance residual.
+In structured scenes, where point-wise geometric information reduces to a
+point-to-surface distance rather than a full two-dimensional displacement,
+the scalar residual of the distance map formulation is more consistent with
+the effective information content of the measurement.
+Consequently, $\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$ tends to produce
+an overconfident pose estimate relative to~$\mathcal{D}_\mathrm{p2p}$.
+This observation is examined further in the context of
+\emph{Uncertainty estimation} below.
+
+The comparison between the precomputed representation
+levels~$\mathcal{M}_1$ and~$\mathcal{M}_2$ and the \gls{icp} baselines
+indicates slightly worse registration accuracy for the distance map-based
+formulations relative to the \gls{icp} baselines at~$\mathcal{M}_0$.
+In both point-to-point and point-to-plane formulations,
+the accuracy degradation relative to the \gls{icp} baselines
+is attributed to quantization errors arising from the grid-based layout of
+the precomputed representation levels and to the finite-difference
+approximation of the distance field gradient, whose discretization error
+scales with cell resolution and introduces a systematic bias in the residual
+direction. Across both formulations, the $\mathcal{M}_0$~representation level
+remains the preferred one for registration accuracy.
+
+\paragraph{Distance map parametrization}
+The choice of the representation level ($\mathcal{M}$) and parametrization
+(cell resolution, sub-pixelization, voxelization) has an effect on the results
+from the point-to-point and point-to-plane distance map-based formulations.
+For~$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$, accuracy degrades as cell resolution ($\delta$)
+increases, with~$\mathcal{M}_1$ variants consistently producing higher
+translation errors than~$\mathcal{M}_0$ across all scenes and noise conditions.
+In contrast, $\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_2)$ is not affected
+significantly by cell resolution ($\delta$) when bi-linear interpolation is
+disabled, independently of performing voxelization pre-processing on the point
+clouds. Within the~$\mathcal{M}_1$ representation, enabling bi-linear sub-pixel
+interpolation does not improve registration accuracy. In several conditions,
+the sub-pixelization introduces a degradation relative to the non-interpolated
+variant, specially on translation errors, despite bi-linear interpolation being
+expected to yield smoother and more accurate distance and gradient values
+between cell centres. An example of this degradation is shown in the results
+from $\delta = \SI{0.05}{\metre}$ with added noise $\sigma = \SI{0.03}{\metre}$
+(see~\tabref{tab:distance-maps:results:synthetic:accuracy:res-0.05m_noise-0.03m}).
+With no voxelization, $\varepsilon_t$ raise from $\SI{0.003}{\metre}$,
+$\SI{0.004}{\metre}$, $\SI{0.008}{\metre}$, and $\SI{0.034}{\metre}$ to
+$\SI{0.039}{\metre}$, $\SI{0.047}{\metre}$, $\SI{0.036}{\metre}$, and
+$\SI{0.063}{\metre}$ for the circle, square, corridor, and random scenes,
+respectively. A similar trend is noted for
+$\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_2)$ results.
+
+The root cause of this counterintuitive behavior lies in the distance map
+construction: hit cells are initialized with a zero distance,
+with a single point assigned to each cell, even when multiple source points
+may fall within the same cell. Then, bilinear interpolation operates on
+a distance field that carries this initialization bias, resulting in residuals
+that are smoother in magnitude but less accurately directed than those from
+the non-interpolated field. Still, the synthetic results validate
+the design choice of the distance map computation algorithm adopted in
+this work, considering the disabling of sub-pixelization
+(see~\secref{sec:distance-maps:alignment:dmaps}). By initializing hit cells with
+a zero distance value and assigning a single point per cell, the algorithm
+avoids the complexity of handling multiple-point cell collisions while remaining
+sufficiently accurate for point cloud registration.
+
+As for voxelization of the 2D~point clouds, this pre-processing step has a
+negligible effect on registration accuracy in the synthetic benchmark,
+with differences between voxelized and non-voxelized variants not exceeding the
+numerical precision of the reported metrics in the majority of conditions.
+The noticeable differences are present on the translation error results from
+the point-to-point
+$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$~\cite{besl-mckay:tpami:1992} and
+the $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_0)$ variant of the distance map-based
+formulation, specially in $\delta \in\{0.03, 0.05\}$~m
+(see Tables~\ref{tab:distance-maps:results:synthetic:accuracy:res-0.03m_noise-0.00m},
+\ref{tab:distance-maps:results:synthetic:accuracy:res-0.03m_noise-0.03m},
+\ref{tab:distance-maps:results:synthetic:accuracy:res-0.05m_noise-0.00m}, and
+\ref{tab:distance-maps:results:synthetic:accuracy:res-0.05m_noise-0.03m}),
+where the probability of multiple points on the same voxel being averaged is
+higher due to a higher voxel scale resolution, assuming the voxelization step
+with the distance map resolution value.
+With $\delta = \SI{0.03}{\metre}$ with no noise (see
+\tabref{tab:distance-maps:results:synthetic:accuracy:res-0.03m_noise-0.00m}),
+$\varepsilon_t$ increases from $\SI{0.001}{\metre}$
+to $\SI{0.009}{\metre}$ and $\SI{0.012}{\metre}$ for the circle and square
+scenes, respectively, with the $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_0)$
+alignment when enabling voxelization.
+Similarly, the results for $\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$ on the
+same settings raise from $\SI{0.000}{\metre}$ and $\SI{0.001}{\metre}$ to
+$\SI{0.009}{\metre}$ and $\SI{0.013}{\metre}$ for the circle and square tests
+with voxelization enabled, respectively.
+This trend is even more noticeable with noise and higher cell resolution, and thus,
+voxelization scale.
+With $\delta = \SI{0.05}{\metre}$ with added noise $\sigma = \SI{0.03}{\metre}$
+(see \tabref{tab:distance-maps:results:synthetic:accuracy:res-0.05m_noise-0.03m}),
+$\varepsilon_t$ increases from $\SI{0.003}{\metre}$ to
+$\SI{0.026}{\metre}$ and $\SI{0.019}{\metre}$ with the
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_0)$, and from
+from $\SI{0.003}{\metre}$ to $\SI{0.026}{\metre}$ and
+$\SI{0.020}{\metre}$ with $\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$ alignment
+for the circle and square scenes, respectively, when enabling voxelization.
+This behavior is consistent with the expectation that voxelization retains
+the same or less information than the original point cloud. Since multiple
+points falling into the same cell are replaced by their centroid in the
+pre-processing step, the effect is more severe when the voxel scale is large
+relative to the scene geometry.
+
+By contrast, pre-computed distance map variants, in particular
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ with voxelization, are
+substantially less affected and achieve accuracy comparable to
+$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$ without voxelization.
+This result suggests that the coarser point-to-cell residual of these variants
+is already insensitive to the centroid averaging introduced by voxelization.
+Moreover, orientation error is similarly unaffected across all conditions
+for all formulations. The random scene results are largely invariant to
+voxelization owing to the uniform spatial distribution of the synthetic points,
+which reduces the probability of intra-voxel collisions.
+Despite its neutral-to-negative effect in the synthetic benchmark results,
+voxelization remains a recommended pre-processing step for deployment with
+physical 2D laser scanners. In practical operation, the radial scanning geometry
+induces a non-uniform point density, where surfaces at close range are sampled
+at higher angular density than distant ones,
+concentrating measurements near the sensor origin.
+Without voxelization, the optimizer implicitly weights these denser regions
+more heavily, potentially skewing the estimated transformation towards
+close-range observations at the expense of more distant, geometrically
+informative surfaces.
+Although this effect is not observable under the controlled conditions of the
+synthetic benchmark, it is expected to have a measurable impact in real-world
+continuous tracking scenarios, where successive scans are acquired at varying
+sensor-to-surface distances and density non-uniformity accumulates over time.
+
+\paragraph{Uncertainty estimation}
+The Mahalanobis-squared $\chi_{\boldsymbol{\varepsilon}}^2$ statistic exposes systematic differences in
+information matrix estimation across formulations and scenes considered in
+the synthetic benchmark. The $\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$ and
+$\mathrm{ICP}_{\mathcal{D},\mathrm{p2pl}}$ formulations produce identical
+$\chi_{\boldsymbol{\varepsilon}}^2$ values throughout the tables. Similarly to registration accuracy, this
+result is expected given that both formulations are analytically equivalent.
+For the non-degenerate square scene, these methods achieve $\chi_{\boldsymbol{\varepsilon}}^2 = 0.00$
+under noise-free conditions (see
+Tables~\ref{tab:distance-maps:results:synthetic:accuracy:res-0.01m_noise-0.00m},
+\ref{tab:distance-maps:results:synthetic:accuracy:res-0.03m_noise-0.00m}, and
+\ref{tab:distance-maps:results:synthetic:accuracy:res-0.05m_noise-0.00m}),
+only rising to $\chi_{\boldsymbol{\varepsilon}}^2 = 0.01$ when adding $\sigma = \SI{0.03}{\metre}$ Gaussian
+noise (see
+Tables~\ref{tab:distance-maps:results:synthetic:accuracy:res-0.01m_noise-0.03m},
+\ref{tab:distance-maps:results:synthetic:accuracy:res-0.03m_noise-0.03m}, and
+\ref{tab:distance-maps:results:synthetic:accuracy:res-0.05m_noise-0.03m}).
+In the corridor scene, $\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$ and
+$\mathrm{ICP}_{\mathcal{D},\mathrm{p2pl}}$ obtain $\chi_{\boldsymbol{\varepsilon}}^2 \leq 5.72$
+and $\chi_{\boldsymbol{\varepsilon}}^2 \leq 14.07$ under noise-free conditions and with
+$\sigma = \SI{0.03}{\metre}$ noise, respectively.
+While for the circle scene the $\chi_{\boldsymbol{\varepsilon}}^2$ is an order of magnitude higher,
+possibly due to the unobservable heading component contributing a large positive
+term to the quadratic form compared to other formulations, both
+$\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$ and
+$\mathrm{ICP}_{\mathcal{D},\mathrm{p2pl}}$ still achieve much lower values for
+the Mahalanobis-squared $\chi_{\boldsymbol{\varepsilon}}^2$ statistic.
+Overall, $\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$ and
+$\mathrm{ICP}_{\mathcal{D},\mathrm{p2pl}}$ formulations obtained the best
+$\chi_{\boldsymbol{\varepsilon}}^2$ statistic results across all conditions in the synthetic benchmark,
+indicating that the two formulations are the best for estimating the uncertainty
+of the pose estimation in 2D~point cloud registration.
+
+All analytical-based point-to-point formulations evaluated in this work
+exhibit severe overconfidence on the circle scene.
+$\mathrm{ICP}_{\mathcal{D},\mathrm{p2p}}$ at $\mathcal{M}_0$
+yields $\chi_{\boldsymbol{\varepsilon}}^2 \approx 5755$--$6666$ across all resolutions without noise,
+and $\chi_{\boldsymbol{\varepsilon}}^2 \approx 6249$--$6587$ with noise. These results are two to
+three orders of magnitude above those of the point-to-plane counterpart.
+$\mathcal{D}_\mathrm{p2p}$ at $\mathcal{M}_0$ is similarly affected to a lesser
+extent, with $\chi_{\boldsymbol{\varepsilon}}^2 \approx 4827$--$6405$ without noise, decreasing to
+$\approx 2981$--$3913$ with noise.
+For the corridor scene, $\mathrm{ICP}_{\mathcal{D},\mathrm{p2p}}$ yields
+$\chi_{\boldsymbol{\varepsilon}}^2 \approx 636$--$834$ without noise and $\approx 766$--$858$ under noise,
+compared to $\approx 380$--$543$ and $\approx 435$--$522$ for
+$\mathcal{D}_\mathrm{p2p}$ at $\mathcal{M}_0$.
+The reduction relative to $\mathrm{ICP}_{\mathcal{D},\mathrm{p2p}}$ is
+attributable to the difference in residual dimensionality: the distance-map
+point-to-point formulation produces a scalar residual with a
+$1 \times 3$ Jacobian, whereas the standard point-to-point \gls{icp} constructs
+a two-dimensional point coordinate residual with a $2 \times 3$ Jacobian. The
+latter accumulates a larger information matrix per correspondence, leading to
+greater overconfidence.
+In the non-degenerate square scene, all point-to-point variants yield
+$\chi_{\boldsymbol{\varepsilon}}^2 \leq 2.15$ across conditions,
+with $\chi_{\boldsymbol{\varepsilon}}^2 \leq 0.04$ in the random scene.
+The overdetermined constraint structure of these geometries
+compensates for the overconfidence detected in the circle and corridor scenes,
+producing well-calibrated consistency statistics regardless of
+which point-to-point variant is employed.
+
+The $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ variants, which use a
+finite-difference approximation of the distance map gradient, yield
+systematically lower $\chi_{\boldsymbol{\varepsilon}}^2$ values than both
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_0)$ and
+$\mathrm{ICP}_{\mathcal{D},\mathrm{p2p}}$ formulations on the circle and
+corridor scenes. The reduction in $\chi_{\boldsymbol{\varepsilon}}^2$ grows
+with cell resolution~$\delta$ and is more pronounced under noise-free
+conditions. On the circle scene without noise,
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ yields
+$\chi_{\boldsymbol{\varepsilon}}^2 \approx 1684$--$2742$,
+$\approx 257$--$586$, and $\approx 162$--$481$ for
+$\delta \in \{0.01, 0.03, 0.05\}$~m, respectively.
+These represent improvements of 52\%--74\%, 88\%--96\%, and 90\%--97\% over
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_0)$
+($\chi_{\boldsymbol{\varepsilon}}^2 \approx 5727$--$6405$,
+$\approx 4827$--$6235$, and $\approx 4954$--$6198$), and of
+59\%--74\%, 91\%--96\%, and 93\%--97\% over
+$\mathrm{ICP}_{\mathcal{D},\mathrm{p2p}}$
+($\chi_{\boldsymbol{\varepsilon}}^2 \approx 6568$--$6666$,
+$\approx 6433$--$6579$, and $\approx 5755$--$6431$).
+Under noise ($\sigma = \SI{0.03}{\metre}$), the improvements are smaller but
+remain substantial, with
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ yielding
+$\chi_{\boldsymbol{\varepsilon}}^2 \approx 1810$--$2118$,
+$\approx 536$--$938$, and $\approx 304$--$704$, compared to
+$\approx 2981$--$2991$, $\approx 3101$--$3124$, and $\approx 3201$--$3913$
+for $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_0)$
+(29\%--39\%, 70\%--83\%, and 78\%--92\% improvement), and to
+$\approx 6584$--$6587$, $\approx 6479$--$6580$, and $\approx 6249$--$6541$
+for $\mathrm{ICP}_{\mathcal{D},\mathrm{p2p}}$
+(68\%--73\%, 86\%--92\%, and 89\%--95\% improvement).
+A consistent trend is observed on the corridor scene.
+Without noise, $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ achieves
+$\chi_{\boldsymbol{\varepsilon}}^2 \approx 155$--$191$,
+$\approx 71$--$98$, and $\approx 44$--$77$ for
+$\delta \in \{0.01, 0.03, 0.05\}$~m, representing improvements of
+64\%--71\%, 79\%--87\%, and 80\%--90\% over
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_0)$
+($\chi_{\boldsymbol{\varepsilon}}^2 \approx 531$--$543$,
+$\approx 463$--$540$, and $\approx 380$--$455$), and of
+77\%--81\%, 87\%--91\%, and 88\%--95\% over
+$\mathrm{ICP}_{\mathcal{D},\mathrm{p2p}}$
+($\chi_{\boldsymbol{\varepsilon}}^2 \approx 825$--$833$,
+$\approx 776$--$834$, and $\approx 636$--$828$).
+Under noise, $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ yields
+$\chi_{\boldsymbol{\varepsilon}}^2 \approx 263$--$303$,
+$\approx 112$--$159$, and $\approx 69$--$110$, compared to
+$\approx 435$--$436$, $\approx 454$--$461$, and $\approx 492$--$522$
+for $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_0)$
+(30\%--40\%, 65\%--76\%, and 78\%--87\% improvement), and to
+$\approx 856$--$858$, $\approx 817$--$855$, and $\approx 766$--$844$
+for $\mathrm{ICP}_{\mathcal{D},\mathrm{p2p}}$
+(65\%--69\%, 81\%--87\%, and 86\%--92\% improvement).
+
+Although the finite-difference gradient used in by the
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ variants is approximately unit-norm by
+the Eikonal property of Euclidean distance field~\cite{jones:tvcg:2006}, it
+differs from the analytical gradient in direction. These differences are present
+near surface boundaries and at coarser resolutions,
+where cell-level averaging introduces a smoothing effect that alters the
+Jacobian structure relative to the one used in
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_0)$.
+Whether this constitutes an improvement in calibration or merely a systematic
+bias in the information matrix that happens to reduce the quadratic form in
+degenerate scenes cannot be determined from the
+$\chi_{\boldsymbol{\varepsilon}}^2$ statistic alone, and a rigorous analysis
+of the Jacobian structure of finite-difference distance-map gradients is beyond
+the scope of this work.
+Still, the experimental results in the synthetic benchmark suggest that
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ variants yield better-calibrated
+uncertainty estimates than the analytical point-to-point
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ variants and the original
+point-to-point \gls{icp}~\cite{besl-mckay:tpami:1992},
+making it more suitable for uncertainty-aware applications such as information
+matrix weighting in pose-graph optimization.
+
+%% CIRCLE
+%%
+%% dmap m0
+%%
+%% without noise:
+%% res 0.01: 5727--6405  (52\% -- 74\%)
+%% res 0.03: 4827--6235  (88\% -- 96\%)
+%% res 0.05: 4954--6198  (90\% -- 97\%)
+%%
+%% with noise:
+%% res 0.01: 2981--2991  (29\% -- 39\%)
+%% res 0.03: 3101--3124  (70\% -- 83\%)
+%% res 0.05: 3201--3913  (78\% -- 92\%)
+%%
+%% dmap m1
+%%
+%% without noise:
+%% res 0.01: 1684--2742
+%% res 0.03: 257--586
+%% res 0.05: 162--481
+%%
+%% with noise:
+%% res 0.01: 1810--2118
+%% res 0.03: 536--938
+%% res 0.05: 304--704
+%%
+%% icp m0
+%%
+%% without noise:
+%% res 0.01: 6666--6568  (59\% -- 74\%)
+%% res 0.03: 6433--6579  (91\% -- 96\%)
+%% res 0.05: 6431--5755  (93\% -- 97\%)
+%%
+%% with noise:
+%% res 0.01: 6584--6587  (68\% -- 73\%)
+%% res 0.03: 6479--6580  (86\% -- 92\%)
+%% res 0.05: 6541--6249  (89\% -- 95\%)
+%%
+%% --------
+%%
+%% CORRIDOR
+%%
+%% dmap m0
+%%
+%% without noise:
+%% res 0.01: 531--543  (64\% -- 71\%)
+%% res 0.03: 463--540  (79\% -- 87\%)
+%% res 0.05: 380--455  (80\% -- 90\%)
+%%
+%% with noise:
+%% res 0.01: 435--436  (30\% -- 40\%)
+%% res 0.03: 454--461  (65\% -- 76\%)
+%% res 0.05: 492--522  (78\% -- 87\%)
+%%
+%% dmap m1
+%%
+%% without noise:
+%% res 0.01: 155--191
+%% res 0.03: 71--98
+%% res 0.05: 44--77
+%%
+%% with noise:
+%% res 0.01: 263--303
+%% res 0.03: 112--159
+%% res 0.05: 69--110
+%%
+%% icp m0
+%%
+%% without noise:
+%% res 0.01: 825--833  (77\% -- 81\%)
+%% res 0.03: 776--834  (87\% -- 91\%)
+%% res 0.05: 636--828  (88\% -- 95\%)
+%%
+%% with noise:
+%% res 0.01: 856--858  (65\% -- 69\%)
+%% res 0.03: 817--855  (81\% -- 87\%)
+%% res 0.05: 766--844  (86\% -- 92\%)
+
+Lastly, the $\mathcal{D}_\mathrm{p2pl}$ variant at $\mathcal{M}_2$ exhibits
+considerably higher $\chi_{\boldsymbol{\varepsilon}}^2$ than its
+$\mathcal{M}_0$ variant, with the discrepancy growing under noise.
+On the circle scene, the noise-free $\chi_{\boldsymbol{\varepsilon}}^2$ ranges
+from approximately $106$ to $545$ across resolutions and voxelization settings,
+compared to $\approx 46$--$54$ for $\mathcal{M}_0$.
+Under $\sigma = \SI{0.03}{\metre}$ Gaussian noise,
+$\chi_{\boldsymbol{\varepsilon}}^2$ rises to $\approx 4527$--$5833$,
+$\approx 1120$--$1717$, and $\approx 442$--$846$ for
+$\delta \in \{0.01, 0.03, 0.05\}$~m, a degradation of up to
+two orders of magnitude relative to both the noise-free case and the
+corresponding $\mathcal{M}_0$ result. While the
+degradation lowers with increasing resolution, this effect is possibly due to
+the smoothing effect of the coarse cell resolution.
+On the corridor scene, $\mathcal{M}_2$ achieves
+$\chi_{\boldsymbol{\varepsilon}}^2\approx 31$--$38$,
+$\approx 5$--$11$, and $\approx 13$--$21$ for
+$\delta \in \{0.01, 0.03, 0.05\}$~m, respectively,
+under noise-free conditions. While the $\chi_{\boldsymbol{\varepsilon}}^2$
+consistency degrades under noise ($\approx 337--445$, $\approx 82--129$, and
+$\approx 32--56$ for $\delta \in \{0.01, 0.03, 0.05\}$~m), the results for
+$\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_2)$ are lower than all point-to-point
+formulations considered in the benchmark.
+This sensitivity to noise is attributable to the use of finite-difference
+approximations for both the gradient and the Hessian of the distance field in
+the $\mathcal{M}_2$ representation. The information matrix construction in
+the point-to-plane formulation requires the second-order spatial derivatives of
+the distance field, which are obtained by applying finite differences to
+the already finite-difference-approximated gradient.
+This successive two-step numerical differentiation compounds the amplification
+of measurement noise, making the Hessian estimate substantially more
+sensitive to noise than the gradient used in $\mathcal{M}_1$.
+As a consequence, the uncertainty estimates produced by $\mathcal{M}_2$ are
+less reliable than those of the $\mathcal{M}_0$ point-to-plane variants under
+noisy conditions, suggesting that the analytical distance map representation
+is preferable for uncertainty-aware applications.
+
+\paragraph{Distance field and its derivatives visualization}
+\figref{fig:distance-maps:results:synthetic:scenes:dist+1st-deriv} illustrates
+the distance map ($\mathcal{D}$) and its 1st-order partial derivatives
+($\partial\mathcal{D}/\partial x$, $\partial\mathcal{D}/\partial y$) for
+the four synthetic environments. The distance map representation considers a
+truncation distance $d_{\max}= \SI{5}{\metre}$ to avoid computing the full map.
+Cells whose nearest-neighbor distance exceeds $d_{\max}$ are assigned a
+constant value $d_{\max}$, so their 1st-order derivatives are identically zero.
+This behavior is analogous to truncated $L_{\mathrm{trunc}}^1$ and
+$L_{\mathrm{trunc}}^2$ M-estimators, ignoring the influence of correspondences
+far from any observed surface.
+
+\begin{figure}[!t]
+\centering
+\subfloat[Circle: $\mathcal{D}$]{\includegraphics[width=0.245\textwidth]{distance-maps/examples/final-test/circle_dist_img.png}}\hfill
+\subfloat[Square: $\mathcal{D}$]{\includegraphics[width=0.245\textwidth]{distance-maps/examples/final-test/square_dist_img.png}}\hfill
+\subfloat[Corridor: $\mathcal{D}$]{\includegraphics[width=0.245\textwidth]{distance-maps/examples/final-test/corridor_dist_img.png}}\hfill
+\subfloat[Random: $\mathcal{D}$]{\includegraphics[width=0.245\textwidth]{distance-maps/examples/final-test/random_dist_img.png}}\\[\smallskipamount]
+
+\subfloat[Circle: $\partial\mathcal{D}/\partial x$]{\includegraphics[width=0.245\textwidth]{distance-maps/examples/final-test/circle_dist_deriv_x_img.png}}\hfill
+\subfloat[Square: $\partial\mathcal{D}/\partial x$]{\includegraphics[width=0.245\textwidth]{distance-maps/examples/final-test/square_dist_deriv_x_img.png}}\hfill
+\subfloat[Corridor: $\partial\mathcal{D}/\partial x$]{\includegraphics[width=0.245\textwidth]{distance-maps/examples/final-test/corridor_dist_deriv_x_img.png}}\hfill
+\subfloat[Random: $\partial\mathcal{D}/\partial x$]{\includegraphics[width=0.245\textwidth]{distance-maps/examples/final-test/random_dist_deriv_x_img.png}}\\[\smallskipamount]
+
+\subfloat[Circle: $\partial\mathcal{D}/\partial y$]{\includegraphics[width=0.245\textwidth]{distance-maps/examples/final-test/circle_dist_deriv_y_img.png}}\hfill
+\subfloat[Square: $\partial\mathcal{D}/\partial y$]{\includegraphics[width=0.245\textwidth]{distance-maps/examples/final-test/square_dist_deriv_y_img.png}}\hfill
+\subfloat[Corridor: $\partial\mathcal{D}/\partial y$]{\includegraphics[width=0.245\textwidth]{distance-maps/examples/final-test/corridor_dist_deriv_y_img.png}}\hfill
+\subfloat[Random: $\partial\mathcal{D}/\partial y$]{\includegraphics[width=0.245\textwidth]{distance-maps/examples/final-test/random_dist_deriv_y_img.png}}\\[\smallskipamount]
+
+\caption[Distance map and 1st-order derivatives for four different environments
+         (circle, square, corridor, and random)]{%
+         Distance map and 1st-order derivatives for four different environments
+         (circle, square, corridor, and random).
+         Color meaning: green (positive values), red (negative values),
+         black (zero values).}
+\label{fig:distance-maps:results:synthetic:scenes:dist+1st-deriv}
+\end{figure}
+
+The 1st-order derivative fields are particularly informative regarding the
+alignment degeneracies identified in the quantitative results.
+For the circle scene, $\partial\mathcal{D}/\partial x$ and
+$\partial\mathcal{D}/\partial y$ vary smoothly and symmetrically around the
+circumference, reflecting the rotational symmetry of the environment. The
+gradient direction approximates the surface normal orientation, though
+without sign information indicating which side of the surface a query point
+lies on, since the distance field is unsigned; the gradient always points
+away from the nearest surface boundary into free space.
+This normal approximation rotates continuously around the circumference
+without providing a stable reference for absolute heading, consistent with
+the rotational degeneracy of the circle scene.
+For the corridor scene, the gradient is dominated by the
+$\partial\mathcal{D}/\partial y$ component perpendicular to the walls, while
+$\partial\mathcal{D}/\partial x$ is near-zero throughout the free space,
+directly visualizing the degenerate $x$~direction and confirming that only
+translation perpendicular to the walls and rotation are observable by the
+alignment formulations.
+In the square and random scenes, both derivative components exhibit rich
+spatial variation, consistent with the well-constrained alignment geometry
+and near-zero $\chi_{\boldsymbol{\varepsilon}}^2$ values observed in those scenes.
+
+Figures~\ref{fig:distance-maps:results:synthetic:scenes:2nd-deriv:circle}--\ref{fig:distance-maps:results:synthetic:scenes:2nd-deriv:random}
+present the 2nd-order partial derivatives
+($\partial^2 \mathcal{D} / \partial x^2$,
+$\partial^2 \mathcal{D} / \partial x \partial y$,
+$\partial^2 \mathcal{D} / \partial y \partial x$, and
+$\partial^2 \mathcal{D} / \partial y^2$) of distance map ($\mathcal{D}$) for all
+four environments.
+Similarly to \figref{fig:distance-maps:results:synthetic:scenes:dist+1st-deriv},
+green and red colors encode positive and negative values respectively,
+normalized by the global minimum and maximum of each map to exploit
+the full $[0, 255]$ color range.
+As expected, the 2nd-order partial derivatives reflect
+the local curvature of the gradient field of $\mathcal{D}$.
+Notably, $\partial^2\mathcal{D}/\partial x \partial y = \partial^2\mathcal{D}/\partial y \partial x$
+across all scenes, making the
+Hessian matrix symmetric, consistent with the analytical formulation in
+\eqref{eq:distance-maps:alignment:dmaps:2nd-deriv:H} and its numerical
+approximation in
+\eqref{eq:distance-maps:alignment:dmaps:2nd-deriv:H:numerical}.
+
+\begin{figure}[!t]
+\centering
+\subfloat[$\partial^2 \mathcal{D} / \partial x^2$]{\includegraphics[width=0.45\textwidth]{distance-maps/examples/final-test/circle_dist_deriv_2_xx_img.png}}\hspace{5mm}
+\subfloat[$\partial^2 \mathcal{D} / \partial x \partial y$]{\includegraphics[width=0.45\textwidth]{distance-maps/examples/final-test/circle_dist_deriv_2_xy_img.png}}\\[\smallskipamount]
+\subfloat[$\partial^2 \mathcal{D} / \partial y \partial x$]{\includegraphics[width=0.45\textwidth]{distance-maps/examples/final-test/circle_dist_deriv_2_yx_img.png}}\hspace{5mm}
+\subfloat[$\partial^2 \mathcal{D} / \partial y^2$]{\includegraphics[width=0.45\textwidth]{distance-maps/examples/final-test/circle_dist_deriv_2_yy_img.png}}\\[\smallskipamount]
+\caption[2nd-order derivatives of the distance map from the circle environment]{%
+         2nd-order derivatives of the distance map from the circle environment.
+         Color meaning: green (positive values), red (negative values),
+         black (zero values).}
+\label{fig:distance-maps:results:synthetic:scenes:2nd-deriv:circle}
+\end{figure}
+
+\begin{figure}[!t]
+\centering
+\subfloat[$\partial^2 \mathcal{D} / \partial x^2$]{\includegraphics[width=0.45\textwidth]{distance-maps/examples/final-test/square_dist_deriv_2_xx_img.png}}\hspace{5mm}
+\subfloat[$\partial^2 \mathcal{D} / \partial x \partial y$]{\includegraphics[width=0.45\textwidth]{distance-maps/examples/final-test/square_dist_deriv_2_xy_img.png}}\\[\smallskipamount]
+\subfloat[$\partial^2 \mathcal{D} / \partial y \partial x$]{\includegraphics[width=0.45\textwidth]{distance-maps/examples/final-test/square_dist_deriv_2_yx_img.png}}\hspace{5mm}
+\subfloat[$\partial^2 \mathcal{D} / \partial y^2$]{\includegraphics[width=0.45\textwidth]{distance-maps/examples/final-test/square_dist_deriv_2_yy_img.png}}\\[\smallskipamount]
+\caption[2nd-order derivatives of the distance map from the square environment]{%
+         2nd-order derivatives of the distance map from the square environment.
+         Color meaning: green (positive values), red (negative values),
+         black (zero values).}
+\label{fig:distance-maps:results:synthetic:scenes:2nd-deriv:square}
+\end{figure}
+
+\begin{figure}[!t]
+\centering
+\subfloat[$\partial^2 \mathcal{D} / \partial x^2$]{\includegraphics[width=0.45\textwidth]{distance-maps/examples/final-test/corridor_dist_deriv_2_xx_img.png}}\hspace{5mm}
+\subfloat[$\partial^2 \mathcal{D} / \partial x \partial y$]{\includegraphics[width=0.45\textwidth]{distance-maps/examples/final-test/corridor_dist_deriv_2_xy_img.png}}\\[\smallskipamount]
+\subfloat[$\partial^2 \mathcal{D} / \partial y \partial x$]{\includegraphics[width=0.45\textwidth]{distance-maps/examples/final-test/corridor_dist_deriv_2_yx_img.png}}\hspace{5mm}
+\subfloat[$\partial^2 \mathcal{D} / \partial y^2$]{\includegraphics[width=0.45\textwidth]{distance-maps/examples/final-test/corridor_dist_deriv_2_yy_img.png}}\\[\smallskipamount]
+\caption[2nd-order derivatives of the distance map from the corridor environment]{%
+         2nd-order derivatives of the distance map from the corridor environment.
+         Color meaning: green (positive values), red (negative values),
+         black (zero values).}
+\label{fig:distance-maps:results:synthetic:scenes:2nd-deriv:corridor}
+\end{figure}
+
+A notable feature of the 2nd-order derivative fields is their sparsity and
+spatial discontinuity compared to the smooth 1st-order fields: non-zero values
+are concentrated near surface boundaries where the nearest-neighbor
+association changes, and their magnitude varies sharply across cell boundaries.
+This structure is directly relevant to the degraded uncertainty estimation
+of the $\mathcal{D}_\mathrm{p2pl}$ variant at $\mathcal{M}_2$ under noise:
+the information matrix construction in that formulation requires evaluating
+these 2nd-order derivatives at query point locations, which are themselves
+subject to measurement noise.
+Because the 2nd-order derivatives are obtained by applying finite differences
+to the already finite-difference-approximated gradient, their sensitivity to
+noise is compounded relative to the 1st-order case, producing the large
+$\chi_{\boldsymbol{\varepsilon}}^2$ values observed under noisy conditions.
+The 1st-order derivative fields, by contrast, are spatially smooth and
+vary gradually between cells, which explains the comparatively stable
+behaviour of the $\mathcal{M}_1$-based point-to-point formulations under noise.
+
+Although the point-to-plane formulation for the unstructured random scene is
+not evaluated in this work given its unstructured nature,
+\figref{fig:distance-maps:results:synthetic:scenes:2nd-deriv:random} presents
+its 2nd-order partial derivatives for completeness.
+Non-zero values appear at cell boundaries where the nearest-neighbor
+association changes, as well as in the vicinity of the observed points,
+confirming that the Hessian field is well-defined for structured scenes but
+reflects the irregular geometry of unstructured point distributions.
+
+\begin{figure}[!t]
+\centering
+\subfloat[$\partial^2 \mathcal{D} / \partial x^2$]{\includegraphics[width=0.45\textwidth]{distance-maps/examples/final-test/random_dist_deriv_2_xx_img.png}}\hspace{5mm}
+\subfloat[$\partial^2 \mathcal{D} / \partial x \partial y$]{\includegraphics[width=0.45\textwidth]{distance-maps/examples/final-test/random_dist_deriv_2_xy_img.png}}\\[\smallskipamount]
+\subfloat[$\partial^2 \mathcal{D} / \partial y \partial x$]{\includegraphics[width=0.45\textwidth]{distance-maps/examples/final-test/random_dist_deriv_2_yx_img.png}}\hspace{5mm}
+\subfloat[$\partial^2 \mathcal{D} / \partial y^2$]{\includegraphics[width=0.45\textwidth]{distance-maps/examples/final-test/random_dist_deriv_2_yy_img.png}}\\[\smallskipamount]
+\caption[2nd-order derivatives of the distance map from the random environment]{%
+         2nd-order derivatives of the distance map from the random environment.
+         Color meaning: green (positive values), red (negative values),
+         black (zero values).}
+\label{fig:distance-maps:results:synthetic:scenes:2nd-deriv:random}
+\end{figure}
 
 \subsection{Real-world laser odometry evaluation}
 \label{sec:distance-maps:results:iilabs3d}
 
-% Dataset description: IILABS3D, OptiTrack ground truth, sensor setup,
-% environment characteristics (indoor, structured, corridor-heavy?).
-% Cite the dataset paper if available.
-%
-% Evaluation protocol: frame-splitting criterion (distance threshold?
-% angle threshold? fixed stride?), scan-to-scan odometry, EVO framework.
-% State which EVO metrics are reported (APE, RPE — translation and
-% rotation separately).
-%
-% Results: one table with methods as columns, EVO metrics as rows.
-% If sequences vary significantly, consider one table per sequence or
-% a multi-row table with sequence as an additional grouping.
-%
-% Brief per-method commentary on drift behaviour; save deeper
-% cross-method interpretation for \subsecref{...}{discussion}.
-
-\subsection{Computational performance}
-\label{sec:distance-maps:results:computational}
-
-% Three-axis evaluation: (1) map construction time, (2) per-query
-% lookup time, (3) total registration time per scan pair.
-% Compare across the three data structure variants: Nano (M0, dense),
-% Standard (M1/M2, dense), Sparse (M1/M2, hash-table).
-%
-% State hardware and compiler settings (CPU model, -O2/-O3, etc.)
-% for reproducibility.
-%
-% A table with data structures as rows and the three timing axes as
-% columns is natural here. If map size varies, report as a function
-% of grid resolution or point count.
-%
-% Memory consumption can be added as a fourth column; it connects back
-% to the complexity table already in the computation section.
-%
-% Note any non-obvious interaction: e.g. Sparse may win on memory for
-% large, mostly-empty environments but lose on lookup latency due to
-% hash collisions.
-
-\subsection{Discussion}
-\label{sec:distance-maps:results:discussion}
-
-% Cross-cutting interpretation that cannot be said cleanly inside any
-% single preceding subsection.
-%
-% Point-to-point vs point-to-plane: when does the surface normal
-% information in p2plane yield measurably better accuracy or
-% covariance? Does the advantage persist in real data or only
-% in synthetic environments with clean normals?
-%
-% ICP with M0 association vs full distance-map formulation: is the
-% data-association improvement from M0 sufficient, or does the
-% closed-form gradient/Hessian from the distance map give additional
-% gains beyond better correspondences?
-%
-% Covariance reliability: do the dominant eigenvectors from the
-% information matrix reflect the true uncertainty directions
-% (validated against the synthetic ground truth)? Implications for
-% downstream fusion (e.g. pose-graph SLAM).
-%
-% Sparse data structure trade-offs: in what regime (environment size,
-% map density) does Sparse beat Standard, and vice versa?
-%
-% Limitations and failure modes: mention scenarios where the distance
-% map formulation underperforms (e.g. dynamic environments, very
-% sparse scans).
+\todo{TBC}
 
 \section{Summary and Conclusions}\label{sec:distance-maps:conclusions}
 
