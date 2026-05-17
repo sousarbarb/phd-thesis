@@ -1,0 +1,161 @@
+\begin{table}[htbp]
+\centering
+\caption{RPE evaluation on the \textit{nav_a_diff} sequence of the IILABS3D dataset
+         ($\delta = \SI{10}{\metre}$, global alignment).}
+\label{tab:iilabs3d:nav_a_diff:rpe}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{llllllrrrrrrrr}
+\toprule
+# Aligner & Formulation & Mode & Structure & Sweep & Param & \multicolumn{4}{c}{Translation RPE [m]} & \multicolumn{4}{c}{Rotation RPE [\si{\degree}]} \\
+Aligner & Formulation & Mode & Structure & Sweep & Param & \multicolumn{1}{c}{Translation RPE [\%]} & \multicolumn{1}{c}{Rotation RPE [\\textdegree{}/m]} \\
+\cmidrule(lr){7-10}\\cmidrule(lr){11-14}
+#  &  &  &  &  &  & RMSE & Mean & Std & Median & RMSE & Mean & Std & Median \\
+ &  &  &  &  &  & Mean & Mean \\
+\midrule
+  dmap & p2p & m0 & dense & inliers & 040 & 1.12 & 0.098 \\
+  dmap & p2p & m0 & dense & inliers & 050 & 1.35 & 0.122 \\
+  dmap & p2p & m0 & dense & inliers & 060 & 1.58 & 0.129 \\
+  dmap & p2p & m0 & dense & inliers & 070 & 1.83 & 0.141 \\
+  dmap & p2p & m0 & dense & inliers & 080 & 2.53 & 0.174 \\
+  dmap & p2p & m0 & dense & inliers & 090 & 5.34 & 0.292 \\
+  dmap & p2p & m0 & dense & trans & 050 & 2.91 & 0.182 \\
+  dmap & p2p & m0 & dense & trans & 100 & 2.05 & 0.161 \\
+  dmap & p2p & m0 & dense & trans & 150 & 1.76 & 0.146 \\
+  dmap & p2p & m0 & dense & trans & 200 & 1.51 & 0.127 \\
+  dmap & p2p & m0 & dense & trans & 250 & 1.35 & 0.126 \\
+  dmap & p2p & m0 & dense & trans & 300 & 1.47 & 0.120 \\
+  dmap & p2p & m1 & dense & inliers & 040 & 1.01 & 0.090 \\
+  dmap & p2p & m1 & dense & inliers & 050 & 0.95 & 0.078 \\
+  dmap & p2p & m1 & dense & inliers & 060 & 1.10 & 0.089 \\
+  dmap & p2p & m1 & dense & inliers & 070 & 1.15 & 0.094 \\
+  dmap & p2p & m1 & dense & inliers & 080 & 1.37 & 0.112 \\
+  dmap & p2p & m1 & dense & inliers & 090 & 1.92 & 0.131 \\
+  dmap & p2p & m1 & dense & trans & 050 & 1.62 & 0.109 \\
+  dmap & p2p & m1 & dense & trans & 100 & 1.12 & 0.096 \\
+  dmap & p2p & m1 & dense & trans & 150 & 1.11 & 0.098 \\
+  dmap & p2p & m1 & dense & trans & 200 & 1.06 & 0.091 \\
+  dmap & p2p & m1 & dense & trans & 250 & 1.12 & 0.091 \\
+  dmap & p2p & m1 & dense & trans & 300 & 1.09 & 0.091 \\
+  dmap & p2p & m2 & sparse & inliers & 040 & 1.04 & 0.093 \\
+  dmap & p2p & m2 & sparse & inliers & 050 & 0.92 & 0.077 \\
+  dmap & p2p & m2 & sparse & inliers & 060 & 1.10 & 0.089 \\
+  dmap & p2p & m2 & sparse & inliers & 070 & 1.20 & 0.107 \\
+  dmap & p2p & m2 & sparse & inliers & 080 & 1.38 & 0.110 \\
+  dmap & p2p & m2 & sparse & inliers & 090 & 1.92 & 0.131 \\
+  dmap & p2p & m2 & sparse & trans & 050 & 1.61 & 0.110 \\
+  dmap & p2p & m2 & sparse & trans & 100 & 1.14 & 0.097 \\
+  dmap & p2p & m2 & sparse & trans & 150 & 1.08 & 0.094 \\
+  dmap & p2p & m2 & sparse & trans & 200 & 1.06 & 0.094 \\
+  dmap & p2p & m2 & sparse & trans & 250 & 1.12 & 0.091 \\
+  dmap & p2p & m2 & sparse & trans & 300 & 1.23 & 0.102 \\
+  dmap & p2pl & m0 & dense & inliers & 040 & 0.92 & 0.094 \\
+  dmap & p2pl & m0 & dense & inliers & 050 & 1.06 & 0.104 \\
+  dmap & p2pl & m0 & dense & inliers & 060 & 1.10 & 0.111 \\
+  dmap & p2pl & m0 & dense & inliers & 070 & 1.24 & 0.124 \\
+  dmap & p2pl & m0 & dense & inliers & 080 & 3.38 & 0.154 \\
+  dmap & p2pl & m0 & dense & inliers & 090 & 8.02 & 0.216 \\
+  dmap & p2pl & m0 & dense & trans & 050 & 1.60 & 0.145 \\
+  dmap & p2pl & m0 & dense & trans & 100 & 1.36 & 0.115 \\
+  dmap & p2pl & m0 & dense & trans & 150 & 1.25 & 0.126 \\
+  dmap & p2pl & m0 & dense & trans & 200 & 1.16 & 0.115 \\
+  dmap & p2pl & m0 & dense & trans & 250 & 1.08 & 0.103 \\
+  dmap & p2pl & m0 & dense & trans & 300 & 1.67 & 0.114 \\
+  dmap & p2pl & m1 & dense & inliers & 040 & 1.04 & 0.089 \\
+  dmap & p2pl & m1 & dense & inliers & 050 & 1.27 & 0.117 \\
+  dmap & p2pl & m1 & dense & inliers & 060 & 1.24 & 0.113 \\
+  dmap & p2pl & m1 & dense & inliers & 070 & 1.30 & 0.121 \\
+  dmap & p2pl & m1 & dense & inliers & 080 & 2.69 & 0.172 \\
+  dmap & p2pl & m1 & dense & inliers & 090 & 14.03 & 0.626 \\
+  dmap & p2pl & m1 & dense & trans & 050 & 1.31 & 0.133 \\
+  dmap & p2pl & m1 & dense & trans & 100 & 1.24 & 0.116 \\
+  dmap & p2pl & m1 & dense & trans & 150 & 1.21 & 0.116 \\
+  dmap & p2pl & m1 & dense & trans & 200 & 1.24 & 0.108 \\
+  dmap & p2pl & m1 & dense & trans & 250 & 1.14 & 0.105 \\
+  dmap & p2pl & m1 & dense & trans & 300 & 1.94 & 0.153 \\
+  dmap & p2pl & m2 & sparse & inliers & 040 & 1.03 & 0.087 \\
+  dmap & p2pl & m2 & sparse & inliers & 050 & 1.02 & 0.090 \\
+  dmap & p2pl & m2 & sparse & inliers & 060 & 1.24 & 0.108 \\
+  dmap & p2pl & m2 & sparse & inliers & 070 & 1.37 & 0.129 \\
+  dmap & p2pl & m2 & sparse & inliers & 080 & 2.60 & 0.174 \\
+  dmap & p2pl & m2 & sparse & inliers & 090 & 14.02 & 0.630 \\
+  dmap & p2pl & m2 & sparse & trans & 050 & 1.34 & 0.128 \\
+  dmap & p2pl & m2 & sparse & trans & 100 & 1.30 & 0.120 \\
+  dmap & p2pl & m2 & sparse & trans & 150 & 1.24 & 0.121 \\
+  dmap & p2pl & m2 & sparse & trans & 200 & 1.13 & 0.103 \\
+  dmap & p2pl & m2 & sparse & trans & 250 & 1.13 & 0.106 \\
+  dmap & p2pl & m2 & sparse & trans & 300 & 1.22 & 0.123 \\
+  icp & p2p & m0 & dense & inliers & 040 & 1.10 & 0.099 \\
+  icp & p2p & m0 & dense & inliers & 050 & 1.32 & 0.116 \\
+  icp & p2p & m0 & dense & inliers & 060 & 1.48 & 0.133 \\
+  icp & p2p & m0 & dense & inliers & 070 & 1.80 & 0.147 \\
+  icp & p2p & m0 & dense & inliers & 080 & 2.54 & 0.169 \\
+  icp & p2p & m0 & dense & inliers & 090 & 5.14 & 0.298 \\
+  icp & p2p & m0 & dense & trans & 050 & 3.03 & 0.180 \\
+  icp & p2p & m0 & dense & trans & 100 & 2.01 & 0.154 \\
+  icp & p2p & m0 & dense & trans & 150 & 1.56 & 0.133 \\
+  icp & p2p & m0 & dense & trans & 200 & 1.40 & 0.123 \\
+  icp & p2p & m0 & dense & trans & 250 & 1.24 & 0.110 \\
+  icp & p2p & m0 & dense & trans & 300 & 1.33 & 0.113 \\
+  icp & p2p & m1 & dense & inliers & 040 & 1.02 & 0.099 \\
+  icp & p2p & m1 & dense & inliers & 050 & 1.34 & 0.118 \\
+  icp & p2p & m1 & dense & inliers & 060 & 1.42 & 0.133 \\
+  icp & p2p & m1 & dense & inliers & 070 & 1.76 & 0.142 \\
+  icp & p2p & m1 & dense & inliers & 080 & 2.45 & 0.166 \\
+  icp & p2p & m1 & dense & inliers & 090 & 5.10 & 0.298 \\
+  icp & p2p & m1 & dense & trans & 050 & 3.02 & 0.178 \\
+  icp & p2p & m1 & dense & trans & 100 & 2.05 & 0.161 \\
+  icp & p2p & m1 & dense & trans & 150 & 1.64 & 0.141 \\
+  icp & p2p & m1 & dense & trans & 200 & 1.43 & 0.125 \\
+  icp & p2p & m1 & dense & trans & 250 & 1.22 & 0.102 \\
+  icp & p2p & m1 & dense & trans & 300 & 1.39 & 0.112 \\
+  icp & p2p & m2 & sparse & inliers & 040 & 1.10 & 0.096 \\
+  icp & p2p & m2 & sparse & inliers & 050 & 1.39 & 0.127 \\
+  icp & p2p & m2 & sparse & inliers & 060 & 1.44 & 0.127 \\
+  icp & p2p & m2 & sparse & inliers & 070 & 1.83 & 0.141 \\
+  icp & p2p & m2 & sparse & inliers & 080 & 2.50 & 0.162 \\
+  icp & p2p & m2 & sparse & inliers & 090 & 5.08 & 0.296 \\
+  icp & p2p & m2 & sparse & trans & 050 & 2.97 & 0.176 \\
+  icp & p2p & m2 & sparse & trans & 100 & 2.03 & 0.154 \\
+  icp & p2p & m2 & sparse & trans & 150 & 1.58 & 0.137 \\
+  icp & p2p & m2 & sparse & trans & 200 & 1.43 & 0.132 \\
+  icp & p2p & m2 & sparse & trans & 250 & 1.25 & 0.111 \\
+  icp & p2p & m2 & sparse & trans & 300 & 1.48 & 0.122 \\
+  icp & p2pl & m0 & dense & inliers & 040 & 0.88 & 0.082 \\
+  icp & p2pl & m0 & dense & inliers & 050 & 1.01 & 0.097 \\
+  icp & p2pl & m0 & dense & inliers & 060 & 1.08 & 0.109 \\
+  icp & p2pl & m0 & dense & inliers & 070 & 1.24 & 0.123 \\
+  icp & p2pl & m0 & dense & inliers & 080 & 3.34 & 0.155 \\
+  icp & p2pl & m0 & dense & inliers & 090 & 7.98 & 0.214 \\
+  icp & p2pl & m0 & dense & trans & 050 & 1.61 & 0.146 \\
+  icp & p2pl & m0 & dense & trans & 100 & 1.37 & 0.114 \\
+  icp & p2pl & m0 & dense & trans & 150 & 1.25 & 0.122 \\
+  icp & p2pl & m0 & dense & trans & 200 & 1.13 & 0.115 \\
+  icp & p2pl & m0 & dense & trans & 250 & 1.09 & 0.095 \\
+  icp & p2pl & m0 & dense & trans & 300 & 1.68 & 0.112 \\
+  icp & p2pl & m1 & dense & inliers & 040 & 0.71 & 0.081 \\
+  icp & p2pl & m1 & dense & inliers & 050 & 1.04 & 0.099 \\
+  icp & p2pl & m1 & dense & inliers & 060 & 1.12 & 0.099 \\
+  icp & p2pl & m1 & dense & inliers & 070 & 1.26 & 0.114 \\
+  icp & p2pl & m1 & dense & inliers & 080 & 3.33 & 0.156 \\
+  icp & p2pl & m1 & dense & inliers & 090 & 7.96 & 0.215 \\
+  icp & p2pl & m1 & dense & trans & 050 & 1.59 & 0.148 \\
+  icp & p2pl & m1 & dense & trans & 100 & 1.31 & 0.109 \\
+  icp & p2pl & m1 & dense & trans & 150 & 1.23 & 0.114 \\
+  icp & p2pl & m1 & dense & trans & 200 & 1.19 & 0.110 \\
+  icp & p2pl & m1 & dense & trans & 250 & 1.10 & 0.105 \\
+  icp & p2pl & m1 & dense & trans & 300 & 1.35 & 0.135 \\
+  icp & p2pl & m2 & sparse & inliers & 040 & 0.88 & 0.094 \\
+  icp & p2pl & m2 & sparse & inliers & 050 & 0.93 & 0.093 \\
+  icp & p2pl & m2 & sparse & inliers & 060 & 1.10 & 0.107 \\
+  icp & p2pl & m2 & sparse & inliers & 070 & 1.25 & 0.120 \\
+  icp & p2pl & m2 & sparse & inliers & 080 & 3.31 & 0.156 \\
+  icp & p2pl & m2 & sparse & inliers & 090 & 8.00 & 0.224 \\
+  icp & p2pl & m2 & sparse & trans & 050 & 1.53 & 0.140 \\
+  icp & p2pl & m2 & sparse & trans & 100 & 1.37 & 0.119 \\
+  icp & p2pl & m2 & sparse & trans & 150 & 1.27 & 0.131 \\
+  icp & p2pl & m2 & sparse & trans & 200 & 1.19 & 0.117 \\
+  icp & p2pl & m2 & sparse & trans & 250 & 1.04 & 0.102 \\
+  icp & p2pl & m2 & sparse & trans & 300 & 1.44 & 0.112 \\
+\bottomrule
+\end{tabular}
+\end{table}

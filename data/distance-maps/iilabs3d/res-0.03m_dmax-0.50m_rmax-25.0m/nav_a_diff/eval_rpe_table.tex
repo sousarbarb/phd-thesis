@@ -1,0 +1,113 @@
+\begin{table}[htbp]
+\centering
+\caption{RPE evaluation on the \textit{nav_a_diff} sequence of the IILABS3D dataset
+         ($\delta = \SI{10}{\metre}$, global alignment).}
+\label{tab:iilabs3d:nav_a_diff:rpe}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lllllrrrrrrrr}
+\toprule
+# Aligner & Formulation & Mode & Sweep & Param & \multicolumn{4}{c}{Translation RPE [m]} & \multicolumn{4}{c}{Rotation RPE [\si{\degree}]} \\
+Aligner & Formulation & Mode & Sweep & Param & \multicolumn{1}{c}{Translation RPE [\%]} & \multicolumn{1}{c}{Rotation RPE [\\textdegree{}/m]} \\
+\cmidrule(lr){6-9}\\cmidrule(lr){10-13}
+#  &  &  &  &  & RMSE & Mean & Std & Median & RMSE & Mean & Std & Median \\
+ &  &  &  &  & Mean & Mean \\
+\midrule
+  dmap & p2p & m0 & inliers & 040 & 1.20 & 0.100 \\
+  dmap & p2p & m0 & inliers & 050 & 1.39 & 0.115 \\
+  dmap & p2p & m0 & inliers & 060 & 1.55 & 0.125 \\
+  dmap & p2p & m0 & inliers & 070 & 1.83 & 0.142 \\
+  dmap & p2p & m0 & inliers & 080 & 2.51 & 0.172 \\
+  dmap & p2p & m0 & inliers & 090 & 5.38 & 0.295 \\
+  dmap & p2p & m0 & trans & 050 & 2.96 & 0.187 \\
+  dmap & p2p & m0 & trans & 100 & 2.02 & 0.160 \\
+  dmap & p2p & m0 & trans & 150 & 1.76 & 0.142 \\
+  dmap & p2p & m0 & trans & 200 & 1.48 & 0.131 \\
+  dmap & p2p & m0 & trans & 250 & 1.33 & 0.122 \\
+  dmap & p2p & m0 & trans & 300 & 1.55 & 0.125 \\
+  dmap & p2p & m1 & inliers & 040 & 1.04 & 0.092 \\
+  dmap & p2p & m1 & inliers & 050 & 0.95 & 0.091 \\
+  dmap & p2p & m1 & inliers & 060 & 1.10 & 0.086 \\
+  dmap & p2p & m1 & inliers & 070 & 1.17 & 0.106 \\
+  dmap & p2p & m1 & inliers & 080 & 1.38 & 0.105 \\
+  dmap & p2p & m1 & inliers & 090 & 2.01 & 0.134 \\
+  dmap & p2p & m1 & trans & 050 & 1.64 & 0.114 \\
+  dmap & p2p & m1 & trans & 100 & 1.13 & 0.099 \\
+  dmap & p2p & m1 & trans & 150 & 1.03 & 0.091 \\
+  dmap & p2p & m1 & trans & 200 & 1.10 & 0.099 \\
+  dmap & p2p & m1 & trans & 250 & 1.07 & 0.096 \\
+  dmap & p2p & m1 & trans & 300 & 1.19 & 0.102 \\
+  dmap & p2pl & m0 & inliers & 040 & 0.94 & 0.095 \\
+  dmap & p2pl & m0 & inliers & 050 & 1.10 & 0.108 \\
+  dmap & p2pl & m0 & inliers & 060 & 1.03 & 0.103 \\
+  dmap & p2pl & m0 & inliers & 070 & 1.23 & 0.118 \\
+  dmap & p2pl & m0 & inliers & 080 & 3.30 & 0.157 \\
+  dmap & p2pl & m0 & inliers & 090 & 7.98 & 0.216 \\
+  dmap & p2pl & m0 & trans & 050 & 1.63 & 0.154 \\
+  dmap & p2pl & m0 & trans & 100 & 1.40 & 0.109 \\
+  dmap & p2pl & m0 & trans & 150 & 1.24 & 0.127 \\
+  dmap & p2pl & m0 & trans & 200 & 1.16 & 0.115 \\
+  dmap & p2pl & m0 & trans & 250 & 1.04 & 0.106 \\
+  dmap & p2pl & m0 & trans & 300 & 1.25 & 0.105 \\
+  dmap & p2pl & m1 & inliers & 040 & 0.99 & 0.096 \\
+  dmap & p2pl & m1 & inliers & 050 & 1.21 & 0.116 \\
+  dmap & p2pl & m1 & inliers & 060 & 1.28 & 0.120 \\
+  dmap & p2pl & m1 & inliers & 070 & 1.29 & 0.120 \\
+  dmap & p2pl & m1 & inliers & 080 & 2.62 & 0.165 \\
+  dmap & p2pl & m1 & inliers & 090 & 14.08 & 0.627 \\
+  dmap & p2pl & m1 & trans & 050 & 1.30 & 0.127 \\
+  dmap & p2pl & m1 & trans & 100 & 1.20 & 0.115 \\
+  dmap & p2pl & m1 & trans & 150 & 1.22 & 0.117 \\
+  dmap & p2pl & m1 & trans & 200 & 1.17 & 0.109 \\
+  dmap & p2pl & m1 & trans & 250 & 1.19 & 0.106 \\
+  dmap & p2pl & m1 & trans & 300 & 1.80 & 0.148 \\
+  icp & p2p & m0 & inliers & 040 & 1.11 & 0.090 \\
+  icp & p2p & m0 & inliers & 050 & 1.38 & 0.128 \\
+  icp & p2p & m0 & inliers & 060 & 1.47 & 0.133 \\
+  icp & p2p & m0 & inliers & 070 & 1.86 & 0.156 \\
+  icp & p2p & m0 & inliers & 080 & 2.54 & 0.167 \\
+  icp & p2p & m0 & inliers & 090 & 5.10 & 0.289 \\
+  icp & p2p & m0 & trans & 050 & 3.01 & 0.172 \\
+  icp & p2p & m0 & trans & 100 & 2.05 & 0.160 \\
+  icp & p2p & m0 & trans & 150 & 1.65 & 0.137 \\
+  icp & p2p & m0 & trans & 200 & 1.42 & 0.123 \\
+  icp & p2p & m0 & trans & 250 & 1.21 & 0.106 \\
+  icp & p2p & m0 & trans & 300 & 1.49 & 0.117 \\
+  icp & p2p & m1 & inliers & 040 & 0.98 & 0.095 \\
+  icp & p2p & m1 & inliers & 050 & 1.33 & 0.117 \\
+  icp & p2p & m1 & inliers & 060 & 1.44 & 0.136 \\
+  icp & p2p & m1 & inliers & 070 & 1.83 & 0.148 \\
+  icp & p2p & m1 & inliers & 080 & 2.47 & 0.169 \\
+  icp & p2p & m1 & inliers & 090 & 5.09 & 0.293 \\
+  icp & p2p & m1 & trans & 050 & 2.98 & 0.178 \\
+  icp & p2p & m1 & trans & 100 & 2.04 & 0.159 \\
+  icp & p2p & m1 & trans & 150 & 1.69 & 0.144 \\
+  icp & p2p & m1 & trans & 200 & 1.42 & 0.125 \\
+  icp & p2p & m1 & trans & 250 & 1.26 & 0.113 \\
+  icp & p2p & m1 & trans & 300 & 1.51 & 0.122 \\
+  icp & p2pl & m0 & inliers & 040 & 0.89 & 0.078 \\
+  icp & p2pl & m0 & inliers & 050 & 1.03 & 0.096 \\
+  icp & p2pl & m0 & inliers & 060 & 1.06 & 0.107 \\
+  icp & p2pl & m0 & inliers & 070 & 1.19 & 0.118 \\
+  icp & p2pl & m0 & inliers & 080 & 3.34 & 0.153 \\
+  icp & p2pl & m0 & inliers & 090 & 7.96 & 0.218 \\
+  icp & p2pl & m0 & trans & 050 & 1.64 & 0.155 \\
+  icp & p2pl & m0 & trans & 100 & 1.40 & 0.110 \\
+  icp & p2pl & m0 & trans & 150 & 1.23 & 0.129 \\
+  icp & p2pl & m0 & trans & 200 & 1.16 & 0.115 \\
+  icp & p2pl & m0 & trans & 250 & 1.05 & 0.102 \\
+  icp & p2pl & m0 & trans & 300 & 1.26 & 0.107 \\
+  icp & p2pl & m1 & inliers & 040 & 0.87 & 0.089 \\
+  icp & p2pl & m1 & inliers & 050 & 1.02 & 0.101 \\
+  icp & p2pl & m1 & inliers & 060 & 1.14 & 0.104 \\
+  icp & p2pl & m1 & inliers & 070 & 1.23 & 0.111 \\
+  icp & p2pl & m1 & inliers & 080 & 3.31 & 0.153 \\
+  icp & p2pl & m1 & inliers & 090 & 7.98 & 0.214 \\
+  icp & p2pl & m1 & trans & 050 & 1.60 & 0.150 \\
+  icp & p2pl & m1 & trans & 100 & 1.27 & 0.117 \\
+  icp & p2pl & m1 & trans & 150 & 1.27 & 0.127 \\
+  icp & p2pl & m1 & trans & 200 & 1.15 & 0.114 \\
+  icp & p2pl & m1 & trans & 250 & 1.11 & 0.101 \\
+  icp & p2pl & m1 & trans & 300 & 1.33 & 0.139 \\
+\bottomrule
+\end{tabular}
+\end{table}

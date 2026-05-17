@@ -100,3 +100,30 @@ evo_rpe tum ground_truth.tum <odom trajectory file>.tum --align --pose_relation 
   }
   // restoreTerminal();
 ```
+
+## Run
+```sh
+cd data/distance-maps/iilabs3d/
+
+python3 -m venv .
+source bin/activate
+
+pip install iilabs3d-toolkit
+
+python3 eval_iilabs3d.py --dir res-0.03m_dmax-0.50m_rmax-10.0m/nav_a_diff/
+python3 eval_iilabs3d.py --dir res-0.03m_dmax-0.50m_rmax-10.0m/nav_a_omni/
+python3 eval_iilabs3d.py --dir res-0.03m_dmax-0.50m_rmax-10.0m/loop/
+python3 eval_iilabs3d.py --dir res-0.03m_dmax-0.50m_rmax-10.0m/slippage/
+python3 eval_iilabs3d.py --dir res-0.03m_dmax-0.50m_rmax-20.0m/nav_a_diff/
+python3 eval_iilabs3d.py --dir res-0.03m_dmax-0.50m_rmax-20.0m/nav_a_omni/
+python3 eval_iilabs3d.py --dir res-0.03m_dmax-0.50m_rmax-20.0m/loop/
+python3 eval_iilabs3d.py --dir res-0.03m_dmax-0.50m_rmax-20.0m/slippage/
+python3 eval_iilabs3d.py --dir res-0.03m_dmax-0.50m_rmax-25.0m/nav_a_diff/
+python3 eval_iilabs3d.py --dir res-0.03m_dmax-0.50m_rmax-25.0m/nav_a_omni/
+python3 eval_iilabs3d.py --dir res-0.03m_dmax-0.50m_rmax-25.0m/loop/
+python3 eval_iilabs3d.py --dir res-0.03m_dmax-0.50m_rmax-25.0m/slippage/
+python3 eval_iilabs3d.py --dir res-0.03m_dmax-0.50m_rmax-30.0m/nav_a_diff/
+python3 eval_iilabs3d.py --dir res-0.03m_dmax-0.50m_rmax-30.0m/nav_a_omni/
+python3 eval_iilabs3d.py --dir res-0.03m_dmax-0.50m_rmax-30.0m/loop/
+python3 eval_iilabs3d.py --dir res-0.03m_dmax-0.50m_rmax-30.0m/slippage/
+```
