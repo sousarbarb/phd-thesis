@@ -1,0 +1,754 @@
+<launch>
+
+  <arg name="mlevel" default="m2_sparse" />
+
+  <arg name="logdir" default="/home/datasets/paper_slam_2d/distance-maps-eval/iilabs3d/iilabs3d_dataset/benchmark/livox_mid-360/nav_a_diff" />
+  <!-- <arg name="logdir" default="/home/datasets/paper_slam_2d/distance-maps-eval/iilabs3d/iilabs3d_dataset/benchmark/livox_mid-360/nav_a_omni" /> -->
+  <!-- <arg name="logdir" default="/home/datasets/paper_slam_2d/distance-maps-eval/iilabs3d/iilabs3d_dataset/benchmark/livox_mid-360/loop" /> -->
+  <!-- <arg name="logdir" default="/home/datasets/paper_slam_2d/distance-maps-eval/iilabs3d/iilabs3d_dataset/benchmark/livox_mid-360/slippage" /> -->
+
+  <arg name="bagfile" default="$(arg logdir)/livox_nav_a_diff_2025-02-05-17-18-07.bag" />
+  <!-- <arg name="bagfile" default="$(arg logdir)/livox_nav_a_omni_2025-02-05-16-30-32.bag" /> -->
+  <!-- <arg name="bagfile" default="$(arg logdir)/livox_loop_2025-02-06-18-24-40.bag" /> -->
+  <!-- <arg name="bagfile" default="$(arg logdir)/livox_slippage_2025-02-05-16-25-36.bag" /> -->
+
+  <arg name="odom_topic" default="/eve/odom" />
+  <arg name="scan_topic" default="/eve/scan" />
+  <arg name="start" default="0" />
+
+  <arg name="paramfile" default="$(dirname)/slam_offline.yaml" />
+
+  <arg name="aligner_dbg_traj" default="false" />
+
+
+
+
+
+
+
+
+
+
+  <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+  <!-- TRANSLATION SPLITTING CRITERIA (0.5, 1.0, 1.5, 2.0, 2.5) -->
+  <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+
+
+
+
+
+
+
+
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="dmap_p2p_$(arg mlevel)_trans_050" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                           value="point2point" />
+    <arg name="aligner_split_criteria_type"            value="translation" />
+    <arg name="aligner_split_criteria_min_travel_dist" value="0.50" />
+    <arg name="aligner_dbg_traj"                       value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="dmap_p2p_$(arg mlevel)_trans_100" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                           value="point2point" />
+    <arg name="aligner_split_criteria_type"            value="translation" />
+    <arg name="aligner_split_criteria_min_travel_dist" value="1.00" />
+    <arg name="aligner_dbg_traj"                       value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="dmap_p2p_$(arg mlevel)_trans_150" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                           value="point2point" />
+    <arg name="aligner_split_criteria_type"            value="translation" />
+    <arg name="aligner_split_criteria_min_travel_dist" value="1.50" />
+    <arg name="aligner_dbg_traj"                       value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="dmap_p2p_$(arg mlevel)_trans_200" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                           value="point2point" />
+    <arg name="aligner_split_criteria_type"            value="translation" />
+    <arg name="aligner_split_criteria_min_travel_dist" value="2.00" />
+    <arg name="aligner_dbg_traj"                       value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="dmap_p2p_$(arg mlevel)_trans_250" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                           value="point2point" />
+    <arg name="aligner_split_criteria_type"            value="translation" />
+    <arg name="aligner_split_criteria_min_travel_dist" value="2.50" />
+    <arg name="aligner_dbg_traj"                       value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="dmap_p2p_$(arg mlevel)_trans_300" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                           value="point2point" />
+    <arg name="aligner_split_criteria_type"            value="translation" />
+    <arg name="aligner_split_criteria_min_travel_dist" value="3.00" />
+    <arg name="aligner_dbg_traj"                       value="$(arg aligner_dbg_traj)" />
+  </include>
+
+
+
+
+
+
+
+
+
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="dmap_p2pl_$(arg mlevel)_trans_050" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                           value="point2plane" />
+    <arg name="aligner_split_criteria_type"            value="translation" />
+    <arg name="aligner_split_criteria_min_travel_dist" value="0.50" />
+    <arg name="aligner_dbg_traj"                       value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="dmap_p2pl_$(arg mlevel)_trans_100" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                           value="point2plane" />
+    <arg name="aligner_split_criteria_type"            value="translation" />
+    <arg name="aligner_split_criteria_min_travel_dist" value="1.00" />
+    <arg name="aligner_dbg_traj"                       value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="dmap_p2pl_$(arg mlevel)_trans_150" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                           value="point2plane" />
+    <arg name="aligner_split_criteria_type"            value="translation" />
+    <arg name="aligner_split_criteria_min_travel_dist" value="1.50" />
+    <arg name="aligner_dbg_traj"                       value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="dmap_p2pl_$(arg mlevel)_trans_200" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                           value="point2plane" />
+    <arg name="aligner_split_criteria_type"            value="translation" />
+    <arg name="aligner_split_criteria_min_travel_dist" value="2.00" />
+    <arg name="aligner_dbg_traj"                       value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="dmap_p2pl_$(arg mlevel)_trans_250" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                           value="point2plane" />
+    <arg name="aligner_split_criteria_type"            value="translation" />
+    <arg name="aligner_split_criteria_min_travel_dist" value="2.50" />
+    <arg name="aligner_dbg_traj"                       value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="dmap_p2pl_$(arg mlevel)_trans_300" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                           value="point2plane" />
+    <arg name="aligner_split_criteria_type"            value="translation" />
+    <arg name="aligner_split_criteria_min_travel_dist" value="3.00" />
+    <arg name="aligner_dbg_traj"                       value="$(arg aligner_dbg_traj)" />
+  </include>
+
+
+
+
+
+
+
+
+
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="icp_p2p_$(arg mlevel)_trans_050" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                           value="icp_point2point" />
+    <arg name="aligner_split_criteria_type"            value="translation" />
+    <arg name="aligner_split_criteria_min_travel_dist" value="0.50" />
+    <arg name="aligner_dbg_traj"                       value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="icp_p2p_$(arg mlevel)_trans_100" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                           value="icp_point2point" />
+    <arg name="aligner_split_criteria_type"            value="translation" />
+    <arg name="aligner_split_criteria_min_travel_dist" value="1.00" />
+    <arg name="aligner_dbg_traj"                       value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="icp_p2p_$(arg mlevel)_trans_150" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                           value="icp_point2point" />
+    <arg name="aligner_split_criteria_type"            value="translation" />
+    <arg name="aligner_split_criteria_min_travel_dist" value="1.50" />
+    <arg name="aligner_dbg_traj"                       value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="icp_p2p_$(arg mlevel)_trans_200" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                           value="icp_point2point" />
+    <arg name="aligner_split_criteria_type"            value="translation" />
+    <arg name="aligner_split_criteria_min_travel_dist" value="2.00" />
+    <arg name="aligner_dbg_traj"                       value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="icp_p2p_$(arg mlevel)_trans_250" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                           value="icp_point2point" />
+    <arg name="aligner_split_criteria_type"            value="translation" />
+    <arg name="aligner_split_criteria_min_travel_dist" value="2.50" />
+    <arg name="aligner_dbg_traj"                       value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="icp_p2p_$(arg mlevel)_trans_300" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                           value="icp_point2point" />
+    <arg name="aligner_split_criteria_type"            value="translation" />
+    <arg name="aligner_split_criteria_min_travel_dist" value="3.00" />
+    <arg name="aligner_dbg_traj"                       value="$(arg aligner_dbg_traj)" />
+  </include>
+
+
+
+
+
+
+
+
+
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="icp_p2pl_$(arg mlevel)_trans_050" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                           value="icp_point2plane" />
+    <arg name="aligner_split_criteria_type"            value="translation" />
+    <arg name="aligner_split_criteria_min_travel_dist" value="0.50" />
+    <arg name="aligner_dbg_traj"                       value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="icp_p2pl_$(arg mlevel)_trans_100" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                           value="icp_point2plane" />
+    <arg name="aligner_split_criteria_type"            value="translation" />
+    <arg name="aligner_split_criteria_min_travel_dist" value="1.00" />
+    <arg name="aligner_dbg_traj"                       value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="icp_p2pl_$(arg mlevel)_trans_150" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                           value="icp_point2plane" />
+    <arg name="aligner_split_criteria_type"            value="translation" />
+    <arg name="aligner_split_criteria_min_travel_dist" value="1.50" />
+    <arg name="aligner_dbg_traj"                       value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="icp_p2pl_$(arg mlevel)_trans_200" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                           value="icp_point2plane" />
+    <arg name="aligner_split_criteria_type"            value="translation" />
+    <arg name="aligner_split_criteria_min_travel_dist" value="2.00" />
+    <arg name="aligner_dbg_traj"                       value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="icp_p2pl_$(arg mlevel)_trans_250" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                           value="icp_point2plane" />
+    <arg name="aligner_split_criteria_type"            value="translation" />
+    <arg name="aligner_split_criteria_min_travel_dist" value="2.50" />
+    <arg name="aligner_dbg_traj"                       value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="icp_p2pl_$(arg mlevel)_trans_300" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                           value="icp_point2plane" />
+    <arg name="aligner_split_criteria_type"            value="translation" />
+    <arg name="aligner_split_criteria_min_travel_dist" value="3.00" />
+    <arg name="aligner_dbg_traj"                       value="$(arg aligner_dbg_traj)" />
+  </include>
+
+
+
+
+
+
+
+
+
+
+  <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+  <!-- INLIERS SPLITTING CRITERIA (0.5, 0.6, 0.7, 0.8, 0.9) -->
+  <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+
+
+
+
+
+
+
+
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="dmap_p2p_$(arg mlevel)_inliers_040" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                             value="point2point" />
+    <arg name="aligner_split_criteria_type"              value="inliers" />
+    <arg name="aligner_split_criteria_max_ratio_inliers" value="0.40" />
+    <arg name="aligner_dbg_traj"                         value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="dmap_p2p_$(arg mlevel)_inliers_050" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                             value="point2point" />
+    <arg name="aligner_split_criteria_type"              value="inliers" />
+    <arg name="aligner_split_criteria_max_ratio_inliers" value="0.50" />
+    <arg name="aligner_dbg_traj"                         value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="dmap_p2p_$(arg mlevel)_inliers_060" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                             value="point2point" />
+    <arg name="aligner_split_criteria_type"              value="inliers" />
+    <arg name="aligner_split_criteria_max_ratio_inliers" value="0.60" />
+    <arg name="aligner_dbg_traj"                         value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="dmap_p2p_$(arg mlevel)_inliers_070" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                             value="point2point" />
+    <arg name="aligner_split_criteria_type"              value="inliers" />
+    <arg name="aligner_split_criteria_max_ratio_inliers" value="0.70" />
+    <arg name="aligner_dbg_traj"                         value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="dmap_p2p_$(arg mlevel)_inliers_080" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                             value="point2point" />
+    <arg name="aligner_split_criteria_type"              value="inliers" />
+    <arg name="aligner_split_criteria_max_ratio_inliers" value="0.80" />
+    <arg name="aligner_dbg_traj"                         value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="dmap_p2p_$(arg mlevel)_inliers_090" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                             value="point2point" />
+    <arg name="aligner_split_criteria_type"              value="inliers" />
+    <arg name="aligner_split_criteria_max_ratio_inliers" value="0.90" />
+    <arg name="aligner_dbg_traj"                         value="$(arg aligner_dbg_traj)" />
+  </include>
+
+
+
+
+
+
+
+
+
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="dmap_p2pl_$(arg mlevel)_inliers_040" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                             value="point2plane" />
+    <arg name="aligner_split_criteria_type"              value="inliers" />
+    <arg name="aligner_split_criteria_max_ratio_inliers" value="0.40" />
+    <arg name="aligner_dbg_traj"                         value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="dmap_p2pl_$(arg mlevel)_inliers_050" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                             value="point2plane" />
+    <arg name="aligner_split_criteria_type"              value="inliers" />
+    <arg name="aligner_split_criteria_max_ratio_inliers" value="0.50" />
+    <arg name="aligner_dbg_traj"                         value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="dmap_p2pl_$(arg mlevel)_inliers_060" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                             value="point2plane" />
+    <arg name="aligner_split_criteria_type"              value="inliers" />
+    <arg name="aligner_split_criteria_max_ratio_inliers" value="0.60" />
+    <arg name="aligner_dbg_traj"                         value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="dmap_p2pl_$(arg mlevel)_inliers_070" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                             value="point2plane" />
+    <arg name="aligner_split_criteria_type"              value="inliers" />
+    <arg name="aligner_split_criteria_max_ratio_inliers" value="0.70" />
+    <arg name="aligner_dbg_traj"                         value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="dmap_p2pl_$(arg mlevel)_inliers_080" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                             value="point2plane" />
+    <arg name="aligner_split_criteria_type"              value="inliers" />
+    <arg name="aligner_split_criteria_max_ratio_inliers" value="0.80" />
+    <arg name="aligner_dbg_traj"                         value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="dmap_p2pl_$(arg mlevel)_inliers_090" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                             value="point2plane" />
+    <arg name="aligner_split_criteria_type"              value="inliers" />
+    <arg name="aligner_split_criteria_max_ratio_inliers" value="0.90" />
+    <arg name="aligner_dbg_traj"                         value="$(arg aligner_dbg_traj)" />
+  </include>
+
+
+
+
+
+
+
+
+
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="icp_p2p_$(arg mlevel)_inliers_040" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                             value="icp_point2point" />
+    <arg name="aligner_split_criteria_type"              value="inliers" />
+    <arg name="aligner_split_criteria_max_ratio_inliers" value="0.40" />
+    <arg name="aligner_dbg_traj"                         value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="icp_p2p_$(arg mlevel)_inliers_050" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                             value="icp_point2point" />
+    <arg name="aligner_split_criteria_type"              value="inliers" />
+    <arg name="aligner_split_criteria_max_ratio_inliers" value="0.50" />
+    <arg name="aligner_dbg_traj"                         value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="icp_p2p_$(arg mlevel)_inliers_060" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                             value="icp_point2point" />
+    <arg name="aligner_split_criteria_type"              value="inliers" />
+    <arg name="aligner_split_criteria_max_ratio_inliers" value="0.60" />
+    <arg name="aligner_dbg_traj"                         value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="icp_p2p_$(arg mlevel)_inliers_070" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                             value="icp_point2point" />
+    <arg name="aligner_split_criteria_type"              value="inliers" />
+    <arg name="aligner_split_criteria_max_ratio_inliers" value="0.70" />
+    <arg name="aligner_dbg_traj"                         value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="icp_p2p_$(arg mlevel)_inliers_080" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                             value="icp_point2point" />
+    <arg name="aligner_split_criteria_type"              value="inliers" />
+    <arg name="aligner_split_criteria_max_ratio_inliers" value="0.80" />
+    <arg name="aligner_dbg_traj"                         value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="icp_p2p_$(arg mlevel)_inliers_090" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                             value="icp_point2point" />
+    <arg name="aligner_split_criteria_type"              value="inliers" />
+    <arg name="aligner_split_criteria_max_ratio_inliers" value="0.90" />
+    <arg name="aligner_dbg_traj"                         value="$(arg aligner_dbg_traj)" />
+  </include>
+
+
+
+
+
+
+
+
+
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="icp_p2pl_$(arg mlevel)_inliers_040" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                             value="icp_point2plane" />
+    <arg name="aligner_split_criteria_type"              value="inliers" />
+    <arg name="aligner_split_criteria_max_ratio_inliers" value="0.40" />
+    <arg name="aligner_dbg_traj"                         value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="icp_p2pl_$(arg mlevel)_inliers_050" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                             value="icp_point2plane" />
+    <arg name="aligner_split_criteria_type"              value="inliers" />
+    <arg name="aligner_split_criteria_max_ratio_inliers" value="0.50" />
+    <arg name="aligner_dbg_traj"                         value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="icp_p2pl_$(arg mlevel)_inliers_060" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                             value="icp_point2plane" />
+    <arg name="aligner_split_criteria_type"              value="inliers" />
+    <arg name="aligner_split_criteria_max_ratio_inliers" value="0.60" />
+    <arg name="aligner_dbg_traj"                         value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="icp_p2pl_$(arg mlevel)_inliers_070" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                             value="icp_point2plane" />
+    <arg name="aligner_split_criteria_type"              value="inliers" />
+    <arg name="aligner_split_criteria_max_ratio_inliers" value="0.70" />
+    <arg name="aligner_dbg_traj"                         value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="icp_p2pl_$(arg mlevel)_inliers_080" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                             value="icp_point2plane" />
+    <arg name="aligner_split_criteria_type"              value="inliers" />
+    <arg name="aligner_split_criteria_max_ratio_inliers" value="0.80" />
+    <arg name="aligner_dbg_traj"                         value="$(arg aligner_dbg_traj)" />
+  </include>
+
+  <include file="$(dirname)/slam_offline.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)" />
+    <arg name="scan_topic" value="$(arg scan_topic)" />
+    <arg name="start"      value="$(arg start)" />
+    <arg name="namespace"  value="icp_p2pl_$(arg mlevel)_inliers_090" />
+    <arg name="bagfile"    value="$(arg bagfile)" />
+    <arg name="paramfile"  value="$(arg paramfile)" />
+    <arg name="aligner_type"                             value="icp_point2plane" />
+    <arg name="aligner_split_criteria_type"              value="inliers" />
+    <arg name="aligner_split_criteria_max_ratio_inliers" value="0.90" />
+    <arg name="aligner_dbg_traj"                         value="$(arg aligner_dbg_traj)" />
+  </include>
+
+
+
+
+
+
+
+
+
+
+</launch>

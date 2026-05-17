@@ -1,0 +1,99 @@
+base_frame: "eve/base_footprint"
+
+ext_odom_use: false
+
+laser_invert_scan: false
+laser_pub_tf_static: false
+
+slam_pub_pose_tf: true
+slam_pub_pose_msg: true
+slam_pose_invert_tf: true
+slam_pub_odom_tf: true
+slam_pub_odom_msg: true
+slam_odom_invert_tf: true
+slam_pose_frame: "map"
+slam_odom_frame: "odom_laser_rico"
+
+## SLAM OFFLINE CORRECTED POSE (CONSIDERING LOOP CLOSURE CORRECTION, NOT NEEDED)
+slam_log_pose_corrected: false
+
+## SLAM BACKEND SOLVER OPTIMIZER (DOES NOT MATTER, ONLY CARE TRACKER OPEN-LOOP)
+slam_solver_debug: $(arg aligner_dbg_traj)
+slam_solver_verbose: false
+slam_solver_damping: 1.0
+slam_solver_max_iterations: 1
+slam_solver_criteria_type: "stepnorm"
+slam_solver_criteria_epsilon: 1e-5
+slam_solver_dbg_ogl_interval: 0
+slam_solver_dbg_ogl_mode: "computeend"
+
+slam_factor_info_use_tracker: true
+slam_factor_local_map_update: false
+
+## SLAM LOOP CLOSURE+RELOCALIZE (DOES NOT MATTER, ONLY CARE TRACKER OPEN-LOOP)
+slam_loop_enable: false
+slam_relocalization_enable: false
+
+###################
+##### TRACKER #####
+###################
+
+tracker_use_ext_odom_as_init: false
+tracker_use_ext_odom_as_prior: false
+
+## SPLITTING CRITERIA
+# tracker_split_criteria_type: "translation"
+# tracker_split_criteria_min_travel_dist: $(arg aligner_solver_max_iterations)
+#
+# tracker_split_criteria_type: "inliers"
+# tracker_split_criteria_min_travel_dist: 0.25
+# tracker_split_criteria_min_travel_heading: -1
+# tracker_split_criteria_max_ratio_inliers: 0.50
+# tracker_split_criteria_max_travel_dist: -1
+# tracker_split_criteria_max_travel_heading: -1
+
+tracker_split_criteria_type: $(arg aligner_split_criteria_type)
+tracker_split_criteria_min_travel_dist: $(arg aligner_split_criteria_min_travel_dist)
+tracker_split_criteria_min_travel_heading: $(arg aligner_split_criteria_min_travel_heading)
+tracker_split_criteria_max_ratio_inliers: $(arg aligner_split_criteria_max_ratio_inliers)
+tracker_split_criteria_max_travel_dist: $(arg aligner_split_criteria_max_travel_dist)
+tracker_split_criteria_max_travel_heading: $(arg aligner_split_criteria_max_travel_heading)
+
+## ALIGNER
+
+tracker_aligner_type: $(arg aligner_type)
+
+# - aligner base parametrisation
+tracker_aligner_debug: $(arg aligner_dbg)
+tracker_aligner_solver_verbose: false
+tracker_aligner_solver_damping: 1.0
+tracker_aligner_solver_max_iterations: $(arg aligner_solver_max_iterations)
+tracker_aligner_solver_criteria_type: "stepnorm"
+tracker_aligner_solver_criteria_epsilon: 1e-5
+tracker_aligner_solver_robustifier_type: "cauchy"
+tracker_aligner_solver_robustifier_num_iterations_coarse: $(arg aligner_solver_robustifier_num_iterations_coarse)
+tracker_aligner_solver_robustifier_threshold_coarse: $(arg aligner_solver_robustifier_threshold_coarse)
+tracker_aligner_solver_robustifier_threshold_fine: $(arg aligner_solver_robustifier_threshold_fine)
+tracker_aligner_failure_ratio_inliers: $(arg aligner_failure_ratio_inliers)
+tracker_aligner_failure_chi_inliers: $(arg aligner_failure_chi_inliers)
+tracker_aligner_dbg_ogl_interval: 0
+tracker_aligner_dbg_ogl_mode: "computeend"
+tracker_aligner_dbg_ogl_show_correspondences: false
+tracker_aligner_dbg_ogl_show_normals: false
+
+# - aligner distance map parametrisation
+tracker_aligner_dist_map_res: $(arg aligner_dmap_res)
+tracker_aligner_dist_map_size: $(arg aligner_dmap_size)
+tracker_aligner_dist_map_max_dist: $(arg aligner_dmap_max_dist)
+
+tracker_solver_regularize_correspondences: $(arg aligner_solver_regularize_correspondences)
+
+## PREPROCESS
+# - voxelization: average the points in the same cell on a grid pattern
+#   (should have better results on removing the radia effect of 2D lasers)
+# - normals computation: for point-to-plane error computation
+
+tracker_enable_voxelization: $(arg aligner_enable_voxelization)
+tracker_normals_computator_min_pts: $(arg aligner_normals_computator_min_pts)
+tracker_normals_computator_radius: $(arg aligner_normals_computator_radius)
+tracker_range_max: $(arg aligner_range_max)

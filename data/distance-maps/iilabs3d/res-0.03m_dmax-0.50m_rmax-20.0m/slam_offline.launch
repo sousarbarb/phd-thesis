@@ -1,0 +1,58 @@
+<launch>
+
+  <arg name="odom_topic" default="/odom" />
+  <arg name="scan_topic" default="/scan" />
+  <arg name="start" default="0" />
+
+  <arg name="namespace" default="robot" />
+
+  <arg name="bagfile" default="rosbag.bag" />
+  <arg name="logfile" default="$(arg bagfile).$(arg namespace).tum" />
+  <arg name="paramfile" default="param.yaml" />
+
+  <!-- ALIGNER PARAMETRIZATION ARGS (consumed by YAML via subst_value) -->
+
+  <arg name="aligner_type" />
+  <arg name="aligner_dbg"        default="false" />
+  <arg name="aligner_dbg_traj"   default="false" />
+
+  <arg name="aligner_split_criteria_type" />
+  <arg name="aligner_split_criteria_min_travel_dist"     default="-1" />
+  <arg name="aligner_split_criteria_min_travel_heading"  default="-1" />
+  <arg name="aligner_split_criteria_max_ratio_inliers"   default="-1" />
+  <arg name="aligner_split_criteria_max_travel_dist"     default="-1" />
+  <arg name="aligner_split_criteria_max_travel_heading"  default="-1" />
+
+  <arg name="aligner_solver_max_iterations"                    default="20" />
+  <arg name="aligner_solver_robustifier_num_iterations_coarse" default="5" />
+  <arg name="aligner_solver_robustifier_threshold_coarse"      default="0.250" />
+  <arg name="aligner_solver_robustifier_threshold_fine"        default="0.005" />
+  <arg name="aligner_failure_ratio_inliers"                    default="0.20" />
+  <arg name="aligner_failure_chi_inliers"                      default="-1.0" />
+
+  <arg name="aligner_dmap_res"      default="0.03" />
+  <arg name="aligner_dmap_size"     default="-1.0" />
+  <arg name="aligner_dmap_max_dist" default="0.50" />
+
+  <arg name="aligner_solver_regularize_correspondences" default="false" />
+  <arg name="aligner_enable_voxelization"               default="true" />
+  <arg name="aligner_normals_computator_min_pts"        default="5" />
+  <arg name="aligner_normals_computator_radius"         default="0.15" />
+  <arg name="aligner_range_max"                         default="20.0" />
+
+
+  <group ns="$(arg namespace)">
+    <node pkg="inesctec_mrdt_slam_distmap_2d_ros" type="slam_offline"
+      name="slam_offline" clear_params="true" output="screen"
+      args="-b $(arg bagfile)
+            --odomtopic $(arg odom_topic)
+            --scantopic $(arg scan_topic)
+            --start $(arg start)
+            --log $(arg logfile)">
+
+      <rosparam command="load" file="$(arg paramfile)" subst_value="true" />
+
+    </node>
+  </group>
+
+</launch>
