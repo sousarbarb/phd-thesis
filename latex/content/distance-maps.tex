@@ -2834,7 +2834,43 @@ reflects the irregular geometry of unstructured point distributions.
 \subsection{Real-world laser odometry evaluation}
 \label{sec:distance-maps:results:iilabs3d}
 
-\todo{TBC}
+The synthetic benchmark evaluates pairwise registration accuracy under
+controlled, repeatable conditions with known ground-truth poses.
+Real-world sequences expose the formulations for 2D~point cloud registration to
+cumulative integration of small alignment errors across extended trajectories,
+sensor noise under real-world conditions, and geometric diversity that
+the synthetic scenes considered in this work cannot fully replicate. Therefore,
+we evaluate the proposed distance map-based registration formulations as a
+2D~laser odometry tracker on the IILABS~3D dataset~\cite{ribeiro:access:2025},
+a complementary contribution within the scope of this PhD~Thesis
+(see~\appxref{appx:iilabs3d}).
+The tracker uses the srrg2\_solver~\cite{grisetti:robotics:2020} framework to
+implement the distance map point-to-point and point-to-plane formulations
+introduced in \secref{sec:distance-maps:alignment:pt2pt}
+and~\secref{sec:distance-maps:alignment:pt2pl}, and
+the standard point-to-point~\cite{besl-mckay:tpami:1992} and
+point-to-plane~\cite{chen-medioni:icra:1991} \gls{icp} baselines,
+with data association resolved via the same distance map representations.
+This implementation approach allows the evaluation of different registration
+formulations in a unified manner, ensuring consistent conditions across them.
+
+Unlike the synthetic benchmark, which constitutes an ablation study of
+individual registration configurations under controlled perturbations,
+our real-world evaluation focuses on determining which error formulations and
+distance map representation levels are best suited to laser odometry in
+indoor environments, compared with the \gls{icp} baselines.
+We focus on laser odometry drift, \ie, the accumulation of translational and
+rotational alignment errors along extended trajectories. This drift
+directly conditions localization accuracy in a \gls{slam} front-end.
+
+\subsubsection{Experimental setup}
+\label{sec:distance-maps:results:iilabs3d:setup}
+
+\subsubsection{Evaluation metrics}
+\label{sec:distance-maps:results:iilabs3d:metrics}
+
+\subsubsection{Laser odometry drift}
+\label{sec:distance-maps:results:iilabs3d:drift}
 
 \section{Summary and Conclusions}\label{sec:distance-maps:conclusions}
 
