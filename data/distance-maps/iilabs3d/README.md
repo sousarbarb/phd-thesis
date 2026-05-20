@@ -126,4 +126,29 @@ python3 eval_iilabs3d.py --dir res-0.03m_dmax-0.50m_rmax-30.0m/nav_a_diff/
 python3 eval_iilabs3d.py --dir res-0.03m_dmax-0.50m_rmax-30.0m/nav_a_omni/
 python3 eval_iilabs3d.py --dir res-0.03m_dmax-0.50m_rmax-30.0m/loop/
 python3 eval_iilabs3d.py --dir res-0.03m_dmax-0.50m_rmax-30.0m/slippage/
+
+python compare_variants.py --file-a results_iilabs3d_res-0.03m_dmax-0.50m_rmax-10.0m_m0.csv --method-a dmap_p2pl --file-b results_iilabs3d_res-0.03m_dmax-0.50m_rmax-10.0m_m0.csv --method-b icp_p2pl --out-csv dmap_p2pl_m0_vs_icp_p2pl_m0_10.0m.csv
+python compare_variants.py --file-a results_iilabs3d_res-0.03m_dmax-0.50m_rmax-20.0m_m0.csv --method-a dmap_p2pl --file-b results_iilabs3d_res-0.03m_dmax-0.50m_rmax-20.0m_m0.csv --method-b icp_p2pl --out-csv dmap_p2pl_m0_vs_icp_p2pl_m0_20.0m.csv
+python compare_variants.py --file-a results_iilabs3d_res-0.03m_dmax-0.50m_rmax-30.0m_m0.csv --method-a dmap_p2pl --file-b results_iilabs3d_res-0.03m_dmax-0.50m_rmax-30.0m_m0.csv --method-b icp_p2pl --out-csv dmap_p2pl_m0_vs_icp_p2pl_m0_30.0m.csv
+
+python compare_variants.py --file-a results_iilabs3d_res-0.03m_dmax-0.50m_rmax-10.0m_m0-1-2.csv --method-a dmap_p2p --file-b results_iilabs3d_res-0.03m_dmax-0.50m_rmax-10.0m_m0.csv --method-b dmap_p2pl --out-csv dmap_p2p_m1_vs_dmap_p2pl_m0_10.0m.csv
+python compare_variants.py --file-a results_iilabs3d_res-0.03m_dmax-0.50m_rmax-20.0m_m0-1-2.csv --method-a dmap_p2p --file-b results_iilabs3d_res-0.03m_dmax-0.50m_rmax-20.0m_m0.csv --method-b dmap_p2pl --out-csv dmap_p2p_m1_vs_dmap_p2pl_m0_20.0m.csv
+python compare_variants.py --file-a results_iilabs3d_res-0.03m_dmax-0.50m_rmax-30.0m_m0-1-2.csv --method-a dmap_p2p --file-b results_iilabs3d_res-0.03m_dmax-0.50m_rmax-30.0m_m0.csv --method-b dmap_p2pl --out-csv dmap_p2p_m1_vs_dmap_p2pl_m0_30.0m.csv
+python compare_variants.py --file-a results_iilabs3d_res-0.03m_dmax-0.50m_rmax-10.0m_m0-1-2.csv --method-a dmap_p2p --file-b results_iilabs3d_res-0.03m_dmax-0.50m_rmax-10.0m_m0.csv --method-b icp_p2pl --out-csv dmap_p2p_m1_vs_icp_p2pl_m0_10.0m.csv
+python compare_variants.py --file-a results_iilabs3d_res-0.03m_dmax-0.50m_rmax-20.0m_m0-1-2.csv --method-a dmap_p2p --file-b results_iilabs3d_res-0.03m_dmax-0.50m_rmax-20.0m_m0.csv --method-b icp_p2pl --out-csv dmap_p2p_m1_vs_icp_p2pl_m0_20.0m.csv
+python compare_variants.py --file-a results_iilabs3d_res-0.03m_dmax-0.50m_rmax-30.0m_m0-1-2.csv --method-a dmap_p2p --file-b results_iilabs3d_res-0.03m_dmax-0.50m_rmax-30.0m_m0.csv --method-b icp_p2pl --out-csv dmap_p2p_m1_vs_icp_p2pl_m0_30.0m.csv
+python compare_variants.py --file-a results_iilabs3d_res-0.03m_dmax-0.50m_rmax-10.0m_m0-1-2.csv --method-a dmap_p2p --file-b results_iilabs3d_res-0.03m_dmax-0.50m_rmax-10.0m_m0.csv --method-b icp_p2p --out-csv dmap_p2p_m1_vs_icp_p2p_m0_10.0m.csv
+python compare_variants.py --file-a results_iilabs3d_res-0.03m_dmax-0.50m_rmax-20.0m_m0-1-2.csv --method-a dmap_p2p --file-b results_iilabs3d_res-0.03m_dmax-0.50m_rmax-20.0m_m0.csv --method-b icp_p2p --out-csv dmap_p2p_m1_vs_icp_p2p_m0_20.0m.csv
+python compare_variants.py --file-a results_iilabs3d_res-0.03m_dmax-0.50m_rmax-30.0m_m0-1-2.csv --method-a dmap_p2p --file-b results_iilabs3d_res-0.03m_dmax-0.50m_rmax-30.0m_m0.csv --method-b icp_p2p --out-csv dmap_p2p_m1_vs_icp_p2p_m0_30.0m.csv
+python compare_variants.py --file-a results_iilabs3d_res-0.03m_dmax-0.50m_rmax-10.0m_m0-1-2.csv --method-a dmap_p2p --file-b results_iilabs3d_res-0.03m_dmax-0.50m_rmax-10.0m_m0.csv --method-b dmap_p2p --out-csv dmap_p2p_m1_vs_dmap_p2p_m0_10.0m.csv
+python compare_variants.py --file-a results_iilabs3d_res-0.03m_dmax-0.50m_rmax-20.0m_m0-1-2.csv --method-a dmap_p2p --file-b results_iilabs3d_res-0.03m_dmax-0.50m_rmax-20.0m_m0.csv --method-b dmap_p2p --out-csv dmap_p2p_m1_vs_dmap_p2p_m0_20.0m.csv
+python compare_variants.py --file-a results_iilabs3d_res-0.03m_dmax-0.50m_rmax-30.0m_m0-1-2.csv --method-a dmap_p2p --file-b results_iilabs3d_res-0.03m_dmax-0.50m_rmax-30.0m_m0.csv --method-b dmap_p2p --out-csv dmap_p2p_m1_vs_dmap_p2p_m0_30.0m.csv
+
+python compare_variants.py --file-a results_iilabs3d_res-0.03m_dmax-0.50m_rmax-10.0m_m0-1-2.csv --method-a dmap_p2pl --file-b results_iilabs3d_res-0.03m_dmax-0.50m_rmax-10.0m_m0.csv --method-b dmap_p2pl --out-csv dmap_p2pl_m2_vs_dmap_p2pl_m0_10.0m.csv
+python compare_variants.py --file-a results_iilabs3d_res-0.03m_dmax-0.50m_rmax-20.0m_m0-1-2.csv --method-a dmap_p2pl --file-b results_iilabs3d_res-0.03m_dmax-0.50m_rmax-20.0m_m0.csv --method-b dmap_p2pl --out-csv dmap_p2pl_m2_vs_dmap_p2pl_m0_20.0m.csv
+python compare_variants.py --file-a results_iilabs3d_res-0.03m_dmax-0.50m_rmax-30.0m_m0-1-2.csv --method-a dmap_p2pl --file-b results_iilabs3d_res-0.03m_dmax-0.50m_rmax-30.0m_m0.csv --method-b dmap_p2pl --out-csv dmap_p2pl_m2_vs_dmap_p2pl_m0_30.0m.csv
+python compare_variants.py --file-a results_iilabs3d_res-0.03m_dmax-0.50m_rmax-10.0m_m0-1-2.csv --method-a dmap_p2pl --file-b results_iilabs3d_res-0.03m_dmax-0.50m_rmax-10.0m_m0.csv --method-b icp_p2pl --out-csv dmap_p2pl_m2_vs_icp_p2pl_m0_10.0m.csv
+python compare_variants.py --file-a results_iilabs3d_res-0.03m_dmax-0.50m_rmax-20.0m_m0-1-2.csv --method-a dmap_p2pl --file-b results_iilabs3d_res-0.03m_dmax-0.50m_rmax-20.0m_m0.csv --method-b icp_p2pl --out-csv dmap_p2pl_m2_vs_icp_p2pl_m0_20.0m.csv
+python compare_variants.py --file-a results_iilabs3d_res-0.03m_dmax-0.50m_rmax-30.0m_m0-1-2.csv --method-a dmap_p2pl --file-b results_iilabs3d_res-0.03m_dmax-0.50m_rmax-30.0m_m0.csv --method-b icp_p2pl --out-csv dmap_p2pl_m2_vs_icp_p2pl_m0_30.0m.csv
+
 ```

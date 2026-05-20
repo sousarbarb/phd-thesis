@@ -82,29 +82,39 @@ class DiffRecord:
     val_a_rre: float | None
     val_b_rre: float | None
 
-    def _abs(self, a, b):
-        return None if (a is None or b is None) else abs(a - b)
+    def _signed(self, a, b):
+        """A - B: negative means A is better (lower error), positive means A is worse."""
+        return None if (a is None or b is None) else a - b
 
-    def _rel(self, a, b):
-        return None if (a is None or b is None or b == 0) else abs(a - b) / b * 100
+    def _abs(self, a, b):
+        d = self._signed(a, b)
+        return None if d is None else abs(d)
+
+    def _rel_signed(self, a, b):
+        """Signed relative diff (A - B) / B * 100. Negative = A improved over B."""
+        return None if (a is None or b is None or b == 0) else (a - b) / b * 100
 
     def _within(self, a, b, thresh):
         d = self._abs(a, b)
         return None if d is None else d <= thresh
 
     @property
-    def abs_diff_rte(self):  return self._abs(self.val_a_rte, self.val_b_rte)
+    def signed_diff_rte(self): return self._signed(self.val_a_rte, self.val_b_rte)
     @property
-    def rel_diff_rte(self):  return self._rel(self.val_a_rte, self.val_b_rte)
+    def abs_diff_rte(self):    return self._abs(self.val_a_rte, self.val_b_rte)
     @property
-    def within_rte(self):    return self._within(self.val_a_rte, self.val_b_rte, RTE_THRESHOLD)
+    def rel_diff_rte(self):    return self._rel_signed(self.val_a_rte, self.val_b_rte)
+    @property
+    def within_rte(self):      return self._within(self.val_a_rte, self.val_b_rte, RTE_THRESHOLD)
 
     @property
-    def abs_diff_rre(self):  return self._abs(self.val_a_rre, self.val_b_rre)
+    def signed_diff_rre(self): return self._signed(self.val_a_rre, self.val_b_rre)
     @property
-    def rel_diff_rre(self):  return self._rel(self.val_a_rre, self.val_b_rre)
+    def abs_diff_rre(self):    return self._abs(self.val_a_rre, self.val_b_rre)
     @property
-    def within_rre(self):    return self._within(self.val_a_rre, self.val_b_rre, RRE_THRESHOLD)
+    def rel_diff_rre(self):    return self._rel_signed(self.val_a_rre, self.val_b_rre)
+    @property
+    def within_rre(self):      return self._within(self.val_a_rre, self.val_b_rre, RRE_THRESHOLD)
 
 
 # ---------------------------------------------------------------------------
@@ -190,12 +200,25 @@ def build_diffs(
 # ---------------------------------------------------------------------------
 
 def safe_stats(values: list) -> dict:
+    """Stats for unsigned (abs) values."""
     v = [x for x in values if x is not None]
     if not v:
         return dict(n=0, mean=None, median=None, max=None, stdev=None)
     return dict(
         n=len(v), mean=statistics.mean(v), median=statistics.median(v),
         max=max(v), stdev=statistics.stdev(v) if len(v) > 1 else 0.0,
+    )
+
+
+def signed_stats(values: list) -> dict:
+    """Stats for signed values (A - B). Negative mean = A generally better than B."""
+    v = [x for x in values if x is not None]
+    if not v:
+        return dict(n=0, mean=None, median=None, min=None, max=None, stdev=None)
+    return dict(
+        n=len(v), mean=statistics.mean(v), median=statistics.median(v),
+        min=min(v), max=max(v),
+        stdev=statistics.stdev(v) if len(v) > 1 else 0.0,
     )
 
 
@@ -209,16 +232,26 @@ def within_pct(records: list[DiffRecord], metric: str) -> float:
 # Console output
 # ---------------------------------------------------------------------------
 
-def _stat_line(label: str, s: dict, decimals: int, unit: str = "") -> str:
+def _stat_line_abs(label: str, s: dict, decimals: int) -> str:
     if s["mean"] is None:
-        return f"    {label}: no data"
+        return f"         {label}: no data"
+    return (f"         {label}: "
+            f"mean={s['mean']:.{decimals}f}  "
+            f"max={s['max']:.{decimals}f}  "
+            f"stdev={s['stdev']:.{decimals}f}  (n={s['n']})")
+
+
+def _stat_line_signed(label: str, s: dict, decimals: int, unit: str = "") -> str:
+    """Show signed stats with min/max so the direction of spread is visible."""
+    if s["mean"] is None:
+        return f"         {label}: no data"
     u = f" {unit}" if unit else ""
-    return (f"    {label}: "
-            f"mean={s['mean']:.{decimals}f}{u}  "
-            f"median={s['median']:.{decimals}f}{u}  "
-            f"max={s['max']:.{decimals}f}{u}  "
-            f"stdev={s['stdev']:.{decimals}f}{u}  "
-            f"(n={s['n']})")
+    direction = "A better" if s["mean"] < 0 else ("A worse" if s["mean"] > 0 else "equal")
+    return (f"         {label}: "
+            f"mean={s['mean']:+.{decimals}f}{u}  "
+            f"median={s['median']:+.{decimals}f}{u}  "
+            f"[{s['min']:+.{decimals}f}{u} … {s['max']:+.{decimals}f}{u}]  "
+            f"→ {direction}  (n={s['n']})")
 
 
 def print_comparison(
@@ -229,44 +262,49 @@ def print_comparison(
 ) -> None:
     sep = "=" * 70
     print(f"\n{sep}")
-    print(f"COMPARISON:  {label_a}  vs  {label_b}")
+    print(f"COMPARISON:  A = {label_a}")
+    print(f"             B = {label_b}")
+    print(f"Sign convention: A - B  →  negative = A better, positive = A worse")
     print(sep)
+
+    def _block(recs):
+        for metric, decimals in [("rte", RTE_DECIMALS), ("rre", RRE_DECIMALS)]:
+            abs_s  = safe_stats(  [getattr(r, f"abs_diff_{metric}")    for r in recs])
+            sgn_s  = signed_stats([getattr(r, f"signed_diff_{metric}") for r in recs])
+            rel_s  = signed_stats([getattr(r, f"rel_diff_{metric}")    for r in recs])
+            pct    = within_pct(recs, metric)
+            print(f"    {metric.upper()}  within-threshold: {pct:.1f}%")
+            print(_stat_line_abs   ("abs diff", abs_s, decimals))
+            print(_stat_line_signed("signed diff (A-B)", sgn_s, decimals))
+            print(_stat_line_signed("rel diff (A-B)/B", rel_s, 1, "%"))
 
     for scenario in scenarios:
         recs = [d for d in diffs if d.scenario == scenario]
         print(f"\n  [{scenario}]  ({len(recs)} param configs)")
-        for metric, decimals in [("rte", RTE_DECIMALS), ("rre", RRE_DECIMALS)]:
-            abs_s = safe_stats([getattr(r, f"abs_diff_{metric}") for r in recs])
-            rel_s = safe_stats([getattr(r, f"rel_diff_{metric}") for r in recs])
-            pct   = within_pct(recs, metric)
-            print(f"    {metric.upper()}  within-threshold: {pct:.1f}%")
-            print(_stat_line("     abs diff", abs_s, decimals))
-            print(_stat_line("     rel diff", rel_s, 1, "%"))
+        _block(recs)
 
-    # Global across all scenarios
     print(f"\n  [ALL SCENARIOS]")
-    for metric, decimals in [("rte", RTE_DECIMALS), ("rre", RRE_DECIMALS)]:
-        abs_s = safe_stats([getattr(r, f"abs_diff_{metric}") for r in diffs])
-        rel_s = safe_stats([getattr(r, f"rel_diff_{metric}") for r in diffs])
-        pct   = within_pct(diffs, metric)
-        print(f"    {metric.upper()}  within-threshold: {pct:.1f}%")
-        print(_stat_line("     abs diff", abs_s, decimals))
-        print(_stat_line("     rel diff", rel_s, 1, "%"))
+    _block(diffs)
 
-    # Outliers
-    print(f"\n  OUTLIERS  (rel diff > {outlier_thresh}% in any metric):")
+    # Outliers — flag by abs(rel_diff) but show signed value
+    print(f"\n  OUTLIERS  (|rel diff| > {outlier_thresh}% in any metric):")
     outliers = [
         d for d in diffs
-        if (d.rel_diff_rte is not None and d.rel_diff_rte > outlier_thresh)
-        or (d.rel_diff_rre is not None and d.rel_diff_rre > outlier_thresh)
+        if (d.rel_diff_rte is not None and abs(d.rel_diff_rte) > outlier_thresh)
+        or (d.rel_diff_rre is not None and abs(d.rel_diff_rre) > outlier_thresh)
     ]
     if not outliers:
         print(f"    None — variants agree within {outlier_thresh}% everywhere.")
     else:
         for o in outliers:
-            rte_s = f"RTE Δ={o.rel_diff_rte:.1f}%" if o.rel_diff_rte is not None else ""
-            rre_s = f"RRE Δ={o.rel_diff_rre:.1f}%" if o.rel_diff_rre is not None else ""
-            print(f"    {o.scenario}  |  {o.param}  |  {rte_s}  {rre_s}")
+            parts = []
+            if o.rel_diff_rte is not None and abs(o.rel_diff_rte) > outlier_thresh:
+                tag = "A better" if o.rel_diff_rte < 0 else "A worse"
+                parts.append(f"RTE {o.rel_diff_rte:+.1f}% ({tag})")
+            if o.rel_diff_rre is not None and abs(o.rel_diff_rre) > outlier_thresh:
+                tag = "A better" if o.rel_diff_rre < 0 else "A worse"
+                parts.append(f"RRE {o.rel_diff_rre:+.1f}% ({tag})")
+            print(f"    {o.scenario}  |  {o.param}  |  {',  '.join(parts)}")
 
 
 # ---------------------------------------------------------------------------
@@ -274,29 +312,36 @@ def print_comparison(
 # ---------------------------------------------------------------------------
 
 def export_csv(diffs: list[DiffRecord], label_a: str, label_b: str, path: str) -> None:
+    # Column order: values, then signed diff (A-B), abs diff, signed rel diff, within-threshold
     fields = [
         "scenario", "param",
-        f"rte_{label_a}", f"rte_{label_b}", "abs_diff_rte", "rel_diff_rte_%", "within_thresh_rte",
-        f"rre_{label_a}", f"rre_{label_b}", "abs_diff_rre", "rel_diff_rre_%", "within_thresh_rre",
+        f"rte_{label_a}", f"rte_{label_b}",
+        "signed_diff_rte_(A-B)", "abs_diff_rte", "rel_diff_rte_%_(A-B)", "within_thresh_rte",
+        f"rre_{label_a}", f"rre_{label_b}",
+        "signed_diff_rre_(A-B)", "abs_diff_rre", "rel_diff_rre_%_(A-B)", "within_thresh_rre",
     ]
     with open(path, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=fields)
         w.writeheader()
         for d in diffs:
-            def _f(v, dec): return f"{v:.{dec}f}" if v is not None else ""
-            def _b(v):      return "" if v is None else str(v)
+            def _f(v, dec, signed=False):
+                if v is None: return ""
+                return f"{v:+.{dec}f}" if signed else f"{v:.{dec}f}"
+            def _b(v): return "" if v is None else str(v)
             w.writerow({
                 "scenario":              d.scenario,
                 "param":                 d.param,
-                f"rte_{label_a}":        _f(d.val_a_rte, RTE_DECIMALS),
-                f"rte_{label_b}":        _f(d.val_b_rte, RTE_DECIMALS),
-                "abs_diff_rte":          _f(d.abs_diff_rte, RTE_DECIMALS),
-                "rel_diff_rte_%":        _f(d.rel_diff_rte, 1),
+                f"rte_{label_a}":        _f(d.val_a_rte,      RTE_DECIMALS),
+                f"rte_{label_b}":        _f(d.val_b_rte,      RTE_DECIMALS),
+                "signed_diff_rte_(A-B)": _f(d.signed_diff_rte, RTE_DECIMALS, signed=True),
+                "abs_diff_rte":          _f(d.abs_diff_rte,    RTE_DECIMALS),
+                "rel_diff_rte_%_(A-B)":  _f(d.rel_diff_rte,   1, signed=True),
                 "within_thresh_rte":     _b(d.within_rte),
-                f"rre_{label_a}":        _f(d.val_a_rre, RRE_DECIMALS),
-                f"rre_{label_b}":        _f(d.val_b_rre, RRE_DECIMALS),
-                "abs_diff_rre":          _f(d.abs_diff_rre, RRE_DECIMALS),
-                "rel_diff_rre_%":        _f(d.rel_diff_rre, 1),
+                f"rre_{label_a}":        _f(d.val_a_rre,      RRE_DECIMALS),
+                f"rre_{label_b}":        _f(d.val_b_rre,      RRE_DECIMALS),
+                "signed_diff_rre_(A-B)": _f(d.signed_diff_rre, RRE_DECIMALS, signed=True),
+                "abs_diff_rre":          _f(d.abs_diff_rre,    RRE_DECIMALS),
+                "rel_diff_rre_%_(A-B)":  _f(d.rel_diff_rre,   1, signed=True),
                 "within_thresh_rre":     _b(d.within_rre),
             })
     print(f"\nFull diff table → {path}")
@@ -313,30 +358,33 @@ def build_latex_summary(
 ) -> str:
     lines = [
         rf"% Equivalence: {label_a} vs {label_b}",
+        rf"% Sign convention: A - B  (negative = A better, positive = A worse)",
         r"\begin{tabular}{lcccccccc}",
         r"\toprule",
         r"& \multicolumn{4}{c}{\textbf{RTE}} & \multicolumn{4}{c}{\textbf{RRE}} \\",
         r"\cmidrule(lr){2-5}\cmidrule(lr){6-9}",
+        # Signed mean diff, abs max diff, signed mean rel diff, within%
         r"Scenario"
-        r" & $\bar{\Delta}$ & $\Delta_{\max}$"
-        r" & $\bar{\Delta}_{\mathrm{rel}}$\,[\%] & $\leq\varepsilon$\,[\%]"
-        r" & $\bar{\Delta}$ & $\Delta_{\max}$"
-        r" & $\bar{\Delta}_{\mathrm{rel}}$\,[\%] & $\leq\varepsilon$\,[\%] \\",
+        r" & $\overline{\delta}$ & $|\Delta|_{\max}$"
+        r" & $\overline{\delta}_{\mathrm{rel}}$\,[\%] & $\leq\varepsilon$\,[\%]"
+        r" & $\overline{\delta}$ & $|\Delta|_{\max}$"
+        r" & $\overline{\delta}_{\mathrm{rel}}$\,[\%] & $\leq\varepsilon$\,[\%] \\",
         r"\midrule",
     ]
 
     def _row(recs, row_label):
         cells = [row_label.replace("_", r"\_")]
         for metric, decimals in [("rte", RTE_DECIMALS), ("rre", RRE_DECIMALS)]:
-            s_abs = safe_stats([getattr(r, f"abs_diff_{metric}") for r in recs])
-            s_rel = safe_stats([getattr(r, f"rel_diff_{metric}") for r in recs])
+            s_sgn = signed_stats([getattr(r, f"signed_diff_{metric}") for r in recs])
+            s_abs = safe_stats(  [getattr(r, f"abs_diff_{metric}")    for r in recs])
+            s_rel = signed_stats([getattr(r, f"rel_diff_{metric}")    for r in recs])
             pct   = within_pct(recs, metric)
-            cells += [
-                f"{s_abs['mean']:.{decimals}f}" if s_abs["mean"] is not None else "--",
-                f"{s_abs['max']:.{decimals}f}"  if s_abs["max"]  is not None else "--",
-                f"{s_rel['mean']:.1f}"           if s_rel["mean"] is not None else "--",
-                f"{pct:.1f}"                     if not math.isnan(pct)        else "--",
-            ]
+            # signed mean with explicit + sign, abs max unsigned, signed rel mean with + sign
+            mean_sgn = f"{s_sgn['mean']:+.{decimals}f}" if s_sgn["mean"] is not None else "--"
+            max_abs  = f"{s_abs['max']:.{decimals}f}"   if s_abs["max"]  is not None else "--"
+            mean_rel = f"{s_rel['mean']:+.1f}"           if s_rel["mean"] is not None else "--"
+            pct_str  = f"{pct:.1f}"                      if not math.isnan(pct)       else "--"
+            cells += [mean_sgn, max_abs, mean_rel, pct_str]
         return " & ".join(cells) + r" \\"
 
     for scenario in scenarios:
