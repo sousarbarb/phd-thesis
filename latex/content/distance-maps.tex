@@ -2880,12 +2880,12 @@ with 24 high-resolution cameras (model Prime\textsuperscript{X}~22) operating at
 
 \begin{figure}[!t]
 \centering
-\subfloat[]{\includegraphics[height=0.28\textwidth]{distance-maps/iilabs3d/IMG_4611.jpg}}\hfill
-\subfloat[]{\includegraphics[height=0.28\textwidth]{distance-maps/iilabs3d/IMG_4612.jpg}}\hfill
-\subfloat[]{\includegraphics[height=0.28\textwidth]{distance-maps/iilabs3d/IMG_4617.jpg}}\\[\smallskipamount]
-\subfloat[]{\includegraphics[height=0.28\textwidth]{distance-maps/iilabs3d/IMG_4619.jpg}}\hfill
-\subfloat[]{\includegraphics[height=0.28\textwidth]{distance-maps/iilabs3d/IMG_4620.jpg}}\hfill
-\subfloat[]{\includegraphics[height=0.28\textwidth]{distance-maps/iilabs3d/IMG_4609.jpg}}
+\subfloat[]{\includegraphics[height=0.29\textwidth]{distance-maps/iilabs3d/IMG_4611.jpg}}\hfill
+\subfloat[]{\includegraphics[height=0.29\textwidth]{distance-maps/iilabs3d/IMG_4612.jpg}}\hfill
+\subfloat[]{\includegraphics[height=0.29\textwidth]{distance-maps/iilabs3d/IMG_4617.jpg}}\\[\smallskipamount]
+\subfloat[]{\includegraphics[height=0.29\textwidth]{distance-maps/iilabs3d/IMG_4619.jpg}}\hfill
+\subfloat[]{\includegraphics[height=0.29\textwidth]{distance-maps/iilabs3d/IMG_4620.jpg}}\hfill
+\subfloat[]{\includegraphics[height=0.29\textwidth]{distance-maps/iilabs3d/IMG_4609.jpg}}
 \caption[Nav~A space and its external corridor at iiLab -- Industry and
          Innovation Laboratory]{Nav~A space and its external corridor at
          \gls{iilab}, with the OptiTrack motion capture system installed on
@@ -3049,7 +3049,7 @@ as follows:
       \label{eq:distance-maps:results:iilabs3d:rre}
       \mathrm{RRE} =
       \frac{1}{N_s} \sum_{t=1}^{N_s}
-      \frac{\left| \theta_{\mathbf{E}_{t,t+\delta}} \right|}{\delta}
+      \frac{\left| \theta_{\boldsymbol{\varepsilon}_{t,t+\Delta d}} \right|}{\Delta d}
       \quad \left(\si{\degree\per\metre}\right)
       \end{equation}
 \end{itemize}
@@ -3064,6 +3064,16 @@ trajectory alignment.
 \subsubsection{Laser odometry drift}
 \label{sec:distance-maps:results:iilabs3d:drift}
 
+Tables~\ref{tab:distance-maps:results:iilabs3d:accuracy:rmax-10.0m:m0}--\ref{tab:distance-maps:results:iilabs3d:accuracy:rmax-30.0m:m0-1-2}
+present the real-world laser odometry drift results on the
+IILABS~3D~\cite{ribeiro:access:2025} dataset for all four registration
+formulations discussed in this work across three maximum ranges
+($r_\mathrm{max} \in \{\SI{10}{\metre},\, \SI{20}{\metre},\, \SI{30}{\metre}\}$),
+two keyframe splitting criteria (translation and inliers ratio), and
+four benchmark sequences (Nav~A~Diff, Nav~A~Omni, Loop, and Slippage).
+Only the 2D~laser scanner data from the Hokuyo~UST-10LX sensor available in the
+dataset is considered in this evaluation.
+
 \input{tables/distance-maps/iilabs3d/results_iilabs3d_res-0.03m_dmax-0.50m_rmax-10.0m_m0.tex}
 \input{tables/distance-maps/iilabs3d/results_iilabs3d_res-0.03m_dmax-0.50m_rmax-10.0m_m0-1-2.tex}
 \input{tables/distance-maps/iilabs3d/results_iilabs3d_res-0.03m_dmax-0.50m_rmax-20.0m_m0.tex}
@@ -3071,8 +3081,36 @@ trajectory alignment.
 \input{tables/distance-maps/iilabs3d/results_iilabs3d_res-0.03m_dmax-0.50m_rmax-30.0m_m0.tex}
 \input{tables/distance-maps/iilabs3d/results_iilabs3d_res-0.03m_dmax-0.50m_rmax-30.0m_m0-1-2.tex}
 
+\paragraph{Theoretical equivalence of point-to-plane formulations}
+The analytical distance map point-to-plane formulation
+$\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$ and the \gls{icp} point-to-plane
+baseline $\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$~\cite{chen-medioni:icra:1991}
+produce similar \gls{rte} and \gls{rre} values across all sequences,
+maximum sensor ranges, and splitting criteria
+(see Tables~\ref{tab:distance-maps:results:iilabs3d:accuracy:rmax-10.0m:m0},
+\ref{tab:distance-maps:results:iilabs3d:accuracy:rmax-20.0m:m0}, and
+\ref{tab:distance-maps:results:iilabs3d:accuracy:rmax-30.0m:m0}).
+At $r_\mathrm{max} = \SI{10}{\metre}$, 35~and 33~out of 48~test cases
+(4~sequences, 12~splitting configurations)
+are within the \SI{0.05}{\percent} \gls{rte} and \SI{0.005}{\degree\per\metre}
+\gls{rre} tolerance, respectively. Similarly,
+at $r_\mathrm{max} = \SI{20}{\metre}$, this agreement improves to 38 out of 48
+for both metrics, while at $r_\mathrm{max} = \SI{30}{\metre}$,
+34 and 38 configurations out of 48 are within tolerance.
+Across all 144~configurations, mean absolute differences between
+$\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$ and
+$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$ remain small at
+\SI{0.04}{\percent} for \gls{rte} and \SI{0.003}{\degree\per\metre} for
+\gls{rre}, confirming that the two formulations produce numerically equivalent
+trajectories in the vast majority of cases. This result is consistent with both
+the theoretical derivation presented in
+\secref{sec:distance-maps:alignment:pt2pl} and the synthetic benchmark findings
+(see~\secref{sec:distance-maps:results:synthetic:registration}), confirming the
+theoretical equivalence between both formulations under real-world tracking
+conditions.
 
+\clearpage
 
 \section{Summary and Conclusions}\label{sec:distance-maps:conclusions}
 
-TBC
+\todo{TBC}
