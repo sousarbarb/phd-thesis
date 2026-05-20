@@ -2,10 +2,26 @@
 \begin{table}[!t]
 \centering
 \caption[%
-    TBC]{%
-    TBC%
-}
-\label{tab:distance-maps:results:iilabs3d:accuracy}
+    Real-world laser odometry drift on the IILABS~3D
+    dataset using distance map-based formulations
+    ($\mathcal{M}_1$ and $\mathcal{M}_2$ for point-to-point and point-to-plane,
+    respectively) and distance map-guided \glsentryshort{icp} baselines
+    ($\mathcal{M}_0$ representation level)
+    for the 2D~point cloud registration problem
+    ($r_\mathrm{max} = \SI{10}{\metre}$)]{%
+    Real-world laser odometry drift on the IILABS~3D~\cite{ribeiro:access:2025}
+    dataset using distance map-based formulations
+    ($\mathcal{M}_1$ and $\mathcal{M}_2$ for point-to-point and point-to-plane,
+    respectively) and distance map-guided \gls{icp} baselines
+    ($\mathcal{M}_0$ representation level)
+    for the 2D~point cloud registration problem
+    ($r_\mathrm{max} = \SI{10}{\metre}$).
+    \gls{rte} (\%) and \gls{rre} (\si{\degree\per\metre}) are reported as
+    the mean over \SI{10}{\metre} segments across four sequences
+    (Nav~A~Diff, Nav~A~Omni, Loop, Slippage). Bold entries indicate the lowest
+    drift overall within a tolerance of \SI{0.05}{\percent} for \gls{rte} and
+    \SI{0.005}{\degree\per\metre} for \gls{rre}.}
+\label{tab:distance-maps:results:iilabs3d:accuracy:rmax-10.0m:m0-1-2}
 \begin{tabular}{
     l   % method family      (multirow label)
     l   % splitting criteria (translation / inliers)
@@ -35,20 +51,20 @@
 \multicolumn{1}{l}{\textbf{Splitting Criteria}} &
 \multicolumn{1}{c|}{\textbf{Thresh.}} &
 \multicolumn{1}{c}{(\%)} &
-\multicolumn{1}{c|}{(\textdegree{}/m)} &
+\multicolumn{1}{c|}{(\si{\degree\per\metre})} &
 \multicolumn{1}{c}{(\%)} &
-\multicolumn{1}{c|}{(\textdegree{}/m)} &
+\multicolumn{1}{c|}{(\si{\degree\per\metre})} &
 \multicolumn{1}{c}{(\%)} &
-\multicolumn{1}{c|}{(\textdegree{}/m)} &
+\multicolumn{1}{c|}{(\si{\degree\per\metre})} &
 \multicolumn{1}{c}{(\%)} &
-\multicolumn{1}{c}{(\textdegree{}/m)}\\
+\multicolumn{1}{c}{(\si{\degree\per\metre})}\\
 \hline
 
 % ==============================================================================
 % DISTANCE MAP POINT-TO-POINT ERROR FORMULATION
 % ==============================================================================
 
-\multirow{10}{*}{$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$} & \multirow{5}{*}{\emph{Translation} (m)}
+\multirow{12}{*}{$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$} & \multirow{5}{*}{\emph{Translation} (m)}
  & $\SI{0.50}{\metre}$ & 1.68 & 0.129 & 1.39 & \bfseries 0.076 & 3.34 & 0.222 & 1.30 & 0.155 \\
 && $\SI{1.00}{\metre}$ & 1.35 & 0.113 & 1.06 & 0.088 & 3.51 & 0.225 & 0.93 & 0.089 \\
 && $\SI{1.50}{\metre}$ & 1.16 & 0.116 & 1.05 & \bfseries 0.078 & 3.44 & 0.221 & 1.10 & 0.112 \\
@@ -70,7 +86,7 @@
 % DISTANCE MAP POINT-TO-PLANE ERROR FORMULATION
 % ==============================================================================
 
-\multirow{10}{*}{$\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_2)$} & \multirow{5}{*}{\emph{Translation} (m)}
+\multirow{12}{*}{$\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_2)$} & \multirow{5}{*}{\emph{Translation} (m)}
  & $\SI{0.50}{\metre}$ & 1.37 & 0.139 & 1.18 & 0.099 & 4.50 & 0.286 & 0.89 & 0.078 \\
 && $\SI{1.00}{\metre}$ & 1.35 & 0.136 & 1.17 & 0.117 & 4.19 & 0.265 & 1.22 & 0.111 \\
 && $\SI{1.50}{\metre}$ & 1.36 & 0.136 & 1.10 & 0.099 & 4.03 & 0.251 & 0.80 & 0.050 \\
@@ -92,7 +108,7 @@
 % ICP POINT-TO-POINT ERROR FORMULATION W/ DISTANCE MAP DATA CORRESPONDENCE
 % ==============================================================================
 
-\multirow{10}{*}{\shortstack[l]{$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$\\(\cite{besl-mckay:tpami:1992})}}
+\multirow{12}{*}{\shortstack[l]{$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$\\(\cite{besl-mckay:tpami:1992})}}
 & \multirow{5}{*}{\emph{Translation} (m)}
  & $\SI{0.50}{\metre}$ & 3.14 & 0.147 & 2.60 & 0.108 & 6.91 & 0.338 & 1.38 & 0.104 \\
 && $\SI{1.00}{\metre}$ & 2.20 & 0.138 & 1.77 & 0.109 & 5.15 & 0.276 & 0.60 & 0.088 \\
@@ -115,7 +131,7 @@
 % ICP POINT-TO-PLANE ERROR FORMULATION W/ DISTANCE MAP DATA CORRESPONDENCE
 % ==============================================================================
 
-\multirow{10}{*}{\shortstack[l]{$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$\\(\cite{chen-medioni:icra:1991})}}
+\multirow{12}{*}{\shortstack[l]{$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$\\(\cite{chen-medioni:icra:1991})}}
 & \multirow{5}{*}{\emph{Translation} (m)}
  & $\SI{0.50}{\metre}$ & 1.55 & 0.142 & 1.35 & 0.104 & 4.80 & 0.309 & 1.47 & 0.134 \\
 && $\SI{1.00}{\metre}$ & 1.45 & 0.119 & 1.29 & 0.096 & 3.06 & 0.237 & 1.09 & 0.100 \\
