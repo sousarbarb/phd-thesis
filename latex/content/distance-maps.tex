@@ -3366,7 +3366,32 @@ derivatives of the distance field, which may introduce discretization errors
 and amplification of the measurement noise.
 
 \paragraph{Effect of the keyframe splitting criterion}
-\todo{TBC}
+The selection of the keyframe splitting criterion impacts the odometric
+drift. For the translation-based criterion, performance generally improves from
+$\SI{0.5}{\metre}$ to $\SI{2.0}{\metre}$--$\SI{2.5}{\metre}$ across
+2D point cloud registration approaches and sequences, before degrading at
+$\SI{3.0}{\metre}$. This behavior could be attributed to two effects.
+Higher translation thresholds reduce the frequency of keyframe splits,
+limiting the accumulation of registration and numerical errors across
+transitions. As the distance between the current pose and the centre of the
+keyframe's coordinate frame increases, the inlier ratio decreases while also
+changing the point density due to the 2D laser scanner radial effect.
+Therefore, the best threshold for the translation splitting criterion on
+the data sequences considered in this work seems to be between
+$\SI{2.0}{\metre}$ and $\SI{2.5}{\metre}$.
+Similarly, the parametrization of the inlier ratio criterion seems to impact
+the performance of registration formulations on laser odometry drift.
+The best results are obtained in general at 40\%--60\% thresholds across
+formulations. Performance degrades at thresholds of 80\% and above,
+which is attributed to the increased frequency of keyframe splits,
+causing registration and numerical errors to accumulate
+across a larger number of transitions.
+Also, in general, the 40\% inlier threshold provides lower or equal
+odometric drift compared to the best translation-based threshold results across
+most formulations and sequences. This result suggests that a keyframe splitting
+criterion based on the information that the tracker is perceiving
+leads to more stable tracking compared to the translation criterion,
+only changing keyframe when needed with the decrease on the inliers ratio.
 
 \paragraph{Effect of maximum sensor range}
 When increasing the maximum admissible range of the data for registration from
