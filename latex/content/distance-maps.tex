@@ -975,7 +975,7 @@ second-order spatial derivatives of the distance map, providing both
 analytical expressions and finite-difference approximations used in
 the implementation of the proposed approach.
 \secref{sec:distance-maps:alignment:dmaps:representation} describes the three
-representation levels of increasing pre-computed information content considered
+representation levels of increasing precomputed information content considered
 in this work. Lastly, \secref{sec:distance-maps:alignment:dmaps:computation}
 details the computation pipeline and the data structures underlying each variant
 of the distance map representations considered in the scope of this PhD~Thesis.
@@ -2396,7 +2396,7 @@ points falling into the same cell are replaced by their centroid in the
 pre-processing step, the effect is more severe when the voxel scale is large
 relative to the scene geometry.
 
-By contrast, pre-computed distance map variants, in particular
+By contrast, precomputed distance map variants, in particular
 $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ with voxelization, are
 substantially less affected and achieve accuracy comparable to
 $\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$ without voxelization.
@@ -2949,7 +2949,7 @@ from the bounding box of the reference point cloud expanded by $d_{\max}$
 (see \algref{alg:distance-maps:alignment:dmaps:initialization}).
 Following the discussion from the synthetic benchmark results
 (see \secref{sec:distance-maps:results:synthetic:registration}), we disable the
-bi-linear interpolation on pre-computed distance map formulations, while
+bi-linear interpolation on precomputed distance map formulations, while
 leaving point cloud voxelization enabled to reduce the radial density effect on
 2D~laser data. Outlier rejection is handled by a Cauchy robustifier
 (see \tabref{tab:distance-maps:background:least-squares:robust-losses})
@@ -3074,13 +3074,6 @@ four benchmark sequences (Nav~A~Diff, Nav~A~Omni, Loop, and Slippage).
 Only the 2D~laser scanner data from the Hokuyo~UST-10LX sensor available in the
 dataset is considered in this evaluation.
 
-\input{tables/distance-maps/iilabs3d/results_iilabs3d_res-0.03m_dmax-0.50m_rmax-10.0m_m0.tex}
-\input{tables/distance-maps/iilabs3d/results_iilabs3d_res-0.03m_dmax-0.50m_rmax-10.0m_m0-1-2.tex}
-\input{tables/distance-maps/iilabs3d/results_iilabs3d_res-0.03m_dmax-0.50m_rmax-20.0m_m0.tex}
-\input{tables/distance-maps/iilabs3d/results_iilabs3d_res-0.03m_dmax-0.50m_rmax-20.0m_m0-1-2.tex}
-\input{tables/distance-maps/iilabs3d/results_iilabs3d_res-0.03m_dmax-0.50m_rmax-30.0m_m0.tex}
-\input{tables/distance-maps/iilabs3d/results_iilabs3d_res-0.03m_dmax-0.50m_rmax-30.0m_m0-1-2.tex}
-
 \paragraph{Theoretical equivalence of point-to-plane formulations}
 The analytical distance map point-to-plane formulation
 $\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$ and the \gls{icp} point-to-plane
@@ -3101,15 +3094,344 @@ Across all 144~configurations, mean absolute differences between
 $\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$ and
 $\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$ remain small at
 \SI{0.04}{\percent} for \gls{rte} and \SI{0.003}{\degree\per\metre} for
-\gls{rre}, confirming that the two formulations produce numerically equivalent
-trajectories in the vast majority of cases. This result is consistent with both
-the theoretical derivation presented in
+\gls{rre} with a standard deviation of \SI{0.05}{\percent} and
+\SI{0.004}{\degree\per\metre}, respectively, confirming that the two
+formulations produce numerically equivalent trajectories in general.
+This result is consistent with both the theoretical derivation presented in
 \secref{sec:distance-maps:alignment:pt2pl} and the synthetic benchmark findings
 (see~\secref{sec:distance-maps:results:synthetic:registration}), confirming the
 theoretical equivalence between both formulations under real-world tracking
 conditions.
 
+\paragraph{Point-to-plane versus point-to-point}
+Similarly to the synthetic benchmark results, at the $\mathcal{M}_0$
+representation level, the proposed distance map-based and \gls{icp}
+point-to-plane~\cite{chen-medioni:icra:1991} formulations
+($\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$ and
+$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$) outperform their point-to-point
+counterparts ($\mathcal{D}_\mathrm{p2p}(\mathcal{M}_0)$
+and $\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$) across the majority of
+configurations in terms of rotational and, specially, on translational drift.
+This result is also in conformity with the finding of Rusinkiewicz and
+Levoy~\cite{rusinkiewicz-levoy:im:2001}, where the original point-to-plane
+\gls{icp}~\cite{chen-medioni:icra:1991} metric demonstrated significantly
+better performance than the point-to-point~\cite{besl-mckay:tpami:1992}
+formulation in \gls{icp}, while extending this conclusion to analytical
+distance-based formulations for 2D~point cloud registration proposed in this
+work. Specifically, $\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$ outperforms
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_0)$ in
+37, 30, and 34 out of 48~configurations
+(median improvement of \SI{20.10}{\percent}, \SI{15.60}{\percent}, and
+\SI{16.75}{\percent}) on \gls{rte}
+and in 28, 30, and 31~cases
+(median improvement of \SI{7.45}{\percent}, \SI{4.65}{\percent}, and
+\SI{4.55}{\percent}) on \gls{rre}
+at $r_\mathrm{max} \in \{\SI{10}{\metre},\,\SI{20}{\metre},\,\SI{30}{\metre}\}$,
+respectively.
+$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$ also outperforms
+$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$, improving on \gls{rte} in
+34, 33, and 32~out of 48~cases
+(median improvement of \SI{15.28}{\percent}, \SI{12.25}{\percent}, and
+\SI{13.05}{\percent}) and on \gls{rre} in 24, 28, and 27~configurations
+(median improvement of \SI{1.05}{\percent}, \SI{4.6}{\percent}, and
+\SI{6.95}{\percent}) for the three maximum range values.
+
 \clearpage
+
+\input{tables/distance-maps/iilabs3d/results_iilabs3d_res-0.03m_dmax-0.50m_rmax-10.0m_m0.tex}
+\input{tables/distance-maps/iilabs3d/results_iilabs3d_res-0.03m_dmax-0.50m_rmax-10.0m_m0-1-2.tex}
+\input{tables/distance-maps/iilabs3d/results_iilabs3d_res-0.03m_dmax-0.50m_rmax-20.0m_m0.tex}
+\input{tables/distance-maps/iilabs3d/results_iilabs3d_res-0.03m_dmax-0.50m_rmax-20.0m_m0-1-2.tex}
+\input{tables/distance-maps/iilabs3d/results_iilabs3d_res-0.03m_dmax-0.50m_rmax-30.0m_m0.tex}
+\input{tables/distance-maps/iilabs3d/results_iilabs3d_res-0.03m_dmax-0.50m_rmax-30.0m_m0-1-2.tex}
+
+\clearpage
+
+However, the advantage of point-to-plane over point-to-point formulations does
+not hold across all splitting configurations.
+At \SI{90}{\percent} inlier thresholds, the proposed distance map-based and the
+original point-to-plane \gls{icp}~\cite{chen-medioni:icra:1991} formulations are
+consistently worse than their point-to-point counterparts on Nav~A~Diff,
+Nav~A~Omni, and Slippage sequences, across all three maximum sensor ranges and
+for both distance-map and \gls{icp} variants.
+For example, at the 90\% inlier threshold,
+$\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$ reaches \SI{9.23}{\percent} on
+Nav~A~Omni and \SI{7.12}{\percent} on Slippage at
+$r_\mathrm{max} = \SI{10}{\metre}$, compared to \SI{4.12}{\percent} and
+\SI{2.61}{\percent} for $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_0)$.
+The same pattern holds for $\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$,
+indicating that the degradation is related to the point-to-plane error
+formulation rather than of the distance-map correspondence mechanism.
+The exception is on the Loop sequence, where the robot traverses in and out of
+the Nav~A space through its external corridor. Indeed, even at the 90\%
+threshold, the point-to-plane formulations consistently outperform their
+point-to-point counterparts on that sequence. These results indicate that
+point-to-plane metrics retaining its consistency better than point-to-point
+counterparts when traversing different spaces of the same environment through
+doors.
+
+\paragraph{Precomputed point-to-point formulation}
+Another relevant observation from the evaluation on the
+IILABS~3D~\cite{ribeiro:access:2025} dataset is that the precomputed
+point-to-point formulation $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ proposed in
+this work outperforms both its analytical
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_0)$ variant
+(compare Tables~\ref{tab:distance-maps:results:iilabs3d:accuracy:rmax-10.0m:m0-1-2},
+\ref{tab:distance-maps:results:iilabs3d:accuracy:rmax-20.0m:m0-1-2}, and
+\ref{tab:distance-maps:results:iilabs3d:accuracy:rmax-30.0m:m0-1-2} with
+Tables~\ref{tab:distance-maps:results:iilabs3d:accuracy:rmax-10.0m:m0},
+\ref{tab:distance-maps:results:iilabs3d:accuracy:rmax-20.0m:m0}, and
+\ref{tab:distance-maps:results:iilabs3d:accuracy:rmax-30.0m:m0}, respectively)
+and the point-to-point \gls{icp}~\cite{besl-mckay:tpami:1992} baseline
+$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$
+(see Tables~\ref{tab:distance-maps:results:iilabs3d:accuracy:rmax-10.0m:m0-1-2},
+\ref{tab:distance-maps:results:iilabs3d:accuracy:rmax-20.0m:m0-1-2}, and
+\ref{tab:distance-maps:results:iilabs3d:accuracy:rmax-30.0m:m0-1-2}) across the
+majority of configurations. Against $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_0)$,
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ achieves lower \gls{rte} in
+42, 36, and 43 (median reduction of \SI{22.20}{\percent}, \SI{28.10}{\percent},
+and \SI{28.60}{\percent}) and lower \gls{rre} in 30, 35, and 36
+(median reduction of \SI{12.55}{\percent}, \SI{17.10}{\percent}, and
+\SI{21.85}{\percent}) out of 48~configurations at
+$r_\mathrm{max} \in \{\SI{10}{\metre},\,\SI{20}{\metre},\,\SI{30}{\metre}\}$,
+respectively. Against $\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$,
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ outperforms in 37, 37, and 39
+out of 48~configurations on \gls{rte} (median improvement of
+\SI{21.05}{\percent}, \SI{21.35}{\percent}, and \SI{22.40}{\percent}) and
+31, 34, and 35 on \gls{rre} (median improvement of \SI{8.2}{\percent},
+\SI{22.85}{\percent}, and \SI{20.35}{\percent}) for the three maximum ranges
+considered in the evaluation.
+This behavior emphasizes the results from the synthetic benchmark, where
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ achieved competitive accuracy with the
+point-to-plane formulations regardless of distance map resolution and of
+voxelization being enabled, while disabling the bi-linear interpolation. Indeed,
+the precomputed finite-difference gradient and distance map resolution
+regularizes the influence of points that lie close to surfaces, where the
+precomputed distance field is nearly flat.
+In contrast, perturbations from sensor noise produce variations on
+the gradient from point-to-point correspondence under the analytical
+$\mathcal{M}_0$-based formulations, contributing to worse results on accumulated
+laser odometry drift compared to $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$.
+
+
+In many configurations, the improvement of the precomputed point-to-point
+formulation $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ proposed in this work over
+the point-to-point baselines extends to competitive performance against
+the point-to-plane formulations $\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$
+and $\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$~\cite{chen-medioni:icra:1991}.
+At $r_\mathrm{max} \in \{\SI{10}{\metre},\,\SI{20}{\metre},\,\SI{30}{\metre}\}$,
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ outperforms
+$\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$ in 26, 29, and 30 out of
+48~configurations on \gls{rte} (median improvement of \SI{5.20}{\percent},
+\SI{5.00}{\percent}, and \SI{9.50}{\percent}) and in 31, 34, and 39 cases on
+\gls{rre} (median improvement of \SI{4.85}{\percent}, \SI{9.25}{\percent}, and
+\SI{20.00}{\percent}). Similarly, $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$
+achieves lower \gls{rte} in 28, 27, and 30 cases (median reduction of
+\SI{2.85}{\percent}, \SI{4.55}{\percent}, and \SI{6.75}{\percent}) and lower
+\gls{rre} in 31, 35, and 36 out of the 48~configurations (median reduction of
+\SI{4.70}{\percent}, \SI{8.25}{\percent}, and \SI{18.55}{\percent}), when
+compared to $\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$~\cite{chen-medioni:icra:1991}.
+This competitive performance of $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$
+against point-to-plane formulations is most pronounced on the Nav~A~Diff,
+Nav~A~Omni, and Slippage sequences. The best results of
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ across all configurations
+and ranges reach \SI{0.95}{\percent} \gls{rte} and
+\SI{0.078}{\degree\per\metre} \gls{rre} on Nav~A~Diff,
+\SI{0.81}{\percent} and \SI{0.063}{\degree\per\metre} on Nav~A~Omni, and
+\SI{0.55}{\percent} and \SI{0.55}{\degree\per\metre} on the Slippage sequence.
+In comparison, the best results of
+$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$~\cite{chen-medioni:icra:1991} are
+\SI{0.88}{\percent} and \SI{0.082}{\degree\per\metre},
+\SI{0.82}{\percent} and \SI{0.070}{\degree\per\metre}, and
+\SI{0.64}{\percent} and \SI{0.056}{\degree\per\metre} on the Nav~A~Diff,
+Nav~A~Omni, and Slippage sequences.
+
+The competitive performance on laser odometry drift of
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ against
+point-to-plane baselines is possibly due to the relationship between the
+distance map gradient and the point-to-plane error metric. Within planar regions
+away from surface boundaries, the finite-difference approximation of
+$\bm{\nabla}\mathcal{D}$ implicitly encodes a similar geometric constraint to
+the point-to-plane formulation, without requiring explicit normal
+estimation. The discretization of the gradient at cell resolution further
+regularizes this direction against sensor noise, attenuating the effect of
+measurement perturbations that would otherwise introduce variation in
+point-to-plane normals estimated from nearest-neighbor sets. Still, near surface
+endpoints and at geometric discontinuities, the gradient direction diverges from
+the surface normal, and the two formulations differ. In those regions,
+point-to-plane formulations retains their advantage, which accounts
+for the residual gap observed on the Loop sequence
+that requires traversing between two distinct areas
+(Nav~A and its external corridor). $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$
+achieves a best \gls{rte} of \SI{2.14}{\percent} against \SI{1.37}{\percent} for
+$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$.
+
+% -----------------------------------------------------
+
+% dmap p2p m1 [nav a diff, nav a omni, loop, slippage]
+% 10: 1.09 0.101 | 0.88 0.124 | 2.81 0.177 | 0.58 0.065
+% 20: 0.98 0.085 | 0.84 0.063 | 2.29 0.123 | 0.71 0.07
+% 30: 0.95 0.078 | 0.81 0.063 | 2.14 0.123 | 0.55 0.056
+
+% dmap p2pl m0 [nav a diff, nav a omni, loop, slippage]
+% 10: 1.03 0.104 | 0.97 0.089 | 1.81 0.138 | 0.68 0.066
+% 20: 1.05 0.09  | 0.84 0.07  | 1.75 0.121 | 0.65 0.075
+% 30: 0.92 0.094 | 0.84 0.064 | 1.41 0.107 | 0.66 0.056
+
+% icp p2pl m0 [nav a diff, nav a omni, loop, slippage]
+% 10: 1.02 0.102 | 0.91 0.087 | 1.79 0.139 | 0.64 0.063
+% 20: 1.04 0.09  | 0.83 0.071 | 1.74 0.123 | 0.65 0.075
+% 30: 0.88 0.082 | 0.82 0.07  | 1.37 0.106 | 0.66 0.056
+
+% -----------------------------------------------------
+
+% dmap p2pl M2 vs p2p M0:
+% - 36, 30, and 28 (median \SI{13.60}{\percent}, \SI{13.60}{\percent}, and \SI{9.50}{\percent})
+% - 27, 22, and 23 (median \SI{4.15}{\percent}, --\SI{1.55}{\percent}, and --\SI{0.45}{\percent})
+
+% dmap p2pl M2 vs p2p M1:
+% - 12, 13, and 8 (median --\SI{15.15}{\percent}, --\SI{12.35}{\percent}, and --\SI{14.20}{\percent})
+% - 15, 10, and 10 (median --\SI{16.20}{\percent}, --\SI{19.25}{\percent}, and --\SI{24.25}{\percent})
+
+% dmap p2pl M2 vs p2pl M0:
+% - 14, 17, and 17 (median --\SI{14.70}{\percent}, --\SI{9.55}{\percent}, and --\SI{8.4}{\percent})
+% - 14, 21, and 16 (median --\SI{6.95}{\percent}, --\SI{2.25}{\percent}, and --\SI{5.2}{\percent})
+
+
+
+% dmap p2pl M2 vs icp p2p M0:
+% - 29, 30, and 27 (median \SI{11.60}{\percent}, \SI{8.45}{\percent}, and \SI{7.40}{\percent})
+% - 22, 31, and 22 (median --\SI{5.75}{\percent}, \SI{4.05}{\percent}, and --\SI{3.00}{\percent})
+
+% dmap p2pl M2 vs icp p2pl M0:
+% - 14, 17, and 15 (median --\SI{12.05}{\percent}, --\SI{10.25}{\percent}, and --\SI{10.65}{\percent})
+% - 14, 20, and 16 (median --\SI{7.90}{\percent}, --\SI{2.20}{\percent}, and --\SI{5.75}{\percent})
+
+% -----------------------------------------------------
+
+% best dmap p2pl M2: [nav a diff, nav a omni, loop, slippage]
+% 10: 1.21 0.117 | 1.10 0.089 | 2.13 0.143 | 0.75 0.050
+% 20: 0.98 0.086 | 0.87 0.084 | 1.91 0.121 | 0.67 0.042
+% 30: 1.02 0.087 | 0.92 0.085 | 2.09 0.124 | 0.78 0.050
+
+% best dmap p2p  M0: [nav a diff, nav a omni, loop, slippage]
+% 10: 1.36 0.115 | 1.23 0.085 | 2.56 0.167 | 0.70 0.033
+% 20: 1.17 0.110 | 1.16 0.088 | 2.58 0.141 | 0.52 0.036
+% 30: 1.12 0.098 | 1.09 0.088 | 2.54 0.144 | 0.63 0.033
+
+% best dmap p2p  M1: [nav a diff, nav a omni, loop, slippage]
+% 10: 1.09 0.101 | 0.88 0.124 | 2.81 0.177 | 0.58 0.065
+% 20: 0.98 0.085 | 0.84 0.063 | 2.29 0.123 | 0.71 0.070
+% 30: 0.95 0.078 | 0.81 0.063 | 2.14 0.123 | 0.55 0.056
+
+% best dmap p2pl M0: [nav a diff, nav a omni, loop, slippage]
+% 10: 1.03 0.104 | 0.97 0.089 | 1.81 0.138 | 0.68 0.066
+% 20: 1.05 0.09  | 0.84 0.07  | 1.75 0.121 | 0.65 0.075
+% 30: 0.92 0.094 | 0.84 0.064 | 1.41 0.107 | 0.66 0.056
+
+% best icp  p2p  M0: [nav a diff, nav a omni, loop, slippage]
+% 10: 1.34 0.109 | 1.16 0.079 | 2.75 0.176 | 0.45 0.039
+% 20: 1.10 0.100 | 0.97 0.080 | 2.84 0.142 | 0.47 0.045
+% 30: 1.10 0.099 | 1.07 0.082 | 2.56 0.158 | 0.56 0.038
+
+% best icp  p2pl M0: [nav a diff, nav a omni, loop, slippage]
+% 10: 1.02 0.102 | 0.91 0.087 | 1.79 0.139 | 0.64 0.063
+% 20: 1.04 0.09  | 0.83 0.071 | 1.74 0.123 | 0.65 0.075
+% 30: 0.88 0.082 | 0.82 0.07  | 1.37 0.106 | 0.66 0.056
+
+% -----------------------------------------------------
+
+As for the precomputed variant of the proposed distance-based point-to-plane
+formulation $\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_2)$, it exhibits different
+behaviors depending on the splitting criteria.
+Under the translation-based criterion,
+$\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_2)$ outperforms
+$\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$ in 9--13 out of 24~configurations
+(4~sequences, 6~threshold values) and
+$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$ in 9--11 configurations on
+\gls{rte} and \gls{rre} across all three maximum ranges considered in the
+evaluation. This result indicates that distance fields could provide an
+advantage over direct point-to-point correspondences approaches
+even on point-to-plane-based formulations.
+Still, under the inliers ratio criterion at thresholds of
+80\% and 90\%, $\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_2)$ is consistently worse
+than $\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$ and
+$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$. This behavior,
+absent from the corresponding $\mathcal{M}_0$ and $\mathcal{M}_1$
+formulations and in the translation-based criterion,
+mirrors the sensitivity of $\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_2)$ to noise
+identified in the synthetic benchmark results. Indeed, the point-to-plane
+residual at $\mathcal{M}_2$ requires evaluating second-order finite-difference
+derivatives of the distance field, which may introduce discretization errors
+and amplification of the measurement noise.
+
+\paragraph{Effect of the keyframe splitting criterion}
+\todo{TBC}
+
+\paragraph{Effect of maximum sensor range}
+When increasing the maximum admissible range of the data for registration from
+$\SI{10}{\metre}$
+(see Tables~\ref{tab:distance-maps:results:iilabs3d:accuracy:rmax-10.0m:m0} and
+\ref{tab:distance-maps:results:iilabs3d:accuracy:rmax-10.0m:m0-1-2})
+to $\SI{20}{\metre}$
+(see Tables~\ref{tab:distance-maps:results:iilabs3d:accuracy:rmax-20.0m:m0} and
+\ref{tab:distance-maps:results:iilabs3d:accuracy:rmax-20.0m:m0-1-2}), this
+results in a consistent reduction in odometric drift across all formulations.
+Among point-to-point formulations, $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_0)$
+reduces in 38 and 34~out of the 48~configurations on \gls{rte} and \gls{rre}
+(median improvement of \SI{7.55}{\percent} and \SI{8.25}{\percent}),
+respectively. Also, $\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$ reduces in 32
+and 26~out of the 48~test cases on the \gls{rte} and \gls{rre} metrics
+(median reduction of \SI{5.80}{\percent} and \SI{3.95}{\percent}).
+The greater improvement is noted with the proposed precomputed variant
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$, where the \gls{rte} and \gls{rre}
+reduces in 40 and 42~out of the 48~configurations with a median improvement of
+\SI{7.40}{\percent} and \SI{13.25}{\percent}, respectively.
+While the median improvement for point-to-plane is lower than in point-to-point
+formulations, there is still a consistent reduction on the laser odometry
+drift from $\SI{10}{\metre}$ to $\SI{20}{\metre}$.
+The results from $\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$ improve
+in 33~and 32 cases on the \gls{rte} and \gls{rre} metrics
+(median reduction of \SI{5.65}{\percent} and \SI{7.75}{\percent}),
+in 32~and 31 configurations for $\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$
+(median reduction of \SI{5.25}{\percent} and \SI{5.65}{\percent}), and
+in 35~and 34 cases for $\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_2)$
+(median improvement of \SI{6.25}{\percent} and \SI{7.05}{\percent}).
+
+The improvements from $\SI{20}{\metre}$ to $\SI{30}{\metre}$ are less noticeable
+across all six formulations considered in the evaluation on
+the IILABS~3D~\cite{ribeiro:access:2025} dataset.
+The results from $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_0)$ improve only
+in 23~and 17~out of 48~configurations on \gls{rte} and \gls{rre}, leading to a
+median increase on the metrics of \SI{0.15}{\percent} and \SI{1.45}{\percent}.
+As for $\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$, the results improve in
+23~and 33~cases, with a \SI{0.00}{\percent} median improvement on \gls{rte},
+while a median reduction of \SI{2.00}{\percent} on \gls{rre}, while
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ improves in 26~and 29~configurations
+(median reduction of \SI{1.80}{\percent} and \SI{2.80}{\percent}).
+Similarly, for the point-to-plane formulation, the results when increasing from
+$\SI{20}{\metre}$ to $\SI{30}{\metre}$ maximum range in 20 and 19 configurations
+on the \gls{rte} and \gls{rre} metrics for
+$\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$,
+in 21 and 24~cases for $\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$, and
+in 18 configurations on both metrics for
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_2)$.
+
+The diminishing returns from increasing $\SI{20}{\metre}$ to $\SI{30}{\metre}$
+compared to from $\SI{10}{\metre}$ to $\SI{20}{\metre}$ on the maximum range are
+expected given the space dimensions of the sequences from the
+IILABS~3D~\cite{ribeiro:access:2025} dataset considered in this work
+(see Figures~\ref{fig:distance-maps:results:iilabs3d:nav-a} and
+\ref{fig:distance-maps:results:iilabs3d:sequences}).
+Nav~A has approximately $\SI{28.4}{\metre}$ length and $\SI{8.5}{\metre}$ width,
+while its external corridor has a $\SI{32.5}{\metre}$ total length and a
+$\SI{4.0}{\metre}$ width. As a result, given that the mobile platform does not
+reach the extremities of the room or corridor during the dataset,
+the $\SI{20}{\metre}$ maximum range already allows the robot to observe
+the structural limits of the environment. Thus, increasing
+$\SI{20}{\metre}$ to $\SI{30}{\metre}$ on the maximum range brings less new
+information for the 2D point cloud registration process compared to
+changing from $\SI{10}{\metre}$ to $\SI{20}{\metre}$.
 
 \section{Summary and Conclusions}\label{sec:distance-maps:conclusions}
 
