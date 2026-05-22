@@ -13,6 +13,7 @@
 \usepackage[toc=true,section=chapter,acronym]{glossaries}
 \usepackage{array}
 \usepackage[ruled,vlined,linesnumbered,algochapter]{algorithm2e}
+\usepackage{booktabs}
 \usepackage{color}
 \usepackage{enumitem}
 \usepackage{lipsum}
@@ -24,6 +25,7 @@
 \usepackage{soul}
 \usepackage{subcaption}
 \usepackage{textcomp}
+\usepackage[normalem]{ulem}
 \usepackage[backend=biber,
             style=numeric-comp,
             citestyle=numeric-comp,
@@ -55,8 +57,11 @@
 \addbibresource{bibliography/myrefs.bib}
 \setlist{nosep}
 \sisetup{
-  detect-weight = true,
-  detect-all    = true
+  detect-all             = true,
+  detect-weight          = true,
+  detect-inline-weight   = math,
+  tight-spacing          = true,
+  table-number-alignment = right
 }
 \SetKwFor{ForAll}{for all}{do}{endfor}
 \renewcommand{\arraystretch}{0.85}

@@ -11,6 +11,14 @@
 \newcommand{\cmark}{\ding{51}}
 \newcommand{\xmark}{\ding{55}}
 
+% https://tex.stackexchange.com/a/749214
+\NewDocumentCommand{\B}{}{\bfseries}
+\NewExpandableDocumentCommand{\U}{m}{#1\pU{}{#1}}
+\NewExpandableDocumentCommand{\UB}{m}{\B#1\pU{\B}{#1}}
+\NewDocumentCommand{\pU}{mm}{%
+  \llap{\uline{\phantom{#1\num{#2}}}}%
+}
+
 \newtheorem{definition}{Definition}[section]
 
 \newtheorem{question}{Research Question}
