@@ -3155,8 +3155,8 @@ consistently worse than their point-to-point counterparts on Nav~A~Diff,
 Nav~A~Omni, and Slippage sequences, across all three maximum sensor ranges and
 for both distance-map and \gls{icp} variants.
 For example, at the 90\% inlier threshold,
-$\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$ reaches \SI{9.23}{\percent} on
-Nav~A~Omni and \SI{7.12}{\percent} on Slippage at
+$\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$ reaches \SI{9.23}{\percent} \gls{rte}
+on Nav~A~Omni and \SI{7.12}{\percent} on Slippage at
 $r_\mathrm{max} = \SI{10}{\metre}$, compared to \SI{4.12}{\percent} and
 \SI{2.61}{\percent} for $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_0)$.
 The same pattern holds for $\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$,
@@ -3171,7 +3171,7 @@ counterparts when traversing different spaces of the same environment through
 doors.
 
 \paragraph{Precomputed point-to-point formulation}
-Another relevant observation from the evaluation on the
+Another observation from the evaluation on the
 IILABS~3D~\cite{ribeiro:access:2025} dataset is that the precomputed
 point-to-point formulation $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ proposed in
 this work outperforms both its analytical
@@ -3201,18 +3201,40 @@ out of 48~configurations on \gls{rte} (median improvement of
 31, 34, and 35 on \gls{rre} (median improvement of \SI{8.2}{\percent},
 \SI{22.85}{\percent}, and \SI{20.35}{\percent}) for the three maximum ranges
 considered in the evaluation.
+When considering the best formulation between
+$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$,
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_0)$, and
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ across all sequences and
+configurations, the precomputed variant
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ obtains the best overall results
+on \gls{rte} and \gls{rre} with a \SI{30}{\metre} maximum range on the
+Nav~A~Diff (\SI{0.95}{\percent} and \SI{0.078}{\degree\per\metre}) and
+Nav~A~Omni (\SI{0.81}{\percent} and \SI{0.065}{\degree\per\metre}) with an
+inliers splitting criterion of 50\%, and on the Loop sequence with  the 40\%
+inliers threshold (\SI{2.14}{\percent} and \SI{0.134}{\degree\per\metre}).
+The only exception is on the Slippage sequence,
+where $\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$ obtains the best results
+with a \SI{2.00}{\metre} translation criterion
+(\SI{0.45}{\percent} and \SI{0.054}{\degree\per\metre}).
+
 This behavior emphasizes the results from the synthetic benchmark, where
-$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ achieved competitive accuracy with the
-point-to-plane formulations regardless of distance map resolution and of
-voxelization being enabled, while disabling the bi-linear interpolation. Indeed,
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ achieved competitive accuracy with
+the analytical point-to-point and point-to-plane formulations
+($\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$,
+$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$,
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_0)$, and
+$\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$) regardless of distance map
+resolution and of voxelization being enabled,
+considering the bi-linear interpolation not enabled. Indeed,
 the precomputed finite-difference gradient and distance map resolution
 regularizes the influence of points that lie close to surfaces, where the
 precomputed distance field is nearly flat.
 In contrast, perturbations from sensor noise produce variations on
 the gradient from point-to-point correspondence under the analytical
-$\mathcal{M}_0$-based formulations, contributing to worse results on accumulated
+$\mathcal{M}_0$-based formulations for analytical-based point-to-point
+formulations ($\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$ and
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_0)$), contributing to worse results on
 laser odometry drift compared to $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$.
-
 
 In many configurations, the improvement of the precomputed point-to-point
 formulation $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ proposed in this work over
@@ -3238,7 +3260,7 @@ $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ across all configurations
 and ranges reach \SI{0.95}{\percent} \gls{rte} and
 \SI{0.078}{\degree\per\metre} \gls{rre} on Nav~A~Diff,
 \SI{0.81}{\percent} and \SI{0.063}{\degree\per\metre} on Nav~A~Omni, and
-\SI{0.55}{\percent} and \SI{0.55}{\degree\per\metre} on the Slippage sequence.
+\SI{0.55}{\percent} and \SI{0.056}{\degree\per\metre} on the Slippage sequence.
 In comparison, the best results of
 $\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$~\cite{chen-medioni:icra:1991} are
 \SI{0.88}{\percent} and \SI{0.082}{\degree\per\metre},
@@ -3257,8 +3279,9 @@ estimation. The discretization of the gradient at cell resolution further
 regularizes this direction against sensor noise, attenuating the effect of
 measurement perturbations that would otherwise introduce variation in
 point-to-plane normals estimated from nearest-neighbor sets. Still, near surface
-endpoints and at geometric discontinuities, the gradient direction diverges from
-the surface normal, and the two formulations differ. In those regions,
+endpoints and at geometric discontinuities, the gradient direction
+$\bm{\nabla}\mathcal{D}$ diverges from the surface normal,
+and the two formulations differ. In those regions,
 point-to-plane formulations retains their advantage, which accounts
 for the residual gap observed on the Loop sequence
 that requires traversing between two distinct areas
@@ -3368,13 +3391,12 @@ and amplification of the measurement noise.
 \paragraph{Effect of the keyframe splitting criterion}
 The selection of the keyframe splitting criterion impacts the odometric
 drift. For the translation-based criterion, performance generally improves from
-$\SI{0.5}{\metre}$ to $\SI{2.0}{\metre}$--$\SI{2.5}{\metre}$ across
-2D point cloud registration approaches and sequences, before degrading at
-$\SI{3.0}{\metre}$. This behavior could be attributed to two effects.
-Higher translation thresholds reduce the frequency of keyframe splits,
-limiting the accumulation of registration and numerical errors across
-transitions. As the distance between the current pose and the centre of the
-keyframe's coordinate frame increases, the inlier ratio decreases while also
+$\SI{0.5}{\metre}$ to $\SI{2.0}{\metre}$--$\SI{2.5}{\metre}$ across 2D point
+cloud registration approaches and sequences, before degrading at
+$\SI{3.0}{\metre}$. Higher translation thresholds reduce the frequency of
+keyframe splits, limiting the accumulation of registration and numerical errors
+across transitions. As the distance between the current pose and the centre of
+the keyframe's coordinate frame increases, the inlier ratio decreases while also
 changing the point density due to the 2D laser scanner radial effect.
 Therefore, the best threshold for the translation splitting criterion on
 the data sequences considered in this work seems to be between
