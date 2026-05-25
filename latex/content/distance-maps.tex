@@ -11,7 +11,7 @@ By replacing the explicit nearest-neighbor search performed at every
 iteration of classical
 \glslink{icp}{\glsentryfull{icp}}~\cite{besl-mckay:tpami:1992,chen-medioni:icra:1991}
 with an $O(1)$ grid lookup on distance map-based data structures,
-the proposed formulation provides both point-to-point and point-to-plane error
+the proposed approach provides both point-to-point and point-to-plane error
 formulations compatible with Gauss-Newton optimization on the $SE(2)$ manifold.
 
 This chapter is organized as follows. \secref{sec:distance-maps:background}
@@ -973,7 +973,7 @@ explicit data association step required by classical
 \secref{sec:distance-maps:alignment:dmaps:derivation} derives the first- and
 second-order spatial derivatives of the distance map, providing both
 analytical expressions and finite-difference approximations used in
-the implementation of the proposed approach.
+the implementation of the proposed approaches.
 \secref{sec:distance-maps:alignment:dmaps:representation} describes the three
 representation levels of increasing precomputed information content considered
 in this work. Lastly, \secref{sec:distance-maps:alignment:dmaps:computation}
@@ -1935,7 +1935,8 @@ Both experiments compare the proposed distance map point-to-point
 standard point-to-point~\cite{besl-mckay:tpami:1992} and
 point-to-plane~\cite{chen-medioni:icra:1991} \gls{icp} error formulations,
 with data association resolved via the distance map representations
-proposed in this work. While the synthetic benchmark focuses on
+proposed in this work for the \gls{icp} baselines.
+While the synthetic benchmark focuses on
 registration accuracy and uncertainty estimation, the real-world evaluation
 extends the analysis to odometric drift across extended trajectories,
 where cumulative alignment errors directly impact localization accuracy.
@@ -2312,8 +2313,12 @@ is attributed to quantization errors arising from the grid-based layout of
 the precomputed representation levels and to the finite-difference
 approximation of the distance field gradient, whose discretization error
 scales with cell resolution and introduces a systematic bias in the residual
-direction. Across both formulations, the $\mathcal{M}_0$~representation level
-remains the preferred one for registration accuracy.
+direction. Still, both precomputed formulations
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ and
+$\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_2)$ achieve competitive registration
+accuracy compared to the \gls{icp} baselines when the bi-linear interpolation
+is disabled and for $\delta = \{\SI{0.01}{\metre}, \SI{0.03}{\metre}\}$
+cell resolutions on noisy data.
 
 \paragraph{Distance map parametrization}
 The choice of the representation level ($\mathcal{M}$) and parametrization
@@ -2675,10 +2680,10 @@ is preferable for uncertainty-aware applications.
 
 \paragraph{Distance field and its derivatives visualization}
 \figref{fig:distance-maps:results:synthetic:scenes:dist+1st-deriv} illustrates
-the distance map ($\mathcal{D}$) and its 1st-order partial derivatives
+the distance map ($\mathcal{D}$) and its 1st-order derivatives
 ($\partial\mathcal{D}/\partial x$, $\partial\mathcal{D}/\partial y$) for
-the four synthetic environments. The distance map representation considers a
-truncation distance $d_{\max}= \SI{5}{\metre}$ to avoid computing the full map.
+the four scenes. The distance map representation considers
+$d_{\max}= \SI{5}{\metre}$ to avoid computing the full map.
 Cells whose nearest-neighbor distance exceeds $d_{\max}$ are assigned a
 constant value $d_{\max}$, so their 1st-order derivatives are identically zero.
 This behavior is analogous to truncated $L_{\mathrm{trunc}}^1$ and
@@ -2985,8 +2990,9 @@ odometric drift:
       ($\SI{0.50}{\metre}$, $\SI{1.00}{\metre}$, $\SI{1.50}{\metre}$,
       $\SI{2.00}{\metre}$, $\SI{2.50}{\metre}$, and $\SI{3.00}{\metre}$);
 \item \textbf{Inlier ratio threshold:} the keyframe is replaced when
-      the ratio of inlier correspondences according to the robustifier threshold
-      $c^2 = 0.005$ from the fine stage drops below a given ratio
+      the ratio of inlier correspondences
+      % according to the robustifier threshold $c^2 = 0.005$ from the fine stage
+      drops below a given ratio
       (40\%, 50\%, 60\%, 70\%, 80\%, and 90\%).
 \end{itemize}
 
@@ -3512,4 +3518,153 @@ on this sequence.
 
 \section{Summary and Conclusions}\label{sec:distance-maps:conclusions}
 
-\todo{TBC}
+This chapter presents a novel framework for 2D~point cloud registration using
+unsigned distance maps, developed in the scope of this PhD~Thesis in
+collaboration with Prof.~Dr.~Giorgio~Grisetti from Sapienza Università di Roma.
+The proposed approach decouples data association from the iterative optimization
+procedure by precomputing distance map-based
+representations over the reference point cloud,
+replacing the explicit nearest-neighbor search required at each iteration of
+classical \gls{icp}~\cite{besl-mckay:tpami:1992,chen-medioni:icra:1991}
+with up to $O(1)$ grid lookups. We derive two error formulations within
+the Gauss-Newton framework on the $SE(2)$ manifold:
+a point-to-point formulation whose residual is the scalar distance
+returned by the distance map representation, and a point-to-plane formulation
+that projects the distance gradient multiplied by the distance to the nearest
+reference point onto the surface normal rotated to the reference frame. Three
+distance map representation levels of increasing information content are defined
+($\mathcal{M}_0$, $\mathcal{M}_1$, $\mathcal{M}_2$) and implemented with dense
+matrices (\emph{Nano}, \emph{Standard}) or hash tables (\emph{Sparse}) data
+structures, each offering a different trade-off between memory requirements,
+precomputation cost, and query-time information availability.
+Then, we derive the spatial derivatives of distance fields analytically and
+approximate them using centered finite differences for precomputed variants,
+providing the gradient vector and Hessian matrix of distance fields required by
+the Jacobians of the proposed distance map-based
+point-to-point and point-to-plane formulations.
+Additionally, we use the nearest-neighbor index-only representation level
+$\mathcal{M}_0$ as a drop-in replacement for kd-tree
+search~\cite{bentley:cacm:1975} for data association with classical
+\gls{icp}~\cite{besl-mckay:tpami:1992,chen-medioni:icra:1991} methods.
+
+The experimental evaluation presented in this chapter comprises a synthetic
+benchmark on four scenes (circle, square, corridor, and random) and
+a real-world laser odometry evaluation on
+the IILABS~3D~\cite{ribeiro:access:2025} dataset within four planar sequences
+(Nav~A~Diff, Nav~A~Omni, Loop, and Slippage). This evaluation compared
+the proposed point-to-point ($\mathcal{D}_\mathrm{p2p}$) and point-to-plane
+($\mathcal{D}_\mathrm{p2pl}$) distance map-based formulations against
+the classical point-to-point~\cite{besl-mckay:tpami:1992}
+($\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$) and
+point-to-plane~\cite{chen-medioni:icra:1991}
+($\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$) \gls{icp} baselines using
+distance-map-guided data association, all within the same
+srrg2\_solver~\cite{grisetti:robotics:2020} framework.
+First, the analytical point-to-plane formulations
+($\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$ and
+$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$)
+consistently outperform their point-to-point counterparts
+($\mathcal{D}_\mathrm{p2p}(\mathcal{M}_0)$ and
+$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$) in terms of registration accuracy,
+uncertainty estimation in degenerate scenes (circle, corridor), and
+odometric drift across the majority of configurations.
+This result is consistent with
+Rusinkiewicz and Levoy~\cite{rusinkiewicz-levoy:im:2001} comparative study of
+\gls{icp} variants, while extending that conclusion to the distance map-based
+formulations for 2D~point cloud registration proposed in this work.
+Next, the analytical distance map point-to-plane formulation
+$\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$ and the classical point-to-plane
+\gls{icp}~\cite{chen-medioni:icra:1991} baseline
+$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$ were shown to be analytically
+identical. This equivalence was confirmed by both the derivation in
+\secref{sec:distance-maps:alignment:pt2pl} and the numerical agreement
+observed throughout the synthetic and real-world experiments.
+
+Furthermore, the precomputed point-to-point distance map formulation
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ proposed in this work achieved
+lower odometric drift than both its analytical counterparts
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_0)$ and
+$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$ across the majority of
+configurations in the real-world evaluation. Indeed, the proposed formulation
+even achieved competitive performance against point-to-plane formulations on
+the Nav~A~Diff, Nav~A~Omni, and Slippage sequences across all maximum ranges and
+configurations considered in the evaluation. This behavior is attributed to
+the regularization effect of the finite-difference gradient
+$\bm{\nabla}\mathcal{D}$ precomputed at a discrete cell resolution: within
+planar regions away from surface boundaries, the precomputed gradient implicitly
+encodes a geometric constraint similar to the point-to-plane metric without
+requiring explicit normal estimation, while attenuating the influence of
+measurement noise that affects analytical gradient-based formulations near
+surfaces. Still, the residual gap of $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$
+relative to point-to-plane methods is most evident in the Loop sequence,
+which involves transitions between distinct areas of the environment
+through doorways (between Nav~A and its external corridor), where gradient
+directions deviate from surface normals near geometric discontinuities.
+While the proposed precomputed point-to-plane distance map formulation
+$\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_2)$
+achieves competitive registration accuracy compared to \gls{icp} baselines,
+this formulation is more affected by measurement noise than
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$, attributed to the finite-difference
+approximation for both the gradient vector and Hessian matrices.
+
+As for uncertainty estimation evaluation on the synthetic benchmark,
+the precomputed variant $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ produces
+better-calibrated uncertainty estimates than both
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_0)$ and
+$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$ in degenerate scenes
+(circle, corridor), suggesting that the finite-difference Jacobian structure and
+the cell-resolution regularization introduce also a beneficial smoothing effect
+on the information matrix. As expected, the analytical point-to-plane
+formulations $\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$ and
+$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$ produce the best uncertainty
+estimates across all configurations, especially for degenerate geometries,
+given the use of surface information in their error formulations.
+Still, these variants may be limited by the structure of the environment and may
+not be suitable for completely unstructured scenes, given the requirement of
+surface normals estimation. Lastly, the inlier-ratio criterion at a 40\%--60\%
+threshold provides lower or equivalent laser odometry drift relative to the best
+translation-based threshold in most configurations. This result indicates that
+a data-driven splitting policy adapts better to varying
+tracking conditions than a fixed translation criterion,
+based on the real-world experiments.
+
+In summary, the distance map framework proposed in this work provides
+a unified formulation for 2D~point cloud registration that supports both
+point-to-point and point-to-plane error metrics,
+multiple representation levels, and sparse or dense storage layouts.
+The $\mathcal{M}_0$ representation enables a drop-in $O(1)$ replacement for
+kd-tree~\cite{bentley:cacm:1975}-based data association within
+classical \gls{icp}~\cite{besl-mckay:tpami:1992,chen-medioni:icra:1991}.
+Also, the proposed precomputed distance map-based formulation
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ improves over its point-to-point
+counterparts while achieving competitive performance over analytical
+point-to-plane formulations.
+The unified distance map data structure developed in this chapter is compatible
+with both the proposed distance map-based registration formulations and the
+\gls{icp}~\cite{besl-mckay:tpami:1992,chen-medioni:icra:1991} baselines,
+providing a common correspondence mechanism across all four evaluated variants.
+Moreover, the unified distance map approach discussed in this work allows
+to formulate point-to-point and point-to-plane registration formulations
+independently of the representation level $\mathcal{M}_l$,
+its implementation through dense or sparse data structures, or even if using
+distance map or classical \gls{icp} error formulations.
+This unified framework is carried forward into \chapref{chap:slam}, where
+the tracker is integrated as the front-end of a graph \gls{slam} system,
+generating odometry and loop closure constraints subsequently
+refined by srrg2\_solver~\cite{grisetti:robotics:2020}.
+
+Future work will focus on improving the results and limitations of this work.
+While Sobreira~\etal~\cite{sobreira:jint:2019} showed in their simulation
+results that precomputed lookup tables that does not require
+an explicit data association step brings computational benefits over
+the traditional two-step optimization procedure on classical
+\gls{icp}~\cite{besl-mckay:tpami:1992,chen-medioni:icra:1991} approaches,
+the 2D~point cloud formulations discussed in this chapter will be evaluated
+in terms of their computational performance compared to
+\gls{icp} with kd-tree search~\cite{bentley:cacm:1975}.
+Also, we will explore alternative strategies to obtain the Hessian of the
+distance field to avoid the compounding of finite-difference errors.
+Finally, a more thorough evaluation of uncertainty estimation with more complex
+scenes within other simulation environments will be performed to study its
+impact on incorporating the estimated information matrices as edge weights
+within a pose-graph optimization back-end.
