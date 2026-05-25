@@ -3464,9 +3464,9 @@ in 21 and 24~cases for $\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$, and
 in 18 configurations on both metrics for
 $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_2)$.
 
-The diminishing returns from increasing $\SI{20}{\metre}$ to $\SI{30}{\metre}$
+The lesser noticeable returns from increasing $\SI{20}{\metre}$ to $\SI{30}{\metre}$
 compared to from $\SI{10}{\metre}$ to $\SI{20}{\metre}$ on the maximum range are
-expected given the space dimensions of the sequences from the
+possibly due to the space dimensions of the sequences from the
 IILABS~3D~\cite{ribeiro:access:2025} dataset considered in this work
 (see Figures~\ref{fig:distance-maps:results:iilabs3d:nav-a} and
 \ref{fig:distance-maps:results:iilabs3d:sequences}).
@@ -3475,10 +3475,40 @@ while its external corridor has a $\SI{32.5}{\metre}$ total length and a
 $\SI{4.0}{\metre}$ width. As a result, given that the mobile platform does not
 reach the extremities of the room or corridor during the dataset,
 the $\SI{20}{\metre}$ maximum range already allows the robot to observe
-the structural limits of the environment. Thus, increasing
+structural limits of the environment. Thus, increasing
 $\SI{20}{\metre}$ to $\SI{30}{\metre}$ on the maximum range brings less new
 information for the 2D point cloud registration process compared to
 changing from $\SI{10}{\metre}$ to $\SI{20}{\metre}$.
+
+Still, when considering the results on the \gls{rte} and \gls{rre} metrics
+across all ranges, the best ones on the Nav~A~Diff, Nav~A~Omni, and Loop
+sequences are obtained with the $\SI{30}{\metre}$ maximum range.
+On the Nav~A~Diff, $\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$ obtains a
+\SI{0.88}{\percent} \gls{rte} with a 40\% inliers threshold, while
+the precomputed $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ variant with a 50\%
+inliers threshold has the best \gls{rre} of \SI{0.078}{\degree\per\metre}.
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ obtains a best of
+\SI{0.81}{\percent} and \SI{0.063}{\degree\per\metre} with 50\% and 70\%
+inlier ratio thresholds on Nav~Omni, respectively. As for the Loop sequence,
+$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$ obtains the best results
+(\SI{1.37}{\percent} and \SI{0.106}{\degree\per\metre}) with the
+$\SI{30}{\metre}$ maximum range and a 40\% threshold on the inliers criterion.
+While the increase on new information from $\SI{20}{\metre}$ to
+$\SI{30}{\metre}$ is less pronounce than from $\SI{10}{\metre}$ to
+$\SI{20}{\metre}$, this result indicates that the higher range still contributes
+for the best overall results on the Nav~A~Diff, Nav~A~Omni, and Loop sequences.
+The only exception is on the Slippage sequence, that the best results are
+obtained with a $\SI{10}{\metre}$ maximum range by
+$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$ with a
+$\SI{2.00}{\metre}$ splitting criterion on \gls{rte} (\SI{0.45}{\percent})
+and by the $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_0)$ with a
+$\SI{3.00}{\metre}$ splitting criterion on \gls{rre}
+(\SI{0.033}{\degree\per\metre}).
+As illustrated in \figref{fig:distance-maps:results:iilabs3d:sequences},
+the fact the the Slippage sequence is executed on the area with more close
+information within the Nav~A space is a possible reason why the lowest
+maximum range considered in this evaluation leads to the best results
+on this sequence.
 
 \section{Summary and Conclusions}\label{sec:distance-maps:conclusions}
 
