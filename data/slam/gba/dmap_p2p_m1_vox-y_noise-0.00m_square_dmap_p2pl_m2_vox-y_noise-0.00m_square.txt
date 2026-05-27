@@ -1,0 +1,33 @@
+=== SE(2) Distance Map Factor Pose-Error Benchmark ===
+  scene          : square (half-side 10 m)
+  grid size      : 8 -> 289 poses
+  cloud noise (m): 0
+  loop range  (m): 1.1
+  dmap res    (m): 0.03
+  dmap size   (m): -1
+  dmap dmax   (m): 5
+  voxelization   : enabled
+  angular res (º): 0.25
+  fov         (º): 360
+  max range   (m): 30
+  square side (m): 10
+  perturb x   (m): 1.5
+  perturb y   (m): 1.5
+  perturb th  (º): 20
+
+[square] dmap_p2p_m1_vox-y_noise-0.00m_square:
+  poses (non-fixed)   : 289
+  factors             : 544
+  err trans RMSE   (m): 0.0462258
+  err x     RMSE   (m): 0.0335573
+  err y     RMSE   (m): 0.0317921
+  err rot   RMSE (deg): 0.0380744
+
+[square] dmap_p2pl_m2_vox-y_noise-0.00m_square:
+  poses (non-fixed)   : 289
+  factors             : 544
+  err trans RMSE   (m): 0.0171358
+  err x     RMSE   (m): 0.012192
+  err y     RMSE   (m): 0.0120412
+  err rot   RMSE (deg): 0.0825541
+

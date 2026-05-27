@@ -1,0 +1,81 @@
+{\setlength{\tabcolsep}{3pt}
+\begin{table}[!t]
+\centering
+\caption[%
+    TBC]{%
+    TBC}
+\label{tab:slam:results:gba}
+\begin{tabular}{
+    l     % method family  (multirow label)
+    l     % level          (M_0 / M_1 / M_2)
+    c |   % variant flags  (V - voxelization)
+    % 4 scene groups
+    S[table-format=1.3] S[table-format=1.2] |   % no noise
+    S[table-format=1.3] S[table-format=1.2]     % with noise (std = 0.03m)
+}
+\hline
+\multicolumn{3}{c|}{} &
+\multicolumn{2}{c|}{\textbf{No Noise}} &
+\multicolumn{2}{c}{\textbf{$\sigma = \SI{0.03}{\metre}$}}\\
+% \multicolumn{3}{c|}{} &
+% \multicolumn{2}{c|}{} &
+% \multicolumn{2}{c}{()}\\
+\multicolumn{3}{c|}{} &
+\multicolumn{1}{c}{$\varepsilon_t$} &
+\multicolumn{1}{c|}{$\varepsilon_\theta$} &
+\multicolumn{1}{c}{$\varepsilon_t$} &
+\multicolumn{1}{c}{$\varepsilon_\theta$}\\
+\multicolumn{1}{l}{\textbf{Meth.}} &
+\multicolumn{1}{c}{$\mathbf{\mathcal{M}_l}$} &
+\multicolumn{1}{c|}{\textbf{V?}} &
+\multicolumn{1}{c}{(m)} &
+\multicolumn{1}{c|}{(\textdegree{})} &
+\multicolumn{1}{c}{(m)} &
+\multicolumn{1}{c}{(\textdegree{})}\\
+\hline
+
+% ==============================================================================
+% DISTANCE MAP POINT-TO-POINT GBA ERROR FORMULATION
+% ==============================================================================
+
+\multirow{4}{*}{$\mathcal{D}_\mathrm{p2p}$} & \multirow{2}{*}{$\mathcal{M}_0$}
+  & \xmark &            % wo/voxelization
+0.267 & 2.05 &          % no noise
+0.187 & 1.51 \\         % with noise
+& & \cmark &            % w/voxelization
+0.013 & 0.06 &          % no noise
+0.009 & 0.06 \\         % with noise
+\cline{2-7}
+& \multirow{2}{*}{$\mathcal{M}_1$}
+  & \xmark &            % wo/voxelization
+0.042 & 0.04 &          % no noise
+\B 0.003 & \B 0.02 \\   % with noise
+& & \cmark &            % w/voxelization
+0.046 & 0.04 &          % no noise
+0.004 & \B 0.02 \\      % with noise
+
+\hline
+
+% ==============================================================================
+% DISTANCE MAP POINT-TO-PLANE GBA ERROR FORMULATION
+% ==============================================================================
+
+\multirow{4}{*}{$\mathcal{D}_\mathrm{p2pl}$} & \multirow{2}{*}{$\mathcal{M}_0$}
+  & \xmark &            % wo/voxelization
+\B 0.000 & \B 0.00 &    % no noise
+0.021 & 0.17 \\         % with noise
+& & \cmark &            % w/voxelization
+\B 0.000 & \B 0.00 &    % no noise
+0.009 & 0.05 \\         % with noise
+\cline{2-7}
+& \multirow{2}{*}{$\mathcal{M}_2$}
+  & \xmark &            % wo/voxelization
+0.027 & 0.12 &          % no noise
+0.004 & 0.03 \\         % with noise
+& & \cmark &            % w/voxelization
+0.017 & 0.08 &          % no noise
+0.005 & 0.03 \\         % with noise
+
+\hline
+\end{tabular}
+\end{table}}

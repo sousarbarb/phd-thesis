@@ -2,7 +2,7 @@
 
 TBC
 
-\section{Background}\label{sec:slam:background}
+\section{System Overview}\label{sec:slam:ricoslam}
 
 TBC
 
@@ -14,13 +14,68 @@ TBC
 
 TBC
 
-\section{Offline Global Bundle Adjustment}\label{sec:slam:offline}
+\section{Global Bundle Adjustment}\label{sec:slam:gba}
 
 TBC
 
 \section{Experimental Results and Discussion}\label{sec:slam:results}
 
-TBC
+\subsection{Trajectory accuracy on the IILABS3D Dataset}\label{sec:slam:results:iilabs3d}
+
+\todo{TBC}
+
+\input{tables/slam/iilabs3d/results_iilabs3d_template.tex}
+
+Algorithms:
+\begin{itemize}
+\item RicoSLAM (online + offline corrected pose)
+\item SLAM Toolbox
+\item GMapping
+\item Cartographer (optional, SLAM Toolbox already provides a graph-based formulation)
+\item HectorSLAM (optional, very low priority)
+\end{itemize}
+
+Metrics:
+\begin{itemize}
+\item ATE (Absolute Trajectory Error)
+\item RTE (Relative Translation Error)
+\item RRE (Relative Rotational Error)
+\end{itemize}
+
+\subsection{Scalability and graph growth with relocalization}\label{sec:slam:results:relocalization}
+
+\todo{TBC}
+
+Algorithms:
+\begin{itemize}
+\item RicoSLAM (no relocalization versus with relocalization)
+\item SLAM Toolbox
+\end{itemize}
+
+Metrics:
+\begin{itemize}
+\item number of nodes along time
+\item number of edges along time
+\end{itemize}
+
+\subsection{Mapping with dynamics removal}\label{sec:slam:results:dynamics}
+
+Algorithms:
+\begin{itemize}
+\item RicoSLAM (standard, no offline dynamics removal)
+\item RicoSLAM (with offline dynamics removal)
+\end{itemize}
+
+Metrics:
+\begin{itemize}
+\item probability distribution of the occupancy cell values
+\end{itemize}
+
+\subsection{Global bundle adjustment with synthetic data}\label{sec:slam:results:gba}
+
+\todo{TBC}
+
+\input{tables/slam/gba/results_synthetic_pc_res-0.03m.tex}
 
 \section{Summary and Conclusions}\label{sec:slam:conclusions}
 
