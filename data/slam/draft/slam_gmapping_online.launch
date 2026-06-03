@@ -1,5 +1,6 @@
 <launch>
 
+  <arg name="rate" default="4.0" />
   <arg name="scan_topic" default="/scan" />
   <arg name="start" default="0" />
 
@@ -86,6 +87,12 @@
 
 
 
+  <param name="/use_sim_time" value="true" />
+
+
+
+
+
   <node pkg="rviz" type="rviz" name="rviz"
         clear_params="true" output="screen"
         args="-d $(dirname)/gmapping.rviz"/>
@@ -94,17 +101,21 @@
 
 
 
-  <node pkg="gmapping" type="slam_gmapping_offline"
-        name="slam_gmapping_offline"
-        output="screen"
-        args="-b $(arg bagfiles)
-          --scantopic $(arg scan_topic)
-          --start $(arg start)
-          --log $(arg logfile)">
+  <node pkg="gmapping" type="slam_gmapping_online"
+        name="slam_gmapping_online"
+        output="screen">
     <!-- launch-prefix="xterm -e gdb -/-args"/> -->
+
+    <remap from="/scan" to="$(arg scan_topic)" />
 
     <rosparam command="load" file="$(dirname)/$(arg paramfile)" subst_value="true" />
 
   </node>
+
+  <node pkg="rosbag" type="record" name="record" output="screen"
+    args="--quiet --repeat-latched -O $(arg logfile)_slam_toolbox.bag $(arg scan_topic) /tf /tf_static /slam_toolbox/pose" />
+
+  <node pkg="rosbag" type="play" name="play" output="screen"
+    args="--clock --quiet --start $(arg start) --rate $(arg rate) --delay 5 $(arg bagfiles)" />
 
 </launch>
