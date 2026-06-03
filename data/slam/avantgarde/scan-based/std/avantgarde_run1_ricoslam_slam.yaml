@@ -1,0 +1,12 @@
+image: avantgarde_run1_ricoslam_slam.pgm
+resolution: 0.030000
+origin: [-45.917377, -34.862122, 0.000000]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.192
+orig_occupied_thresh: 0.300000
+orig_free_thresh: -1.000000
+usable_range_min: 0.100000
+usable_range_max: 50.000000
+maximum_range: 50.000000
+
