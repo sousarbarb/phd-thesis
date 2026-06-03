@@ -1,0 +1,87 @@
+{\setlength{\tabcolsep}{2pt}
+\begin{table}[!t]
+\centering
+\caption[%
+    TBC]{%
+    TBC%
+}
+\label{tab:slam:results:iilabs3d:graph}
+\begin{tabular}{
+    l   % method family      (multirow label)
+    l|  % method variant
+    % 4 sequences from the IILABS3D dataset
+    S[table-format=3.0] S[table-format=3.0] S[table-format=3.0] | % nav A diff
+    S[table-format=3.0] S[table-format=3.0] S[table-format=3.0] | % nav A omni
+    S[table-format=3.0] S[table-format=3.0] S[table-format=3.0] | % loop
+    S[table-format=3.0] S[table-format=3.0] S[table-format=3.0]   % slippage
+}
+\hline
+\multicolumn{1}{l}{\textbf{Method}} &
+\multicolumn{1}{l|}{\textbf{Variant}} &
+\multicolumn{3}{c|}{\textbf{Nav~A Diff}} &
+\multicolumn{3}{c|}{\textbf{Nav~A Omni}} &
+\multicolumn{3}{c|}{\textbf{Loop}} &
+\multicolumn{3}{c}{\textbf{Slippage}}\\
+\multicolumn{1}{c}{} &
+\multicolumn{1}{c|}{} &
+\multicolumn{1}{c}{\textbf{\#n}} &
+\multicolumn{1}{c}{\textbf{\#s}} &
+\multicolumn{1}{c|}{\textbf{\#e}} &
+\multicolumn{1}{c}{\textbf{\#n}} &
+\multicolumn{1}{c}{\textbf{\#s}} &
+\multicolumn{1}{c|}{\textbf{\#e}} &
+\multicolumn{1}{c}{\textbf{\#n}} &
+\multicolumn{1}{c}{\textbf{\#s}} &
+\multicolumn{1}{c|}{\textbf{\#e}} &
+\multicolumn{1}{c}{\textbf{\#n}} &
+\multicolumn{1}{c}{\textbf{\#s}} &
+\multicolumn{1}{c}{\textbf{\#e}}\\
+\hline
+
+% ==============================================================================
+% RICOSLAM
+% ==============================================================================
+
+\multirow{5}{*}{RicoSLAM} & scan &
+ 75 &  75 & 168 &  % nav A diff
+ 31 &  31 &  47 &  % nav A omni
+ 83 &  83 & 158 &  % loop
+ 10 &  10 &  11 \\ % slippage
+& scan w/reloc. &
+ 34 &  34 &  36 &  % nav A diff
+ 18 &  18 &  18 &  % nav A omni
+ 19 &  19 &  19 &  % loop
+  8 &   8 &   7 \\ % slippage
+& local &
+106 & 373 & 240 &  % nav A diff
+ 43 & 155 &  66 &  % nav A omni
+ 89 & 325 & 168 &  % loop
+ 15 &  47 &  17 \\ % slippage
+& local w/upd. &
+106 & 373 & 238 &  % nav A diff
+ 43 & 155 &  66 &  % nav A omni
+ 89 & 325 & 168 &  % loop
+ 15 &  47 &  17 \\ % slippage
+& local w/reloc. &
+ 17 &  89 &  23  &  % nav A diff
+ 17 &  80 &  23 &  % nav A omni
+ 18 &  82 &  18 &  % loop
+  8 &  31 &   7 \\ % slippage
+
+\hline
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{tabular}
+\end{table}}
