@@ -1,0 +1,12 @@
+image: local-map_w-relocalization/iilabs3d_slippage_ricoslam_slam.pgm
+resolution: 0.030000
+origin: [-4.797970, -23.685890, 0.000000]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.192
+orig_occupied_thresh: 0.300000
+orig_free_thresh: -1.000000
+usable_range_min: 0.100000
+usable_range_max: 30.000000
+maximum_range: 30.000000
+
