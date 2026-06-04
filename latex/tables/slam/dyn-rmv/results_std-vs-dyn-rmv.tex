@@ -1,0 +1,293 @@
+{\setlength{\tabcolsep}{1.7pt}
+\begin{table}[!t]
+\centering
+\caption[%
+    TBC]{%
+    TBC%
+}
+\label{tab:slam:results:dyn-rmv}
+\begin{tabular}{
+    l   % Dataset  (multirow label)
+    l   % sequence (multirow label)
+    l|  % method variant
+    ccc | % n_valid
+    S[table-format=2.2] S[table-format=1.2] |  % tau  5%: standard
+    S[table-format=2.2] S[table-format=1.2] | % tau  5%: dynamics rmv
+    % S[table-format=2.2] S[table-format=1.2] |  % tau 10%: standard
+    % S[table-format=2.2] S[table-format=1.2] | % tau 10%: dynamics rmv
+    S[table-format=2.2] S[table-format=1.2] |  % tau 20%: standard
+    S[table-format=2.2] S[table-format=1.2]    % tau 20%: dynamics rmv
+}
+\hline
+\multicolumn{1}{c}{} &
+\multicolumn{1}{c}{} &
+\multicolumn{1}{c|}{} &
+\multicolumn{1}{c}{} &
+\multicolumn{1}{c}{} &
+\multicolumn{1}{c|}{} &
+\multicolumn{4}{c|}{$\tau=0.05$} &
+\multicolumn{4}{c}{$\tau=0.10$} \\
+% \multicolumn{4}{c}{$\tau=0.20$}\\
+\multicolumn{1}{c}{} &
+\multicolumn{1}{c}{} &
+\multicolumn{1}{c|}{} &
+\multicolumn{1}{c}{} &
+\multicolumn{1}{c}{} &
+\multicolumn{1}{c|}{} &
+\multicolumn{2}{c|}{\textbf{standard}} &
+\multicolumn{2}{c|}{\textbf{dyn-rmv}} &
+% \multicolumn{2}{c|}{\textbf{standard}} &
+% \multicolumn{2}{c|}{\textbf{dyn-rmv}} &
+\multicolumn{2}{c|}{\textbf{standard}} &
+\multicolumn{2}{c}{\textbf{dyn-rmv}}\\
+\multicolumn{1}{c}{} &
+\multicolumn{1}{c}{} &
+\multicolumn{1}{c|}{} &
+\multicolumn{1}{c}{\textbf{standard}} &
+\multicolumn{1}{c}{\textbf{dyn-rmv}} &
+\multicolumn{1}{c|}{} &
+\multicolumn{1}{c}{$m_\text{peak}$} &
+\multicolumn{1}{c|}{$m_\text{mid}$} &
+\multicolumn{1}{c}{$m_\text{peak}$} &
+\multicolumn{1}{c|}{$m_\text{mid}$} &
+% \multicolumn{1}{c}{$m_\text{peak}$} &
+% \multicolumn{1}{c|}{$m_\text{mid}$} &
+% \multicolumn{1}{c}{$m_\text{peak}$} &
+% \multicolumn{1}{c|}{$m_\text{mid}$} &
+\multicolumn{1}{c}{$m_\text{peak}$} &
+\multicolumn{1}{c|}{$m_\text{mid}$} &
+\multicolumn{1}{c}{$m_\text{peak}$} &
+\multicolumn{1}{c}{$m_\text{mid}$}\\
+\multicolumn{1}{c}{\textbf{Dataset}} &
+\multicolumn{1}{c}{\textbf{Sequence}} &
+\multicolumn{1}{c|}{\textbf{Met.}} &
+\multicolumn{1}{c}{$N_\text{obs.}$} &
+\multicolumn{1}{c}{$N_\text{obs.}$} &
+\multicolumn{1}{c|}{$\Delta N_\text{obs.}$} &
+\multicolumn{1}{c}{(\si{\percent})} &
+\multicolumn{1}{c|}{(\si{\percent})} &
+\multicolumn{1}{c}{(\si{\percent})} &
+\multicolumn{1}{c|}{(\si{\percent})} &
+% \multicolumn{1}{c}{(\si{\percent})} &
+% \multicolumn{1}{c|}{(\si{\percent})} &
+% \multicolumn{1}{c}{(\si{\percent})} &
+% \multicolumn{1}{c|}{(\si{\percent})} &
+\multicolumn{1}{c}{(\si{\percent})} &
+\multicolumn{1}{c|}{(\si{\percent})} &
+\multicolumn{1}{c}{(\si{\percent})} &
+\multicolumn{1}{c}{(\si{\percent})}\\
+\hline
+
+
+
+\multirow{8}{*}{IILABS 3D} & \multirow{2}{*}{Nav A Diff}
+ & scan & % [scan-based] Map A: shape=(958, 474) #cells=454092 #n_valid=225571 | Map B: shape=(958, 474) #cells=454092 #n_valid=225091
+225571 & 225091 & $-480$ &
+95.21 & 4.79 &   % tau  5%: standard
+\B 96.19 & \B 3.81 &   % tau  5%: dynamics rmv
+96.26 & 3.74 &   % tau 10%: standard
+\B 96.74 & \B 3.26 \\  % tau 10%: dynamics rmv
+% 97.61 & 2.39 &   % tau 20%: standard
+% 97.75 & 2.25 \\  % tau 20%: dynamics rmv
+&& local & % [local-map] Map A: shape=(961, 478) #cells=459358 #n_valid=238282 | Map B: shape=(961, 478) #cells=459358 #n_valid=238015
+238282 & 238015 & $-267$ &
+92.91 & 7.09 &   % tau  5%: standard
+\B 94.17 & \B 5.83 &   % tau  5%: dynamics rmv
+94.70 & 5.30 &   % tau 10%: standard
+\B 95.25 & \B 4.75 \\  % tau 10%: dynamics rmv
+% 96.64 & 3.36 &   % tau 20%: standard
+% 96.78 & 3.22 \\  % tau 20%: dynamics rmv
+ & \multirow{2}{*}{Nav A Omni}
+ & scan & % [scan-based] Map A: shape=(951, 301) #cells=286251 #n_valid=211680 | Map B: shape=(951, 301) #cells=286251 #n_valid=211027
+211680 & 211027 & $-653$ &
+96.30 & 3.70 &   % tau  5%: standard
+\B 96.99 & \B 3.01 &   % tau  5%: dynamics rmv
+96.84 & 3.16 &   % tau 10%: standard
+\B 97.26 & \B 2.74 \\  % tau 10%: dynamics rmv
+% 97.83 & 2.17 &   % tau 20%: standard
+% 98.01 & 1.99 \\  % tau 20%: dynamics rmv
+&& local & % [local-map] Map A: shape=(954, 463) #cells=441702 #n_valid=232092 | Map B: shape=(954, 463) #cells=441702 #n_valid=231639
+232092 & 231639 & $-453$ &
+93.21 & 6.79 &   % tau  5%: standard
+\B 94.43 & \B 5.57 &   % tau  5%: dynamics rmv
+94.69 & 5.31 &   % tau 10%: standard
+\B 95.27 & \B 4.73 \\  % tau 10%: dynamics rmv
+% 96.60 & 3.40 &   % tau 20%: standard
+% 96.76 & 3.24 \\  % tau 20%: dynamics rmv
+ & \multirow{2}{*}{Loop}
+ & scan & % [scan-based] Map A: shape=(1311, 452) #cells=592572 #n_valid=324553 | Map B: shape=(1311, 452) #cells=592572 #n_valid=324249
+324553 & 324249 & $-304$ &
+96.25 & 3.75 &   % tau  5%: standard
+\B 96.90 & \B 3.10 &   % tau  5%: dynamics rmv
+96.95 & 3.05 &   % tau 10%: standard
+\B 97.28 & \B 2.72 \\  % tau 10%: dynamics rmv
+% 97.95 & 2.05 &   % tau 20%: standard
+% 98.07 & 1.93 \\  % tau 20%: dynamics rmv
+&& local & % [local-map] Map A: shape=(1317, 655) #cells=862635  #n_valid=355885 | Map B: shape=(1317, 655) #cells=862635 #n_valid=355165
+355885 & 355165 & $-720$ &
+94.72 & 5.28 &   % tau  5%: standard
+\B 95.52 & \B 4.48 &   % tau  5%: dynamics rmv
+95.87 & 4.13 &   % tau 10%: standard
+\B 96.25 & \B 3.75 \\  % tau 10%: dynamics rmv
+% 97.20 & 2.80 &   % tau 20%: standard
+% 97.32 & 2.68 \\  % tau 20%: dynamics rmv
+ & \multirow{2}{*}{Slippage}
+ & scan & % [scan-based] Map A: shape=(951, 292) #cells=277692 #n_valid=177664 | Map B: shape=(951, 292) #cells=277692 #n_valid=177476
+177664 & 177476 & $-188$ &
+98.38 & 1.62 &   % tau  5%: standard
+\B 98.64 & \B 1.36 &   % tau  5%: dynamics rmv
+98.48 & 1.52 &   % tau 10%: standard
+\B 98.68 & \B 1.32 \\  % tau 10%: dynamics rmv
+% 98.86 & 1.14 &   % tau 20%: standard
+% 98.95 & 1.05 \\  % tau 20%: dynamics rmv
+&& local & % [local-map] Map A: shape=(953, 306) #cells=291618  #n_valid=196312 | Map B: shape=(953, 306) #cells=291618 #n_valid=196097
+196312 & 196097 & $-215$ &
+96.27 & 3.73 &   % tau  5%: standard
+\B 96.98 & \B 3.02 &   % tau  5%: dynamics rmv
+97.08 & 2.92 &   % tau 10%: standard
+\B 97.42 & \B 2.58 \\  % tau 10%: dynamics rmv
+% 98.14 & 1.86 &   % tau 20%: standard
+% 98.24 & 1.76 \\  % tau 20%: dynamics rmv
+
+
+\hline
+
+
+
+\multirow{7}{*}{avantgarde} & run0 & scan & % Map A: shape=(7173, 8262) #cells=59263326 #n_valid=6944503 | Map B: shape=(7173, 8262) #cells=59263326 #n_valid=6885705
+6944503 & 6885705 & $-58798$ &
+98.90 & 1.10 &   % tau  5%: standard
+\B 99.02 & \B 0.98 &   % tau  5%: dynamics rmv
+98.98 & 1.02 &   % tau 10%: standard
+\B 99.06 & \B 0.94 \\  % tau 10%: dynamics rmv
+% 99.23 & 0.77 &   % tau 20%: standard
+% 99.27 & 0.73 \\  % tau 20%: dynamics rmv
+& run1 & scan & % Map A: shape=(2514, 3943) #cells=9912702 #n_valid=1961496 | Map B: shape=(2514, 3943) #cells=9912702 #n_valid=1925419
+1961496 & 1925419 & $-36077$ &
+98.99 & 1.01 &   % tau  5%: standard
+\B 99.07 & \B 0.93 &   % tau  5%: dynamics rmv
+99.08 & 0.92 &   % tau 10%: standard
+\B 99.14 & \B 0.86 \\  % tau 10%: dynamics rmv
+% 99.31 & 0.69 &   % tau 20%: standard
+% 99.34 & 0.66 \\  % tau 20%: dynamics rmv
+& run2 & scan & % Map A: shape=(3549, 2466) #cells=8751834 #n_valid=1868482 | Map B: shape=(3549, 2466) #cells=8751834 #n_valid=1846486
+1868482 & 1846486 & $-21996$ &
+98.81 & 1.19 &   % tau  5%: standard
+\B 98.94 & \B 1.06 &   % tau  5%: dynamics rmv
+98.91 & 1.09 &   % tau 10%: standard
+\B 99.01 & \B 0.99 \\  % tau 10%: dynamics rmv
+% 99.19 & 0.81 &   % tau 20%: standard
+% 99.24 & 0.76 \\  % tau 20%: dynamics rmv
+& run3 & scan & % Map A: shape=(3545, 2329) #cells=8256305 #n_valid=1753355 | Map B: shape=(3545, 2329) #cells=8256305 #n_valid=1733622
+1753355 & 1733622 & $-19733$ &
+98.86 & 1.14 &   % tau  5%: standard
+\B 98.96 & \B 1.04 &   % tau  5%: dynamics rmv
+98.94 & 1.06 &   % tau 10%: standard
+\B 99.01 & \B 0.99 \\  % tau 10%: dynamics rmv
+% 99.19 & 0.81 &   % tau 20%: standard
+% 99.23 & 0.77 \\  % tau 20%: dynamics rmv
+& run4 & scan & % Map A: shape=(4092, 2291) #cells=9374772 #n_valid=1880880 | Map B: shape=(4092, 2291) #cells=9374772 #n_valid=1862146
+1880880 & 1862146 & $-18734$ &
+98.71 & 1.29 &   % tau  5%: standard
+\B 98.83 & \B 1.17 &   % tau  5%: dynamics rmv
+98.82 & 1.18 &   % tau 10%: standard
+\B 98.91 & \B 1.09 \\  % tau 10%: dynamics rmv
+% 99.12 & 0.88 &   % tau 20%: standard
+% 99.17 & 0.83 \\  % tau 20%: dynamics rmv
+& run5 & scan & % Map A: shape=(3999, 2448) #cells=9789552 #n_valid=1965889 | Map B: shape=(3999, 2448) #cells=9789552 #n_valid=1948151
+1965889 & 1948151 & $-17738$ &
+98.49 & 1.51 &   % tau  5%: standard
+\B 98.67 & \B 1.33 &   % tau  5%: dynamics rmv
+98.66 & 1.34 &   % tau 10%: standard
+\B 98.79 & \B 1.21 \\  % tau 10%: dynamics rmv
+% 99.01 & 0.99 &   % tau 20%: standard
+% 99.08 & 0.92 \\  % tau 20%: dynamics rmv
+& run6 & scan & % Map A: shape=(3544, 2438) #cells=8640272  #n_valid=1645006 | Map B: shape=(3544, 2438) #cells=8640272 #n_valid=1627833
+1645006 & 1627833 & $-17173$ &
+98.68 & 1.32 &   % tau  5%: standard
+\B 98.80 & \B 1.20 &   % tau  5%: dynamics rmv
+98.81 & 1.19 &   % tau 10%: standard
+\B 98.90 & \B 1.10 \\  % tau 10%: dynamics rmv
+% 99.11 & 0.89 &   % tau 20%: standard
+% 99.16 & 0.84 \\  % tau 20%: dynamics rmv
+
+\hline
+
+
+
+\multirow{2}{*}{cappero} && scan & % [scan-based_rmax-25.0m_res-0.03m] Map A: shape=(2043, 3426) #cells=6999318 #n_valid=842204 | Map B: shape=(2043, 3426) #cells=6999318 #n_valid=840532
+842204 & 840532 & $-1672$ &
+94.13 & 5.87 &   % tau  5%: standard
+\B 94.61 & \B 5.39 &   % tau  5%: dynamics rmv
+95.24 & 4.76 &   % tau 10%: standard
+\B 95.48 & \B 4.52 \\  % tau 10%: dynamics rmv
+% 96.78 & 3.22 &   % tau 20%: standard
+% 96.89 & 3.11 \\  % tau 20%: dynamics rmv
+&& local & % [local-map-wo-factors-update_rmax-25.0m_res-0.03m_trans-2.50m] Map A: shape=(2055, 3427) #cells=7042485 #n_valid=853734 | Map B: shape=(2055, 3427) #cells=7042485 #n_valid=852711
+853734 & 852711 & $-1023$ &
+93.67 & 6.33 &   % tau  5%: standard
+\B 94.17 & \B 5.83 &   % tau  5%: dynamics rmv
+94.90 & 5.10 &   % tau 10%: standard
+\B 95.17 & \B 4.83 \\  % tau 10%: dynamics rmv
+% 96.58 & 3.42 &   % tau 20%: standard
+% 96.69 & 3.31 \\  % tau 20%: dynamics rmv
+
+\hline
+
+
+
+\multirow{3}{*}{flowbotic} & 20251024 & local & % Map A: shape=(2758, 3565) #cells=9832270 #n_valid=3815218 | Map B: shape=(2758, 3565) #cells=9832270 #n_valid=3769513
+3815218 & 3769513 & $-45705$ &
+96.81 & 3.19 &   % tau  5%: standard
+\B 97.52 & \B 2.48 &   % tau  5%: dynamics rmv
+97.45 & 2.55 &   % tau 10%: standard
+\B 97.87 & \B 2.13 \\  % tau 10%: dynamics rmv
+% 98.31 & 1.69 &   % tau 20%: standard
+% 98.48 & 1.52 \\  % tau 20%: dynamics rmv
+& 20251027 & local & % Map A: shape=(2692, 3658) #cells=9847336 #n_valid=3116225 | Map B: shape=(2692, 3658) #cells=9847336 #n_valid=3071177
+3116225 & 3071177 & $-45048$ &
+97.01 & 2.99 &   % tau  5%: standard
+\B 97.68 & \B 2.32 &   % tau  5%: dynamics rmv
+97.57 & 2.43 &   % tau 10%: standard
+\B 97.97 & \B 2.03 \\  % tau 10%: dynamics rmv
+% 98.36 & 1.64 &   % tau 20%: standard
+% 98.53 & 1.47 \\  % tau 20%: dynamics rmv
+& 20251028 & local & % Map A: shape=(2380, 3471) #cells=8260980 #n_valid=3214031 | Map B: shape=(2380, 3471) #cells=8260980 #n_valid=3166414
+3214031 & 3166414 & $-47617$ &
+96.98 & 3.02 &   % tau  5%: standard
+\B 97.59 & \B 2.41 &   % tau  5%: dynamics rmv
+97.64 & 2.36 &   % tau 10%: standard
+\B 98.02 & \B 1.98 \\  % tau 10%: dynamics rmv
+% 98.44 & 1.56 &   % tau 20%: standard
+% 98.62 & 1.38 \\  % tau 20%: dynamics rmv
+
+\hline
+
+
+
+kuka && local &  % Map A: shape=(5694, 5914) #cells=33674316 #n_valid=11281724 | Map B: shape=(5694, 5914) #cells=33674316 #n_valid=11169607
+11281724 & 11169607 & $-112117$ &
+96.28 & 3.72 &   % tau  5%: standard
+\B 97.06 & \B 2.94 &   % tau  5%: dynamics rmv
+96.95 & 3.05 &   % tau 10%: standard
+\B 97.42 & \B 2.58 \\  % tau 10%: dynamics rmv
+% 97.96 & 2.04 &   % tau 20%: standard
+% 98.15 & 1.85 \\  % tau 20%: dynamics rmv
+
+\hline
+
+% \multicolumn{14}{l}{%
+%     \footnotesize
+%     $^{\dagger}$ offline pose correction (accounting with loop closures).}\\
+
+\multicolumn{11}{l}{%
+  \footnotesize
+  Peak / middle mass partition uses $\tau$ where
+  peak   = cells in $\left[0, \tau\right]$ union $\left[1-\tau, 1\right]$;}\\
+\multicolumn{11}{l}{%
+  \footnotesize
+  middle = cells in $\left(\tau, 1-\tau\right)$}
+
+
+\end{tabular}
+\end{table}}

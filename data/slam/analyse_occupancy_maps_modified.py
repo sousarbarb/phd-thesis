@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-analyse_occupancy_maps.py
+analyse_occupancy_maps_modified.py
 --------------------------
 Compares the occupancy probability distributions of two 2D occupancy grid
 maps (e.g. with vs. without dynamic object removal).
@@ -16,17 +16,22 @@ Supported inputs
 The convention is auto-detected from the image dtype but can be forced with
 --convention.
 
+Peak / middle mass
+-------------------
+With a single threshold tau, the two metrics partition [0, 1]:
+  peak_mass   = fraction of cells in [0, tau] ∪ [1 - tau, 1]
+  middle_mass = fraction of cells in (tau, 1 - tau)
+so that peak_mass + middle_mass = 1 over the set of valid (observed) cells.
+
 Usage
 ------
-  python analyse_occupancy_maps.py map_a.tiff map_b.tiff \\
-      --labels "With dynamics" "Without dynamics" \\
-      --output comparison.pdf
+  python analyse_occupancy_maps_modified.py map_a.tiff map_b.tiff
 
   # Force ROS interpretation of 8-bit PNGs
-  python analyse_occupancy_maps.py map_a.png map_b.png --convention ros
+  python analyse_occupancy_maps_modified.py map_a.png map_b.png --convention ros
 
-  # Headless export
-  python analyse_occupancy_maps.py a.tiff b.tiff --no-show --output out.png
+  # Use a different partition threshold
+  python analyse_occupancy_maps_modified.py map_a.tiff map_b.tiff --tau 0.3
 
 Co-developed with Claude... Thanks!!!
 """
@@ -36,9 +41,6 @@ import sys
 from pathlib import Path
 
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
-from matplotlib.lines import Line2D
 from PIL import Image
 from scipy.stats import gaussian_kde
 
@@ -113,15 +115,25 @@ def differential_entropy(p: np.ndarray) -> float:
     return float(-np.sum(pdf * np.log2(pdf) * dx))
 
 
-def middle_mass(p: np.ndarray, lo: float = 0.3, hi: float = 0.7) -> float:
-    return float(np.mean((p >= lo) & (p <= hi)))
+def peak_mass(p: np.ndarray, tau: float = 0.25) -> float:
+    """
+    Fraction of cells with strong evidence of being free or occupied.
+
+    Cells in [0, tau] ∪ [1 - tau, 1].
+    """
+    return float(np.mean((p <= tau) | (p >= 1.0 - tau)))
 
 
-def peak_mass(p: np.ndarray, width: float = 0.15) -> float:
-    return float(np.mean((p <= width) | (p >= 1.0 - width)))
+def middle_mass(p: np.ndarray, tau: float = 0.25) -> float:
+    """
+    Fraction of cells with weak or ambiguous evidence.
+
+    Cells in (tau, 1 - tau). Complementary to peak_mass for the same tau.
+    """
+    return float(np.mean((p > tau) & (p < 1.0 - tau)))
 
 
-def summary_stats(p: np.ndarray, label: str) -> dict:
+def summary_stats(p: np.ndarray, label: str, tau: float = 0.25) -> dict:
     valid = p[~np.isnan(p)]
     return {
         "label":        label,
@@ -132,14 +144,14 @@ def summary_stats(p: np.ndarray, label: str) -> dict:
         "std":          float(np.std(valid)),
         "median":       float(np.median(valid)),
         "entropy_bits": differential_entropy(valid),
-        "middle_mass":  middle_mass(valid),
-        "peak_mass":    peak_mass(valid),
+        "peak_mass":    peak_mass(valid, tau=tau),
+        "middle_mass":  middle_mass(valid, tau=tau),
     }
 
 
-def print_stats(stats_a: dict, stats_b: dict) -> None:
+def print_stats(stats_a: dict, stats_b: dict, tau: float) -> None:
     keys = ["n_total", "n_valid", "n_unknown", "mean", "std",
-            "median", "entropy_bits", "middle_mass", "peak_mass"]
+            "median", "entropy_bits", "peak_mass", "middle_mass"]
     width = 22
     la, lb = stats_a["label"], stats_b["label"]
     header = f"{'Metric':<{width}}  {la:>18}  {lb:>18}"
@@ -153,115 +165,13 @@ def print_stats(stats_a: dict, stats_b: dict) -> None:
         else:
             print(f"{k:<{width}}  {va:>18.4f}  {vb:>18.4f}")
     print("-" * len(header))
+    print(f"\nPeak / middle mass partition uses tau = {tau:.3f}")
+    print(f"  peak   = cells in [0, {tau:.2f}] union [{1.0 - tau:.2f}, 1]")
+    print(f"  middle = cells in ({tau:.2f}, {1.0 - tau:.2f})")
     delta_e = stats_b["entropy_bits"] - stats_a["entropy_bits"]
     sign    = "+" if delta_e >= 0 else ""
     print(f"\nEntropy difference (B - A): {sign}{delta_e:.4f} bits")
     print("  A negative value indicates map B is more resolved.\n")
-
-
-# ---------------------------------------------------------------------------
-# Plotting
-# ---------------------------------------------------------------------------
-
-def build_figure(prob_a: np.ndarray, prob_b: np.ndarray,
-                 stats_a: dict, stats_b: dict, n_bins: int) -> plt.Figure:
-
-    valid_a = prob_a[~np.isnan(prob_a)]
-    valid_b = prob_b[~np.isnan(prob_b)]
-
-    fig = plt.figure(figsize=(13, 9))
-    fig.patch.set_facecolor("white")
-    gs  = gridspec.GridSpec(
-        2, 3, figure=fig,
-        hspace=0.45, wspace=0.35,
-        top=0.88, bottom=0.10, left=0.07, right=0.97,
-    )
-    fig.suptitle("Occupancy grid - probability distribution analysis",
-                 fontsize=14, color="#2C2C2A")
-
-    # Colour-mapped grids
-    for col, (prob, stats) in enumerate([(prob_a, stats_a), (prob_b, stats_b)]):
-        ax = fig.add_subplot(gs[0, col])
-        disp = np.where(np.isnan(prob), 0.5, prob)
-        im   = ax.imshow(disp, cmap="RdYlGn_r", vmin=0, vmax=1,
-                         interpolation="nearest", origin="upper")
-        ax.set_title(stats["label"], fontsize=11, color="#2C2C2A", pad=6)
-        ax.axis("off")
-        plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04,
-                     label="p(occ)", shrink=0.85)
-
-    # Summary statistics table
-    ax_stats = fig.add_subplot(gs[0, 2])
-    ax_stats.axis("off")
-    rows = [
-        ["Metric", stats_a["label"], stats_b["label"]],
-        ["Valid cells",
-         f"{stats_a['n_valid']:,}", f"{stats_b['n_valid']:,}"],
-        ["Unknown cells",
-         f"{stats_a['n_unknown']:,}", f"{stats_b['n_unknown']:,}"],
-        ["Mean p(occ)",
-         f"{stats_a['mean']:.4f}", f"{stats_b['mean']:.4f}"],
-        ["Std dev",
-         f"{stats_a['std']:.4f}", f"{stats_b['std']:.4f}"],
-        ["Entropy (bits)",
-         f"{stats_a['entropy_bits']:.4f}", f"{stats_b['entropy_bits']:.4f}"],
-        ["Middle mass\n(0.3 - 0.7)",
-         f"{stats_a['middle_mass']:.4f}", f"{stats_b['middle_mass']:.4f}"],
-        ["Peak mass\n(<=0.15, >=0.85)",
-         f"{stats_a['peak_mass']:.4f}", f"{stats_b['peak_mass']:.4f}"],
-    ]
-    tbl = ax_stats.table(cellText=rows[1:], colLabels=rows[0],
-                         loc="center", cellLoc="center")
-    tbl.auto_set_font_size(False)
-    tbl.set_fontsize(8.5)
-    tbl.scale(1.0, 1.55)
-    for j in range(3):
-        tbl[0, j].set_facecolor("#D3D1C7")
-        tbl[0, j].set_text_props(fontweight="bold", color="#2C2C2A")
-    ax_stats.set_title("Summary statistics", fontsize=11,
-                       color="#2C2C2A", pad=6)
-
-    # Overlaid histogram + KDE
-    ax_main = fig.add_subplot(gs[1, :])
-    bin_edges = np.linspace(0, 1, n_bins + 1)
-    bin_cx    = 0.5 * (bin_edges[:-1] + bin_edges[1:])
-
-    for valid, colour, label, ls in [
-        (valid_a, COLOUR_A, stats_a["label"], "--"),
-        (valid_b, COLOUR_B, stats_b["label"], "-"),
-    ]:
-        counts, _ = np.histogram(valid, bins=bin_edges, density=True)
-        ax_main.fill_between(bin_cx, counts, alpha=0.18, color=colour)
-        kde = gaussian_kde(valid, bw_method="scott")
-        xs  = np.linspace(0, 1, 500)
-        ax_main.plot(xs, kde(xs), color=colour, lw=2.0,
-                     linestyle=ls, label=label)
-        for peak in (0.0, 1.0):
-            ax_main.axvline(peak, color=colour, lw=0.6,
-                            linestyle=":", alpha=0.6)
-
-    ax_main.set_xlabel("Occupancy probability  p(occ)", fontsize=11)
-    ax_main.set_ylabel("Density", fontsize=11)
-    ax_main.set_xlim(0, 1)
-    ax_main.set_ylim(bottom=0)
-    ax_main.tick_params(labelsize=9)
-    ax_main.spines[["top", "right"]].set_visible(False)
-    ax_main.grid(axis="y", linewidth=0.4, color="#D3D1C7", linestyle="--")
-
-    legend_elements = [
-        Line2D([0], [0], color=COLOUR_A, lw=2, linestyle="--",
-               label=stats_a["label"]),
-        Line2D([0], [0], color=COLOUR_B, lw=2, linestyle="-",
-               label=stats_b["label"]),
-    ]
-    ax_main.legend(handles=legend_elements, fontsize=10,
-                   frameon=False, loc="upper center")
-    ax_main.set_title(
-        "Probability distribution of occupancy across all cells",
-        fontsize=11, color="#2C2C2A", pad=6,
-    )
-
-    return fig
 
 
 # ---------------------------------------------------------------------------
@@ -289,19 +199,21 @@ def parse_args() -> argparse.Namespace:
         help="[ros only] Tolerance around pixel value 205 to mark as unknown. "
              "Default: 5",
     )
-    p.add_argument("--bins", type=int, default=60,
-                   help="Histogram bin count. Default: 60")
-    p.add_argument("--output", type=Path, default=None,
-                   help="Save figure to this path (PNG/PDF/SVG)")
-    p.add_argument("--no-show", action="store_true",
-                   help="Do not open the interactive figure window")
-    p.add_argument("--dpi", type=int, default=150,
-                   help="Figure DPI for saved output. Default: 150")
+    p.add_argument(
+        "--tau", type=float, default=0.25, metavar="TAU",
+        help="Threshold for the peak/middle mass partition of [0, 1]. "
+             "Peak mass counts cells in [0, tau] union [1 - tau, 1]; "
+             "middle mass counts cells in (tau, 1 - tau). "
+             "Must satisfy 0 < tau < 0.5. Default: 0.25",
+    )
     return p.parse_args()
 
 
 def main() -> None:
     args = parse_args()
+
+    if not (0.0 < args.tau < 0.5):
+        sys.exit(f"[error] --tau must be in (0, 0.5); got {args.tau}")
 
     for path in (args.map_a, args.map_b):
         if not path.exists():
@@ -316,10 +228,10 @@ def main() -> None:
     conv_a = detect_convention(raw_a, override)
     conv_b = detect_convention(raw_b, override)
 
-    print(f"[info] Map A: shape={raw_a.shape}  dtype={raw_a.dtype}  "
-          f"convention={conv_a}")
-    print(f"[info] Map B: shape={raw_b.shape}  dtype={raw_b.dtype}  "
-          f"convention={conv_b}")
+    print(f"[info] Map A: shape={raw_a.shape}  #cells={raw_a.size}  "
+          f"dtype={raw_a.dtype}  convention={conv_a}")
+    print(f"[info] Map B: shape={raw_b.shape}  #cells={raw_b.size}  "
+          f"dtype={raw_b.dtype}  convention={conv_b}")
 
     if conv_a != conv_b:
         print("[warn] The two maps use different conventions; "
@@ -329,18 +241,9 @@ def main() -> None:
     prob_b = to_probability(raw_b, conv_b, args.unknown_tol)
 
     label_a, label_b = args.labels
-    stats_a = summary_stats(prob_a, label_a)
-    stats_b = summary_stats(prob_b, label_b)
-    print_stats(stats_a, stats_b)
-
-    fig = build_figure(prob_a, prob_b, stats_a, stats_b, n_bins=args.bins)
-
-    if args.output:
-        fig.savefig(args.output, dpi=args.dpi, bbox_inches="tight")
-        print(f"[info] Figure saved to {args.output}")
-
-    if not args.no_show:
-        plt.show()
+    stats_a = summary_stats(prob_a, label_a, tau=args.tau)
+    stats_b = summary_stats(prob_b, label_b, tau=args.tau)
+    print_stats(stats_a, stats_b, tau=args.tau)
 
 
 if __name__ == "__main__":
