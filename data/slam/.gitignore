@@ -7,3 +7,6 @@ pyvenv.cfg
 *.tum
 *.json
 *.dat
+*.pgm
+*.png
+*.tiff
