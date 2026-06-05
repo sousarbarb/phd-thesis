@@ -1,0 +1,7 @@
+update frame 24830
+update ld=0.506842 ad=0.148437
+Laser Pose= -6.95939 2.54111 -0.837854
+m_count 459
+Average Scan Matching Score=960.174
+neff= 68.0287
+Registering Scans:Done

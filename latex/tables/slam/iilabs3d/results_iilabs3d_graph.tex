@@ -3,7 +3,7 @@
 \centering
 \caption[%
     TBC]{%
-    TBC%
+    \#n number nodes; \#s number of scans; \#e number of edges%
 }
 \label{tab:slam:results:iilabs3d:graph}
 \begin{tabular}{
@@ -16,14 +16,14 @@
     S[table-format=3.0] S[table-format=3.0] S[table-format=3.0]   % slippage
 }
 \hline
-\multicolumn{1}{l}{\textbf{Method}} &
-\multicolumn{1}{l|}{\textbf{Variant}} &
+\multicolumn{1}{l}{} &
+\multicolumn{1}{l|}{} &
 \multicolumn{3}{c|}{\textbf{Nav~A Diff}} &
 \multicolumn{3}{c|}{\textbf{Nav~A Omni}} &
 \multicolumn{3}{c|}{\textbf{Loop}} &
 \multicolumn{3}{c}{\textbf{Slippage}}\\
-\multicolumn{1}{c}{} &
-\multicolumn{1}{c|}{} &
+\multicolumn{1}{l}{\textbf{Method}} &
+\multicolumn{1}{l|}{\textbf{Variant}} &
 \multicolumn{1}{c}{\textbf{\#n}} &
 \multicolumn{1}{c}{\textbf{\#s}} &
 \multicolumn{1}{c|}{\textbf{\#e}} &
@@ -36,6 +36,28 @@
 \multicolumn{1}{c}{\textbf{\#n}} &
 \multicolumn{1}{c}{\textbf{\#s}} &
 \multicolumn{1}{c}{\textbf{\#e}}\\
+\hline
+
+% ==============================================================================
+% GMAPPING
+% ==============================================================================
+
+\multirow{3}{*}{GMapping} & 0.3m 0.3rad &
+{--} & 897 & {--} &  % nav A diff
+{--} & 373 & {--} &  % nav A omni
+{--} & 757 & {--} &  % loop
+{--} & 141 & {--} \\ % slippage
+& 0.5m 0.5rad &
+{--} & 544 & {--} &  % nav A diff
+{--} & 226 & {--} &  % nav A omni
+{--} & 459 & {--} &  % loop
+{--} &  84 & {--} \\ % slippage
+& 1.0m 1.0rad &
+{--} & 273 & {--} &  % nav A diff
+{--} & 113 & {--} &  % nav A omni
+{--} & 231 & {--} &  % loop
+{--} &  42 & {--} \\ % slippage
+
 \hline
 
 % ==============================================================================
@@ -69,19 +91,6 @@
   8 &  31 &   7 \\ % slippage
 
 \hline
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 \end{tabular}
 \end{table}}
