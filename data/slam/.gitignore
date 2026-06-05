@@ -10,3 +10,4 @@ pyvenv.cfg
 *.pgm
 *.png
 *.tiff
+*.bag

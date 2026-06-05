@@ -24,11 +24,12 @@ TBC
 
 \todo{TBC}
 
-\input{tables/slam/iilabs3d/results_iilabs3d_template.tex}
+\input{tables/slam/iilabs3d/results_iilabs3d.tex}
 
 Algorithms:
 \begin{itemize}
-\item RicoSLAM (online + offline corrected pose)
+\item RicoSLAM (online + offline corrected pose, 0.03m resolution,
+      voxelization enabled, bi-linear interpolation disabled, M1 representation)
 \item SLAM Toolbox
 \item GMapping
 \item Cartographer (optional, SLAM Toolbox already provides a graph-based formulation)
@@ -42,13 +43,20 @@ Metrics:
 \item RRE (Relative Rotational Error)
 \end{itemize}
 
+
+SLAM Toolbox with 1.00m/1.00rad, 1.50m/1.50rad, and 2.50m (setting minimum angle to 10.0 to avoid splitting due to angular displacement)
+fails. Only with 0.3m/0.3rad and 0.5m/0.5rad...
+
 \subsection{Scalability and graph growth with relocalization}\label{sec:slam:results:relocalization}
 
 \todo{TBC}
 
+\input{tables/slam/iilabs3d/results_iilabs3d_graph.tex}
+
 Algorithms:
 \begin{itemize}
-\item RicoSLAM (no relocalization versus with relocalization)
+\item RicoSLAM (no relocalization versus with relocalization, 0.03m resolution,
+      voxelization enabled, bi-linear interpolation disabled, M1 representation)
 \item SLAM Toolbox
 \end{itemize}
 
@@ -60,10 +68,14 @@ Metrics:
 
 \subsection{Mapping with dynamics removal}\label{sec:slam:results:dynamics}
 
+\input{tables/slam/dyn-rmv/results_std-vs-dyn-rmv.tex}
+
 Algorithms:
 \begin{itemize}
-\item RicoSLAM (standard, no offline dynamics removal)
-\item RicoSLAM (with offline dynamics removal)
+\item RicoSLAM (standard, no offline dynamics removal, 0.03m resolution,
+      voxelization enabled, bi-linear interpolation disabled, M1 representation)
+\item RicoSLAM (with offline dynamics removal, 0.03m resolution,
+      voxelization enabled, bi-linear interpolation disabled, M1 representation)
 \end{itemize}
 
 Metrics:

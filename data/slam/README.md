@@ -17,6 +17,13 @@ python3 eval_iilabs3d.py \
   iilabs3d/local-map_w-factors-update/iilabs3d_nav_a_diff_ricoslam_slam_pose_corrected.tum  \
   iilabs3d/local-map_w-relocalization/iilabs3d_nav_a_diff_ricoslam_slam_pose_corrected.tum
 
+# Gmapping
+python3 eval_iilabs3d.py \
+  /mnt/data/datasets/paper_slam_2d/distance-maps-eval/iilabs3d/iilabs3d_dataset/benchmark/livox_mid-360/nav_a_diff/ground_truth.tum \
+  iilabs3d/gmapping_lin-0.30m_ang-0.30rad/iilabs3d_nav_a_diff_gmapping_pose.tum \
+  iilabs3d/gmapping_lin-0.50m_ang-0.50rad/iilabs3d_nav_a_diff_gmapping_pose.tum \
+  iilabs3d/gmapping_lin-1.00m_ang-1.00rad/iilabs3d_nav_a_diff_gmapping_pose.tum
+
 # IILABS3D W/ EVO: (nav_a_omni)
 # RicoSLAM
 python3 eval_iilabs3d.py \
@@ -31,6 +38,13 @@ python3 eval_iilabs3d.py \
   iilabs3d/local-map/iilabs3d_nav_a_omni_ricoslam_slam_pose_corrected.tum                   \
   iilabs3d/local-map_w-factors-update/iilabs3d_nav_a_omni_ricoslam_slam_pose_corrected.tum  \
   iilabs3d/local-map_w-relocalization/iilabs3d_nav_a_omni_ricoslam_slam_pose_corrected.tum
+
+# Gmapping
+python3 eval_iilabs3d.py \
+  /mnt/data/datasets/paper_slam_2d/distance-maps-eval/iilabs3d/iilabs3d_dataset/benchmark/livox_mid-360/nav_a_omni/ground_truth.tum \
+  iilabs3d/gmapping_lin-0.30m_ang-0.30rad/iilabs3d_nav_a_omni_gmapping_pose.tum \
+  iilabs3d/gmapping_lin-0.50m_ang-0.50rad/iilabs3d_nav_a_omni_gmapping_pose.tum \
+  iilabs3d/gmapping_lin-1.00m_ang-1.00rad/iilabs3d_nav_a_omni_gmapping_pose.tum
 
 # IILABS3D W/ EVO: (loop)
 # RicoSLAM
@@ -47,6 +61,13 @@ python3 eval_iilabs3d.py \
   iilabs3d/local-map_w-factors-update/iilabs3d_loop_ricoslam_slam_pose_corrected.tum  \
   iilabs3d/local-map_w-relocalization/iilabs3d_loop_ricoslam_slam_pose_corrected.tum
 
+# Gmapping
+python3 eval_iilabs3d.py \
+  /mnt/data/datasets/paper_slam_2d/distance-maps-eval/iilabs3d/iilabs3d_dataset/benchmark/livox_mid-360/loop/ground_truth.tum \
+  iilabs3d/gmapping_lin-0.30m_ang-0.30rad/iilabs3d_loop_gmapping_pose.tum \
+  iilabs3d/gmapping_lin-0.50m_ang-0.50rad/iilabs3d_loop_gmapping_pose.tum \
+  iilabs3d/gmapping_lin-1.00m_ang-1.00rad/iilabs3d_loop_gmapping_pose.tum
+
 # IILABS3D W/ EVO: (slippage)
 # RicoSLAM
 python3 eval_iilabs3d.py \
@@ -61,6 +82,48 @@ python3 eval_iilabs3d.py \
   iilabs3d/local-map/iilabs3d_slippage_ricoslam_slam_pose_corrected.tum                   \
   iilabs3d/local-map_w-factors-update/iilabs3d_slippage_ricoslam_slam_pose_corrected.tum  \
   iilabs3d/local-map_w-relocalization/iilabs3d_slippage_ricoslam_slam_pose_corrected.tum
+
+# Gmapping
+python3 eval_iilabs3d.py \
+  /mnt/data/datasets/paper_slam_2d/distance-maps-eval/iilabs3d/iilabs3d_dataset/benchmark/livox_mid-360/slippage/ground_truth.tum \
+  iilabs3d/gmapping_lin-0.30m_ang-0.30rad/iilabs3d_slippage_gmapping_pose.tum \
+  iilabs3d/gmapping_lin-0.50m_ang-0.50rad/iilabs3d_slippage_gmapping_pose.tum \
+  iilabs3d/gmapping_lin-1.00m_ang-1.00rad/iilabs3d_slippage_gmapping_pose.tum
+
+
+## SLAM Toolbox
+# preprocessing
+# roscore on another terminal
+python3 sync_tf_scan.py --base eve/base_footprint --map map --scan /eve/scan iilabs3d/slam-toolbox_lin-0.30m_ang-0.30rad/iilabs3d_nav_a_diff.tum_slam_toolbox.bag iilabs3d/slam-toolbox_lin-0.30m_ang-0.30rad/iilabs3d_nav_a_diff.tum_slam_toolbox.tum
+python3 sync_tf_scan.py --base eve/base_footprint --map map --scan /eve/scan iilabs3d/slam-toolbox_lin-0.30m_ang-0.30rad/iilabs3d_nav_a_omni.tum_slam_toolbox.bag iilabs3d/slam-toolbox_lin-0.30m_ang-0.30rad/iilabs3d_nav_a_omni.tum_slam_toolbox.tum
+python3 sync_tf_scan.py --base eve/base_footprint --map map --scan /eve/scan iilabs3d/slam-toolbox_lin-0.30m_ang-0.30rad/iilabs3d_loop.tum_slam_toolbox.bag iilabs3d/slam-toolbox_lin-0.30m_ang-0.30rad/iilabs3d_loop.tum_slam_toolbox.tum
+python3 sync_tf_scan.py --base eve/base_footprint --map map --scan /eve/scan iilabs3d/slam-toolbox_lin-0.30m_ang-0.30rad/iilabs3d_slippage.tum_slam_toolbox.bag iilabs3d/slam-toolbox_lin-0.30m_ang-0.30rad/iilabs3d_slippage.tum_slam_toolbox.tum
+
+python3 sync_tf_scan.py --base eve/base_footprint --map map --scan /eve/scan iilabs3d/slam-toolbox_lin-0.50m_ang-0.50rad/iilabs3d_nav_a_diff.tum_slam_toolbox.bag iilabs3d/slam-toolbox_lin-0.50m_ang-0.50rad/iilabs3d_nav_a_diff.tum_slam_toolbox.tum
+python3 sync_tf_scan.py --base eve/base_footprint --map map --scan /eve/scan iilabs3d/slam-toolbox_lin-0.50m_ang-0.50rad/iilabs3d_nav_a_omni.tum_slam_toolbox.bag iilabs3d/slam-toolbox_lin-0.50m_ang-0.50rad/iilabs3d_nav_a_omni.tum_slam_toolbox.tum
+python3 sync_tf_scan.py --base eve/base_footprint --map map --scan /eve/scan iilabs3d/slam-toolbox_lin-0.50m_ang-0.50rad/iilabs3d_loop.tum_slam_toolbox.bag iilabs3d/slam-toolbox_lin-0.50m_ang-0.50rad/iilabs3d_loop.tum_slam_toolbox.tum
+python3 sync_tf_scan.py --base eve/base_footprint --map map --scan /eve/scan iilabs3d/slam-toolbox_lin-0.50m_ang-0.50rad/iilabs3d_slippage.tum_slam_toolbox.bag iilabs3d/slam-toolbox_lin-0.50m_ang-0.50rad/iilabs3d_slippage.tum_slam_toolbox.tum
+
+# Benchmark
+python3 eval_iilabs3d.py \
+  /mnt/data/datasets/paper_slam_2d/distance-maps-eval/iilabs3d/iilabs3d_dataset/benchmark/livox_mid-360/nav_a_diff/ground_truth.tum \
+  iilabs3d/slam-toolbox_lin-0.30m_ang-0.30rad/iilabs3d_nav_a_diff.tum_slam_toolbox.tum \
+  iilabs3d/slam-toolbox_lin-0.50m_ang-0.50rad/iilabs3d_nav_a_diff.tum_slam_toolbox.tum
+
+python3 eval_iilabs3d.py \
+  /mnt/data/datasets/paper_slam_2d/distance-maps-eval/iilabs3d/iilabs3d_dataset/benchmark/livox_mid-360/nav_a_omni/ground_truth.tum \
+  iilabs3d/slam-toolbox_lin-0.30m_ang-0.30rad/iilabs3d_nav_a_omni.tum_slam_toolbox.tum \
+  iilabs3d/slam-toolbox_lin-0.50m_ang-0.50rad/iilabs3d_nav_a_omni.tum_slam_toolbox.tum
+
+python3 eval_iilabs3d.py \
+  /mnt/data/datasets/paper_slam_2d/distance-maps-eval/iilabs3d/iilabs3d_dataset/benchmark/livox_mid-360/loop/ground_truth.tum \
+  iilabs3d/slam-toolbox_lin-0.30m_ang-0.30rad/iilabs3d_loop.tum_slam_toolbox.tum \
+  iilabs3d/slam-toolbox_lin-0.50m_ang-0.50rad/iilabs3d_loop.tum_slam_toolbox.tum
+
+python3 eval_iilabs3d.py \
+  /mnt/data/datasets/paper_slam_2d/distance-maps-eval/iilabs3d/iilabs3d_dataset/benchmark/livox_mid-360/slippage/ground_truth.tum \
+  iilabs3d/slam-toolbox_lin-0.30m_ang-0.30rad/iilabs3d_slippage.tum_slam_toolbox.tum \
+  iilabs3d/slam-toolbox_lin-0.50m_ang-0.50rad/iilabs3d_slippage.tum_slam_toolbox.tum
 
 
 ################################################################################
