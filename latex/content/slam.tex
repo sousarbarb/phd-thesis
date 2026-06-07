@@ -1,6 +1,53 @@
 \chapter{Simultaneous Localization and Mapping~(SLAM) in Dynamic Environments}\label{chap:slam}
 
-TBC
+This chapter presents RicoSLAM, a graph-based 2D~\gls{slam} system for dynamic
+environments developed within the scope of this PhD~Thesis, building on the 2D
+point cloud registration framework introduced in \chapref{chap:distance-maps}.
+RicoSLAM integrates the distance map-based tracker from
+\chapref{chap:distance-maps} as its front-end with the
+srrg2\_solver~\cite{grisetti:robotics:2020} optimization back-end to construct
+an $SE(2)$ pose graph, detecting loop closures by combining nodes' proximity
+in the world frame with graph-distance of the loop chain.
+The proposed \gls{slam} framework filters dynamic observations
+online during local map maintenance using a 2D laser scanner ray model,
+while providing an offline 2D occupancy grid map generation step in which
+the same ray model is combined with
+Bresenham-like~\cite{bresenham:ibm:1965,zingl:uas:2016} line rasterization to
+ignore dynamic observations when projecting all scans considered during online
+\gls{slam} onto the final grid map. Additionally, this chapter presents
+novel formulations for \gls{gba} based on distance map-based per-point factors,
+building on the point-to-point and point-to-plane distance map-based
+formulations presented in \chapref{chap:distance-maps}.
+Experimental results indicate that RicoSLAM can operate in highly dynamic,
+noisy environments while filtering dynamic observations from
+the 2D~occupancy grid representation of the environment.
+
+This chapter is organized as follows.
+First, \secref{sec:slam:ricoslam} presents a high-level overview of the RicoSLAM
+framework, positioning the contributions of this chapter in relation to
+the components inherited from \chapref{chap:distance-maps} and
+the graph-based \gls{slam} literature.
+Next, \secref{sec:slam:online} describes the online \gls{slam} pipeline,
+covering the $SE(2)$ pose-pose geodesic error factor and its Jacobians via
+right-sided perturbation available in the
+srrg2\_solver~\cite{grisetti:robotics:2020} framework, the local map splitting
+and merging criteria, the loop closure detection procedure, the relocalization
+mechanism, and the pose history streams (laser odometry, online and offline
+corrected poses) logged for trajectory evaluation.
+\secref{sec:slam:dynamics} describes the dynamics removal strategy proposed in
+this work, both online (during local map maintenance) and offline
+(during 2D~occupancy grid map generation).
+Moreover, \secref{sec:slam:gba} introduces the distance map-based \gls{gba}
+per-point formulations proposed in this work, deriving the
+point-to-point and point-to-plane error factors together with their Jacobians
+via right-sided perturbation on the $SE(2)$ manifold.
+Then, \secref{sec:slam:results} presents the experimental evaluation, including
+a benchmark on the IILABS~3D~\cite{ribeiro:access:2025} dataset in terms of
+accuracy and scalability, the impact of dynamics removal from the 2D occupancy
+grid representation, and a synthetic benchmark to evaluate the distance
+map-based \gls{gba} proposed in this work.
+Lastly, \secref{sec:slam:conclusions} summarizes the main conclusions and
+directions for future work.
 
 \section{System Overview}\label{sec:slam:ricoslam}
 
