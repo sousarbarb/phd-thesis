@@ -1,0 +1,86 @@
+\begin{algorithm}[!t]
+\DontPrintSemicolon
+\caption[Tracker processing front-end pipeline of a 2D laser scan message in RicoSLAM]{%
+         Tracker processing front-end pipeline of a 2D laser scan message in RicoSLAM.}
+\label{alg:slam:online:tracker}
+\KwIn{2D~laser scan $\mathcal{S}$,
+external odometry estimate
+$\mathbf{x}_{R,\mathrm{ext}}\in SE(2)$ (optional)}
+\KwOut{Updated robot pose \gls{wrt} the current keyframe
+$\mathbf{x}_{R,\mathrm{kf}}\in SE(2)$ and its information matrix
+$\boldsymbol{\Omega}_{R,\mathrm{kf}}$,
+updated local map $\mathcal{M}_{\mathrm{kf}}$,
+tracker status $s_\mathrm{tracker}$}
+
+\tcc{Step 1: Preprocessing}
+$\mathcal{P} \leftarrow$ scanToPointCloud$(\mathcal{S})$
+\tcp*{out-of-range points marked invalid}
+
+\lIf{normals enabled}{computeNormals$(\mathcal{P})$}
+\lIf{voxelization enabled}{voxelize$(\mathcal{P}, r_v)$}
+
+\tcc{Step 2: 2D Point Cloud Registration}
+\If{external odometry used as initial guess}{
+  $\Delta \leftarrow
+   \big(\mathbf{x}_{R,\mathrm{ext}}^{\mathrm{prev}}\big)^{-1}\cdot
+   \mathbf{x}_{R,\mathrm{ext}}$\;
+  $\mathbf{x}_{R,\mathrm{kf}} \leftarrow
+   \mathbf{x}_{R,\mathrm{kf}}\cdot\Delta$\;
+  $\mathbf{x}_{R,\mathrm{ext}}^{\mathrm{prev}}
+  \leftarrow \mathbf{x}_{R,\mathrm{ext}}$\;
+}
+
+\If{$s_\mathrm{tracker} = \emph{Initializing}$}{
+  $\mathcal{M}_{\mathrm{kf}} \leftarrow
+   \mathrm{buildLocalMap}(\mathcal{P}, \mathcal{S})$\;
+  $\mathbf{x}_{R,\mathrm{kf}} \leftarrow
+   \left[\mathbf{I}_{2\times 2} \,|\, \mathbf{0}_{2\times 1} \right]\in SE(2)$\;
+  $s_\mathrm{tracker} \leftarrow \emph{Initialized}$\;
+  \Return
+}
+
+$\mathrm{aligner}.\mathrm{setSource}(\mathcal{P})$\;
+$\mathrm{aligner}.\mathrm{setTarget}(\mathcal{M}_{\mathrm{kf}})$\;
+$\mathrm{aligner}.\mathrm{setSourceInTarget}(\mathbf{x}_{R,\mathrm{kf}})$\;
+$\mathrm{aligner}.\mathrm{compute}()$\;
+$\boldsymbol{\sigma} \leftarrow \mathrm{aligner}.\mathrm{getStats}()$
+\tcp*{$\chi_{\mathrm{inlier/outlier/suppressed}}^2$, inlier/outlier/suppressed ratios, \ldots}
+
+\If{$\mathrm{aligner}.\mathrm{status} \neq \emph{Success}$}{
+  $\mathcal{M}_{\mathrm{kf}} \leftarrow
+   \mathrm{buildLocalMap}(\mathcal{P}, \mathcal{S})$\;
+  $\mathbf{x}_{R,\mathrm{kf}} \leftarrow
+   \left[\mathbf{I}_{2\times 2} \,|\, \mathbf{0}_{2\times 1} \right]\in SE(2)$\;
+  $s_\mathrm{tracker} \leftarrow \emph{Error}$\;
+  \Return
+}
+
+\tcc{Step 3: Update robot pose and information matrix}
+$\mathbf{x}_{R,\mathrm{kf}} \leftarrow
+ \mathrm{aligner}.\mathrm{getResult}()$\;
+$\boldsymbol{\Omega}_{R,\mathrm{kf}} \leftarrow
+ \mathrm{aligner}.\mathrm{getH}()$\;
+$s_\mathrm{tracker} \leftarrow \emph{Tracking}$\;
+
+\tcc{Step 4: Split Criteria}
+\If{$\mathrm{splittingCriterion}(\mathcal{S},
+ \mathbf{x}_{R,\mathrm{kf}}, \boldsymbol{\sigma})$ \emph{triggers}}{
+  $\mathcal{M}_{\mathrm{kf}} \leftarrow
+   \mathrm{buildLocalMap}(\mathcal{P}, \mathcal{S})$\;
+  $\mathbf{x}_{R,\mathrm{kf}} \leftarrow
+   \left[\mathbf{I}_{2\times 2} \,|\, \mathbf{0}_{2\times 1} \right]\in SE(2)$\;
+  $s_\mathrm{tracker} \leftarrow \emph{TrackingMeasurementSplit}$\;
+  \Return
+}
+
+\tcc{Step 5: Merge Criteria}
+\If{$\mathrm{mergingCriterion}(\mathcal{S},
+ \mathbf{x}_{R,\mathrm{kf}}, \boldsymbol{\sigma})$ \emph{triggers}}{
+  $\mathrm{merger}.\mathrm{merge}(\mathcal{P}, \mathcal{S},
+   \mathbf{x}_{R,\mathrm{kf}}, \mathcal{M}_{\mathrm{kf}})$
+  \tcp*{see \secref{sec:slam:dynamics:online}}
+  $\mathcal{M}_{\mathrm{kf}}.\mathrm{appendScan}(\mathcal{S},
+   \mathbf{x}_{R,\mathrm{kf}})$\;
+  $s_\mathrm{tracker} \leftarrow \emph{TrackingMeasurementMerged}$\;
+}
+\end{algorithm}
