@@ -1,6 +1,6 @@
 \chapter{Simultaneous Localization and Mapping~(SLAM) in Dynamic Environments}\label{chap:slam}
 
-This chapter presents RicoSLAM, a graph-based 2D~\gls{slam} system for dynamic
+This chapter presents RicoSLAM, a graph-based 2D~\gls{slam} framework for dynamic
 environments developed within the scope of this PhD~Thesis, building on the 2D
 point cloud registration framework introduced in \chapref{chap:distance-maps}.
 RicoSLAM integrates the distance map-based tracker from
@@ -25,8 +25,7 @@ the 2D~occupancy grid representation of the environment.
 This chapter is organized as follows.
 First, \secref{sec:slam:ricoslam} presents a high-level overview of the RicoSLAM
 framework, positioning the contributions of this chapter in relation to
-the components inherited from \chapref{chap:distance-maps} and
-the graph-based \gls{slam} literature.
+the components inherited from \chapref{chap:distance-maps}.
 Next, \secref{sec:slam:online} describes the online \gls{slam} pipeline,
 covering the $SE(2)$ pose-pose geodesic error factor and its Jacobians via
 right-sided perturbation available in the
@@ -49,9 +48,130 @@ map-based \gls{gba} proposed in this work.
 Lastly, \secref{sec:slam:conclusions} summarizes the main conclusions and
 directions for future work.
 
-\section{System Overview}\label{sec:slam:ricoslam}
+\section{Framework Overview}\label{sec:slam:ricoslam}
 
-TBC
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{slam/system/system-overview.drawio.pdf}
+  \caption[Block diagram of the RicoSLAM framework]{%
+  Block diagram of the RicoSLAM framework.}
+  \label{fig:slam:ricoslam}
+\end{figure}
+
+RicoSLAM is a 2D~graph \gls{slam} framework compatible with 2D~laser scanners
+and wheeled odometry for dynamic environments in industrial \gls{amr} applications.
+This framework represents the robot trajectory and the environment map as
+a sparse factor graph~\cite{grisetti:itsm:2010,dellaert-kaess:ftr:2017}.
+Each $SE(2)$ variable in the graph encodes the pose of a keyframe in
+a common world frame, together with its measurement:
+the locally built point cloud, the precomputed distance map representation
+introduced in \secref{sec:distance-maps:alignment:dmaps}, and
+the 2D~laser scanner messages aggregated within that keyframe. Each factor
+encodes a relative-pose measurement between two keyframes, generated either by
+odometric chaining of the front-end tracker or by loop closure detection.
+
+\figref{fig:slam:ricoslam} presents a block diagram of RicoSLAM.
+Internally, the system is organized around two top-level containers -- a tracker
+front-end and a factor graph back-end -- with two additional offline
+post-processing stages, a distance map-based \gls{gba} procedure and a
+2D~occupancy grid mapper, that operate on the optimized pose graph once the
+online run has completed. All the blocks in the diagram are summarized as follows:
+\begin{itemize}
+\item The tracker is built on top of the distance map-based aligner from
+      \chapref{chap:distance-maps} and is extended in this chapter with a
+      dynamics-aware local mapping stage. Preprocessing
+      (conversion of laser scan messages into a point cloud representation,
+      voxelization, and normal computation) and the distance map-based
+      point-to-point and point-to-plane formulations
+      (see~\secref{sec:distance-maps:alignment:pt2pt} and
+      \secref{sec:distance-maps:alignment:pt2pl}) are inherited from
+      \chapref{chap:distance-maps}. We also added to the framework both
+      point-to-point~\cite{besl-mckay:tpami:1992} and
+      point-to-plane~\cite{chen-medioni:icra:1991} \gls{icp} formulations for
+      2D~point cloud registration with the tracker's aligner,
+      using distance map-guided data association.
+      New to this chapter are the split and merge triggering criteria,
+      which monitor the aligner output stream
+      (translation, orientation, viewpoint, inlier ratio, and the
+      timestamp from the latest laser scan message processed by the tracker).
+      The split criterion determines when to commit the current keyframe to
+      the graph and start tracking on a new keyframe.
+      The merge criterion determines when to merge new returns into
+      the tracker's local map, using a merger container that performs
+      online ray-based dynamics removal on that local map by treating
+      each laser beam as a sensor model that may see through a previously
+      mapped point or add new observations to the local representation.
+      The tracker maintains the current keyframe --
+      local point cloud, precomputed distance map, and array of raw laser scans
+      aggregated since the last split -- and exposes its
+      laser odometry estimate and alignment statistics to the back-end;
+
+\item The factor graph back-end uses srrg2\_solver~\cite{grisetti:robotics:2020}
+      to solve the optimization problem and host all the components that operate
+      on the graph. Its core data structure is the pose graph,
+      populated by the tracker through the update-on-split action that
+      promotes the current keyframe to a graph variable and adds a geodesic
+      factor against the previously committed keyframe.
+      The loop finder and graph visitor containers traverse the graph
+      in search of loop closure candidates by combining world-frame proximity
+      around the current robot pose with a graph-distance constraint that
+      ensures non-trivial loop geometry. Each candidate is validated by
+      the loop aligner, aligning the latest point cloud processed by the tracker
+      against the candidate keyframe's local map, using two complementary
+      initial guesses (pose graph-based and same-place-based). This loop aligner
+      may be the same as the tracker's front-end or a different one.
+      After a successful loop closure, a relative-pose geosedic factor is added
+      between the current keyframe and the loop variables. Also, if
+      the relocalization policy is enabled, it updates the tracker's keyframe
+      from an existing one on the graph, relocalizing the robot in
+      the existing back-end graph. The Gauss-Newton solver, provided by
+      srrg2\_solver~\cite{grisetti:robotics:2020} and the only third-party
+      component of the framework, performs iterative least-squares optimization
+      on the $SE(2)$ manifold with a sparse-block Cholesky linear solver,
+      and is invoked incrementally whenever a loop closure factor is added to
+      the graph. Furthermore, a pose history container makes available the three
+      pose streams produced over time: the raw laser odometry from the tracker,
+      the online \gls{slam} pose estimate, and the corrected pose based on
+      the online estimate while considering the loop closures throughout time.
+      RicoSLAM generates TUM~\cite{sturm:iros:2012} files for these three pose
+      streams through external \gls{ros} services upon user request.
+      Additionally, RicoSLAM saves the factor graph through the serialization
+      framework made available through the
+      srrg2\_solver~\cite{grisetti:robotics:2020} into a human-readable JSON
+      file, including keyframe variables and their global poses,
+      the $SE(2)$ geosedic pose-pose factors, 2D~point clouds, and
+      the arrays of 2D~laser scan messages associated with each keyframe;
+
+\item Finally, two offline post-processing stages consume the optimized pose
+      graph from the serialized JSON file after the online run completes.
+      The \gls{gba} replaces the pose-pose constraints obtained from
+      the tracker and the loop aligner by per-scan-point distance map residuals
+      between different laser scan messages, thereby refining all scans that
+      contributed to the online \gls{slam} map through novel distance map-based
+      \gls{gba} formulations proposed in this chapter.
+      The 2D~occupancy grid mapper generates a ROS-compatible occupancy grid map
+      by Bresenham-based~\cite{bresenham:ibm:1965,zingl:uas:2016} rasterization
+      of each retained scan, using the same laser ray model as
+      the online merger to ignore the contributions of dynamic observations.
+\end{itemize}
+
+Throughout this chapter, the notation introduced in
+\secref{sec:distance-maps:alignment:problem} is kept whenever possible.
+Consistent with the convention adopted in \chapref{chap:distance-maps}
+for $SE(2)$ optimization variables, a keyframe variable in the pose graph
+is denoted by $\mathbf{x} \in SE(2)$ when it refers to a generic graph node,
+and is given subscripts \emph{from} or \emph{to} when both endpoints of
+a pose-pose geosedic factor must be distinguished.
+The current pose \gls{wrt} the world frame is denoted
+$\mathbf{x}_{R,W} = \mathbf{x}_{\mathrm{kf}} \cdot \mathbf{x}_{R,\mathrm{kf}}$,
+where $\mathbf{x}_{\mathrm{kf}}$ is the current keyframe estimate and
+$\mathbf{x}_{R,\mathrm{kf}}$ is the local laser odometry estimate of
+the robot \gls{wrt} that keyframe. The right-sided perturbation update
+$\mathbf{x} \oplus \boldsymbol{\xi} = \mathbf{x}\cdot\exp(\boldsymbol{\xi})$
+adopted in
+\secref{sec:distance-maps:background:least-squares:manifold} and
+\secref{sec:distance-maps:alignment:problem} is used in all error and
+Jacobian derivations of this chapter.
 
 \section{Online SLAM}\label{sec:slam:online}
 
