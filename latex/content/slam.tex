@@ -433,13 +433,103 @@ the measurement on the manifold, as formulated in
 Following the convention of
 \secref{sec:distance-maps:alignment:problem}, the
 \emph{logarithmic mapping} from $SE(2)$ to its tangent space is the vector
-$(t_x, t_y, \atan2(r_{2,1}, r_{1,1}))^T$ that stacks the translational
+$(t_x, t_y, \atan2(r_{2,1}, r_{2,2}))^T$ that stacks the translational
 components with the angular residual extracted from the rotation matrix.
 Let $\mathbf{E} = \mathbf{z}^{-1}\cdot\mathbf{x}_{\mathrm{from}}^{-1}\cdot
 \mathbf{x}_{\mathrm{to}}\in SE(2)$ denote the residual $SE(2)$
 transformation, with rotation matrix $\mathbf{R}_E$ and translation
 $\mathbf{t}_E$. Then
-$\mathbf{e} = \left(\mathbf{t}_E^T,\;\atan2(r_{E,21}, r_{E,11})\right)^T$.
+$\mathbf{e} = \left(\mathbf{t}_E^T,\;\atan2(r_{E,21}, r_{E,22})\right)^T$.
+
+\subsubsection{Jacobian matrices via right-sided perturbation}
+\label{sec:slam:online:factor:jacobian}
+
+Applying the right-sided perturbation
+$\mathbf{x}_{\mathrm{from}}\oplus\boldsymbol{\xi}_{\mathrm{from}}
+= \mathbf{x}_{\mathrm{from}}\cdot\exp(\boldsymbol{\xi}_{\mathrm{from}})$
+and $\mathbf{x}_{\mathrm{to}}\oplus\boldsymbol{\xi}_{\mathrm{to}}
+= \mathbf{x}_{\mathrm{to}}\cdot\exp(\boldsymbol{\xi}_{\mathrm{to}})$, with
+$\boldsymbol{\xi}_{\mathrm{from}},\boldsymbol{\xi}_{\mathrm{to}}\in\mathbb{R}^3$,
+the perturbed residual on the manifold is given by
+\eqref{eq:slam:online:factor:perturbed}.
+\begin{equation}
+\label{eq:slam:online:factor:perturbed}
+\begin{aligned}
+\mathbf{e}\!\left(
+  \mathbf{x}_{\mathrm{from}}\oplus\boldsymbol{\xi}_{\mathrm{from}},\,
+  \mathbf{x}_{\mathrm{to}}\oplus\boldsymbol{\xi}_{\mathrm{to}}
+\right)
+& = \log\!\left(\mathbf{z}^{-1}\cdot
+                \exp(-\boldsymbol{\xi}_{\mathrm{from}})\cdot
+                \mathbf{x}_{\mathrm{from}}^{-1}\cdot
+                \mathbf{x}_{\mathrm{to}}\cdot
+                \exp(\boldsymbol{\xi}_{\mathrm{to}})\right)
+\end{aligned}
+\end{equation}
+
+The Jacobian matrices
+$\mathbf{J}_{\mathrm{from}},\mathbf{J}_{\mathrm{to}}\in\mathbb{R}^{3\times3}$
+are obtained by differentiating
+\eqref{eq:slam:online:factor:perturbed} \gls{wrt}
+$\boldsymbol{\xi}_{\mathrm{from}}$ and
+$\boldsymbol{\xi}_{\mathrm{to}}$ at
+$\boldsymbol{\xi}_{\mathrm{from}}=\boldsymbol{\xi}_{\mathrm{to}}=\mathbf{0}$.
+The derivation applies the chain rule to the logarithmic mapping that
+extracts $(t_x, t_y, \theta)$ from an $SE(2)$ pose.
+The block structure of both Jacobians, with $\mathbf{R}_E$ the rotation
+matrix of the residual $SE(2)$ pose at $\boldsymbol{\xi}=\mathbf{0}$,
+the rotation matrix $\mathbf{R}_z$ of the relative pose measurement
+$\mathbf{z}$, and $\mathbf{R}_{\mathrm{from}}$, $\mathbf{R}_{\mathrm{to}}$
+the rotation matrices of the variables under linearization, separates
+the translational rows $(1{:}2)$ from the rotational row $(3)$,
+since the logarithmic mapping extracts these components independently.
+\eqref{eq:slam:online:factor:jacobian-from} and
+\eqref{eq:slam:online:factor:jacobian-to} formulate
+$\mathbf{J}_{\mathrm{from}}$ and $\mathbf{J}_{\mathrm{to}}$,
+respectively, where $\boldsymbol{\partial}_{\atan2}$ is the partial derivative
+of the $\atan2$ map \gls{wrt} the second row entries of $\mathbf{R}_E$
+under an infinitesimal in-place rotation, $\Delta\mathbf{t} =
+\mathbf{t}_{\mathrm{to}}-\mathbf{t}_{\mathrm{from}}$ is the world-frame
+translational delta between the two keyframes, and
+$\lfloor\cdot\rfloor$ denotes the 2D~skew operator introduced in
+\eqref{eq:distance-maps:alignment:problem:skew}.
+The rotational row of both Jacobians arises from differentiating
+$\atan2(r_{E,21}, r_{E,22})$ via the chain rule, with
+$\boldsymbol{\partial}_{\atan2} = (-r_{E,21},\,r_{E,22})^T /
+(r_{E,21}^2 + r_{E,22}^2)$.
+\begin{equation}
+\label{eq:slam:online:factor:jacobian-from}
+\mathbf{J}_{\mathrm{from}} =
+\begin{bmatrix}
+-\mathbf{R}_z^T &
+\mathbf{R}_z^T\cdot\lfloor\cdot\rfloor^T\cdot \mathbf{R}_{\mathrm{from}}^T\cdot\Delta\mathbf{t} \\[3pt]
+\mathbf{0}_{1\times2} &
+\boldsymbol{\partial}_{\atan2}^T \cdot
+\left[\mathbf{R}_z^T\cdot\lfloor\cdot\rfloor^T\cdot
+      \mathbf{R}_{\mathrm{from}}^T\cdot\mathbf{R}_{\mathrm{to}}\right]_{(2,:)}^T
+\end{bmatrix}
+\in\mathbb{R}^{3\times3}
+\end{equation}
+\begin{equation}
+\label{eq:slam:online:factor:jacobian-to}
+\mathbf{J}_{\mathrm{to}} =
+\begin{bmatrix}
+\mathbf{R}_E &
+\mathbf{0}_{2\times1} \\[3pt]
+\mathbf{0}_{1\times2} &
+\boldsymbol{\partial}_{\atan2}^T \cdot
+\left[\mathbf{R}_E\cdot\lfloor\cdot\rfloor\right]_{(2,:)}^T
+\end{bmatrix}
+\in\mathbb{R}^{3\times3}
+\end{equation}
+
+The information matrix $\boldsymbol{\Omega}\in\mathbb{R}^{3\times3}$ of the
+factor is either inherited from the tracker's aligner (the approximate
+Hessian $\mathbf{H}$ at convergence; see
+\secref{sec:distance-maps:background:least-squares:uncertainty}) or fixed
+to a user-specified diagonal, typically giving higher confidence to the heading
+component than to the translational ones. RicoSLAM supports both options
+in terms of the framework parametrization.
 
 \section{Dynamics Removal}\label{sec:slam:dynamics}
 
