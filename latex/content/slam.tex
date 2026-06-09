@@ -149,7 +149,7 @@ online run has completed. All the blocks in the diagram are summarized as follow
       between different laser scan messages, thereby refining all scans that
       contributed to the online \gls{slam} map through novel distance map-based
       \gls{gba} formulations proposed in this chapter.
-      The 2D~occupancy grid mapper generates a ROS-compatible occupancy grid map
+      The 2D~occupancy grid mapper generates a \gls{ros}-compatible occupancy grid map
       by Bresenham-based~\cite{bresenham:ibm:1965,zingl:uas:2016} rasterization
       of each retained scan, using the same laser ray model as
       the online merger to ignore the contributions of dynamic observations.
@@ -278,7 +278,7 @@ which depend only on the relative pose between the two endpoints
 $\mathbf{g}\in SE(2)$ to every variable in the graph leaves unchanged
 these relative quantities their the cost. Consequently,
 the Gauss-Newton approximate Hessian
-$\mathbf{H} = \mathbf{J}^{\top}\boldsymbol{\Omega}\mathbf{J}$ is
+$\mathbf{H} = \mathbf{J}^{T}\boldsymbol{\Omega}\mathbf{J}$ is
 rank-deficient and any trajectory would be determined only up to
 a global rigid-body transformation. Marking the first keyframe as
 fixed eliminates its three columns from the normal equations, makes the reduced
@@ -397,6 +397,49 @@ gives rise to two practical operating modes: a scan-based graph \gls{slam} mode
 and a local maps variant. The former has the merging criterion disabled and
 every registered scan becomes its own keyframe. The latter has both criteria
 active and multiple scans are aggregated per keyframe before a split.
+
+\subsection{$SE(2)$ pose-pose geodesic error factor}
+\label{sec:slam:online:factor}
+
+Pairwise pose constraints between keyframes are encoded in the back-end graph by
+an $SE(2)$ pose-pose geodesic error factor available in the
+srrg2\_solver~\cite{grisetti:robotics:2020} framework. RicoSLAM only adapts
+the original constraint to be compatible with the custom distance map-based
+$SE(2)$ variables implemented in the scope of this PhD~Thesis.
+Let $\mathbf{x}_{\mathrm{from}}, \mathbf{x}_{\mathrm{to}} \in SE(2)$
+be the two keyframe variables connected by the factor, and let
+$\mathbf{z}\in SE(2)$ be the measured relative pose of $\mathbf{x}_{\mathrm{to}}$
+\gls{wrt} $\mathbf{x}_{\mathrm{from}}$, provided either by the tracker
+(odometric edges) or by the loop aligner (loop closure edges).
+The prediction $\hat{\mathbf{z}}\!\left(\mathbf{x}_{\mathrm{from}},\,\mathbf{x}_{\mathrm{to}}\right)$
+is given by \eqref{eq:slam:online:factor:prediction}, and the residual
+$\mathbf{e}\!\left(\mathbf{x}_{\mathrm{from}},\,\mathbf{x}_{\mathrm{to}}\right)$
+is the \emph{logarithmic mapping} of the discrepancy between the prediction and
+the measurement on the manifold, as formulated in
+\eqref{eq:slam:online:factor:error}.
+\begin{equation}
+\label{eq:slam:online:factor:prediction}
+\hat{\mathbf{z}}\!\left(\mathbf{x}_{\mathrm{from}},\,\mathbf{x}_{\mathrm{to}}\right)
+= \mathbf{x}_{\mathrm{from}}^{-1}\cdot\mathbf{x}_{\mathrm{to}} \in SE(2)
+\end{equation}
+\begin{equation}
+\label{eq:slam:online:factor:error}
+\mathbf{e}\!\left(\mathbf{x}_{\mathrm{from}},\,\mathbf{x}_{\mathrm{to}}\right) =
+\log\!\left(\mathbf{z}^{-1}\cdot
+            \mathbf{x}_{\mathrm{from}}^{-1}\cdot\mathbf{x}_{\mathrm{to}}\right)
+\in \mathbb{R}^3
+\end{equation}
+
+Following the convention of
+\secref{sec:distance-maps:alignment:problem}, the
+\emph{logarithmic mapping} from $SE(2)$ to its tangent space is the vector
+$(t_x, t_y, \atan2(r_{2,1}, r_{1,1}))^T$ that stacks the translational
+components with the angular residual extracted from the rotation matrix.
+Let $\mathbf{E} = \mathbf{z}^{-1}\cdot\mathbf{x}_{\mathrm{from}}^{-1}\cdot
+\mathbf{x}_{\mathrm{to}}\in SE(2)$ denote the residual $SE(2)$
+transformation, with rotation matrix $\mathbf{R}_E$ and translation
+$\mathbf{t}_E$. Then
+$\mathbf{e} = \left(\mathbf{t}_E^T,\;\atan2(r_{E,21}, r_{E,11})\right)^T$.
 
 \section{Dynamics Removal}\label{sec:slam:dynamics}
 
