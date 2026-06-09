@@ -1,0 +1,42 @@
+\begin{algorithm}[!t]
+\DontPrintSemicolon
+\caption[Online SLAM scan processing pipeline in RicoSLAM]{Online SLAM scan processing pipeline in RicoSLAM.}
+\label{alg:slam:online}
+\KwIn{2D~laser scan $\mathcal{S}$,
+external odometry estimate
+$\mathbf{x}_{\mathrm{ext}}\in SE(2)$ (optional)}
+\KwOut{Updated pose graph, robot pose \gls{wrt} world
+$\mathbf{x}_{R,W}\in SE(2)$, and pose history}
+$\mathrm{tracker}.\mathrm{processScan}(\mathcal{S}, \mathbf{x}_{\mathrm{ext}})$
+\tcp*{see \chapref{chap:distance-maps} and \algref{alg:slam:online:tracker}}
+\uIf{$\mathrm{tracker.status} = \emph{Initialized}$}{
+  $\mathrm{insertFixedKeyframe}(\mathbf{x}_{\mathrm{kf}},\mathcal{M}_{\mathrm{kf}})$\;
+}
+\ElseIf{$\mathrm{tracker.status} \in \{\emph{TrackingMeasurementSplit},\emph{Error}\}$}{
+  $\mathrm{insertOdometryKeyframe}(\mathbf{x}_{\mathrm{kf}},\mathcal{M}_{\mathrm{kf}})$\;
+}
+$\mathbf{x}_{R,W} \leftarrow \mathbf{x}_{\mathrm{kf}}\cdot
+                              \mathbf{x}_{R,\mathrm{kf}}$\;
+\If(\tcp*[f]{see \secref{sec:slam:online:loop-closure}}){loop closure enabled}{
+  $\mathrm{hints} \leftarrow \mathrm{loopFinder.compute}()$\;
+  $\mathrm{loops},\,\mathrm{shortLoops} \leftarrow
+   \mathrm{validateAndAlign}(\mathrm{hints})$\;
+  \ForAll{$\ell\in\mathrm{loops}$}{
+    $\mathrm{graph.addFactor}(\mathbf{x}_{\ell},\,\mathbf{x}_{\mathrm{kf}},\,
+       \hat{\mathbf{x}}_{R,\ell}\cdot
+       \mathbf{x}_{R,\mathrm{kf}}^{-1},\,
+       \boldsymbol{\Omega}_{R,\ell})$\;
+  }
+  \If{$\mathrm{loops}\neq \emptyset$}{
+    $\mathrm{solver.compute}()$
+    \tcp*{see \secref{sec:slam:online:factor}}
+    $\mathbf{x}_{R,W} \leftarrow \mathbf{x}_{\mathrm{kf}}\cdot
+                                  \mathbf{x}_{R,\mathrm{kf}}$\;
+  }
+  \If(\tcp*[f]{see \secref{sec:slam:online:relocalization}}){relocalization enabled}{
+    $\mathrm{relocalizeIntoBestShortLoop}(\mathrm{shortLoops})$\;
+  }
+}
+$\mathrm{logCorrectedPoseEntry}(\mathcal{S}.t,\,
+\mathbf{x}_{R,\mathrm{kf}},\,\mathbf{x}_{\mathrm{kf}})$\;
+\end{algorithm}

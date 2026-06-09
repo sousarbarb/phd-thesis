@@ -175,7 +175,146 @@ Jacobian derivations of this chapter.
 
 \section{Online SLAM}\label{sec:slam:online}
 
-TBC
+\todo{CHECK INTRO}
+
+This section describes the online operation of RicoSLAM.
+\secref{sec:slam:online:overview} presents the processing pipeline triggered
+by each incoming 2D~laser scan, articulating the interaction between the
+tracker, the graph, the loop finder, and the relocalization module.
+\secref{sec:slam:online:splitting-merging} formalises the splitting and
+merging criteria used by the tracker to decide when the local map of the
+current keyframe should be expanded or when a new graph node should be
+added. \secref{sec:slam:online:factor} derives the $SE(2)$ pose-pose
+geodesic error factor that encodes binary constraints between
+keyframes, together with its Jacobians via right-sided perturbation.
+\secref{sec:slam:online:loop-closure} details the loop closure detection
+procedure, while \secref{sec:slam:online:relocalization} describes the
+relocalization policy that allows the system to re-enter previously visited
+keyframes, mitigating unbounded graph growth.
+Finally, \secref{sec:slam:online:pose-history} discusses the two pose
+history streams (online and offline corrected) logged by RicoSLAM
+for trajectory evaluation.
+
+\subsection{Processing pipeline}\label{sec:slam:online:overview}
+
+The tracker front-end of RicoSLAM processes the 2D~laser scan message stream
+from the sensor and, optionally, wheel odometry data for initialization during
+the point cloud registration step. \algref{alg:slam:online:tracker} summarizes
+the processing pipeline for the latest scan message ($\mathcal{S}$), updating
+the local robot pose \gls{wrt} the current keyframe
+($\mathbf{x}_{R,\mathrm{kf}}$) and providing a laser odometry estimate to
+the RicoSLAM back-end. First, the tracker converts the range vector of the
+incoming laser scan ($\mathcal{S}$) into a 2D~point cloud ($\mathcal{P}$) in the
+sensor frame using the scanner's angular parametrization, preserving the data ordering.
+This conversion marks points whose ranges fall outside the configured admissible
+range interval or outside the sensor's minimum and maximum ranges as invalid,
+so the aligner ignores them. Two additional preprocessing steps include
+computing the point cloud normals
+(see~\secref{sec:distance-maps:alignment:pt2pl:normals}) and voxelizing
+the point cloud using a given voxelization scale ($r_v$), or assuming
+the same resolution as the distance map representation.
+Next, the tracker updates $\mathbf{x}_{R,\mathrm{kf}}$ using wheel odometry data
+if the user enables it. If not, the tracker assumes the robot's pose from
+the previous scan message for aligner initialization. In the case that it is
+the first laser scan message processed by the tracker, the latter initializes
+the local map ($\mathcal{M}_{\mathrm{kf}}$), building its distance map
+representation and appending the first laser scan message, and initializes the
+local robot pose as an identity $SE(2)$ pose, changing the state of
+the tracker to \emph{Initialized}.
+
+\input{algorithms/slam/tracker.tex}
+
+Then, the tracker's aligner estimates the local robot pose $\mathbf{x}_{R,\mathrm{kf}}$
+that best aligns the moving cloud ($\mathcal{P}$) from the latest scan message ($\mathcal{S}$)
+to the reference cloud of the current keyframe. This aligner implements the
+distance map-based formulations proposed in \chapref{chap:distance-maps}, with
+the option also to use \gls{icp} point-to-point~\cite{besl-mckay:tpami:1992} and
+point-to-plane~\cite{chen-medioni:icra:1991} formulations.
+If the aligner fails the registration process, the tracker resets its
+local map ($\mathcal{M}_{\mathrm{kf}}$) and local robot pose
+($\mathbf{x}_{R,\mathrm{kf}}$), setting the internal state to \emph{Error}.
+After updating $\mathbf{x}_{R,\mathrm{kf}}$ and its information matrix
+($\boldsymbol{\Omega}_{R,\mathrm{kf}}$) upon a successful registration,
+the tracker changes its internal state to \emph{Tracking}.
+Afterward, the tracker first evaluates whether the split criterion is triggered
+based on the aligner stats ($\chi_{\mathrm{inlier}}^2$, inlier ratio),
+$\mathbf{x}_{R,\mathrm{kf}}$, and the timestamp of the latest scan message.
+If the split criterion is triggered, the tracker changes its current keyframe
+and sets an $SE(2)$ identity pose, changing the internal state to
+\emph{TrackingMeasurementSplit}. Second, if the split criterion is not triggered
+and the merge criterion is triggered based on the same evaluation as for
+the former, the tracker's merger fuses the moving cloud ($\mathcal{P}$) into
+the local map ($\mathcal{M}_{\mathrm{kf}}$) using the online ray-based dynamics
+removal model (see~\secref{sec:slam:dynamics:online}).
+The raw scan is appended to the keyframe's history of aggregated measurements,
+changing the internal state to \emph{TrackingMeasurementMerged}.
+Testing splitting before merging ensures that a scan satisfying both criteria is
+committed as a new keyframe rather than merged into an outgoing one.
+The five states admissible by the tracker --
+\emph{Initialized}, \emph{Error}, \emph{Tracking},
+\emph{TrackingMeasurementSplit}, and \emph{TrackingMeasurementMerged} --
+are then used by the back-end of RicoSLAM to decide whether to
+insert a fixed keyframe, an odometric pose-pose factor, or simply
+update the corrected-pose stream.
+
+Next, \algref{alg:slam:online} summarizes the online processing pipeline
+triggered when a new scan message ($\mathcal{S}$) arrives at
+the RicoSLAM system. First, as already explained, the tracker processes
+the message stream and the wheel odometry data
+(see~\algref{alg:slam:online:tracker}). Depending on the tracker's status --
+\emph{Initialized} (first scan after the tracker initialized its current
+keyframe), \emph{Error} (registration failure), or
+\emph{TrackingMeasurementSplit} (the splitting criterion fired making
+the tracker changing its current keyframe) -- a new graph node may be inserted
+with either a fixed status (reserved for the first keyframe variable of
+the back-end factor graph) or an active status with an odometric pose-pose
+factor linking it to the previous keyframe. The distinction between
+fixed and active variables is what makes the pose graph optimization problem
+well-posed. The cost minimized by the Gauss-Newton solver is a sum of
+geodesic errors of the form
+$\left(\mathbf{x}_i^{-1}\cdot\mathbf{x}_j\right)\ominus\mathbf{z}_{ij}$,
+which depend only on the relative pose between the two endpoints
+(see~\secref{sec:literature:slam:graph}). Applying any transformation
+$\mathbf{g}\in SE(2)$ to every variable in the graph leaves unchanged
+these relative quantities their the cost. Consequently,
+the Gauss-Newton approximate Hessian
+$\mathbf{H} = \mathbf{J}^{\top}\boldsymbol{\Omega}\mathbf{J}$ is
+rank-deficient and any trajectory would be determined only up to
+a global rigid-body transformation. Marking the first keyframe as
+fixed eliminates its three columns from the normal equations, makes the reduced
+Hessian full-rank, and defines the world frame the same as that
+keyframe~\cite{grisetti:itsm:2010,grisetti:robotics:2020}.
+
+\input{algorithms/slam/slam.tex}
+
+After the keyframe-management step, the back-end of RicoSLAM updates
+the robot pose \gls{wrt} the world frame ($\mathbf{x}_{R,W}$)
+by composing the current keyframe estimate in the factor graph
+($\mathbf{x}_{\mathrm{kf}}$) with the local laser odometry of the robot
+\gls{wrt} that keyframe ($\mathbf{x}_{R,\mathrm{kf}}$), as formulated in
+\eqref{eq:slam:online:robot-in-world}.
+\begin{equation}
+\label{eq:slam:online:robot-in-world}
+\mathbf{x}_{R,W} = \mathbf{x}_{\mathrm{kf}}\cdot\mathbf{x}_{R,\mathrm{kf}}
+\end{equation}
+
+If loop closure detection is enabled, the back-end of RicoSLAM invokes the loop
+finder to compute the set of candidate hints
+(see~\secref{sec:slam:online:loop-closure}).
+Each hint is then validated by running the loop aligner (either the same
+distance map-based aligner used by the tracker or a dedicated instance)
+on the current moving point cloud against the candidate keyframe's local
+map. Successfully aligned hints generate loop closure factors that are added
+to the graph, based on the loop aligner estimation of the robot \gls{wrt} the
+loop keyframe ($\hat{\mathbf{x}}_{R,\ell}$) and the robot \gls{wrt} the current
+one ($\mathbf{x}_{R,\mathrm{kf}}$).
+If at least one loop factor is added,
+the solver runs a single optimization pass and the world-frame robot pose
+is updated accordingly (see \eqref{eq:slam:online:robot-in-world}).
+Finally, if relocalization is enabled and at least one
+short-loop candidate is available, the relocalization policy described in
+\secref{sec:slam:online:relocalization} may transfer the tracker into an
+existing graph node instead of growing the graph further.
 
 \section{Dynamics Removal}\label{sec:slam:dynamics}
 

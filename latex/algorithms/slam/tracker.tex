@@ -12,14 +12,14 @@ $\boldsymbol{\Omega}_{R,\mathrm{kf}}$,
 updated local map $\mathcal{M}_{\mathrm{kf}}$,
 tracker status $s_\mathrm{tracker}$}
 
-\tcc{Step 1: Preprocessing}
+\tcc*[l]{Step 1: Preprocessing}
 $\mathcal{P} \leftarrow$ scanToPointCloud$(\mathcal{S})$
 \tcp*{out-of-range points marked invalid}
 
 \lIf{normals enabled}{computeNormals$(\mathcal{P})$}
 \lIf{voxelization enabled}{voxelize$(\mathcal{P}, r_v)$}
 
-\tcc{Step 2: 2D Point Cloud Registration}
+\tcc*[l]{Step 2: 2D Point Cloud Registration}
 \If{external odometry used as initial guess}{
   $\Delta \leftarrow
    \big(\mathbf{x}_{R,\mathrm{ext}}^{\mathrm{prev}}\big)^{-1}\cdot
@@ -55,14 +55,14 @@ $\boldsymbol{\sigma} \leftarrow \mathrm{aligner}.\mathrm{getStats}()$
   \Return
 }
 
-\tcc{Step 3: Update robot pose and information matrix}
+\tcc*[l]{Step 3: Update robot pose and information matrix}
 $\mathbf{x}_{R,\mathrm{kf}} \leftarrow
  \mathrm{aligner}.\mathrm{getResult}()$\;
 $\boldsymbol{\Omega}_{R,\mathrm{kf}} \leftarrow
  \mathrm{aligner}.\mathrm{getH}()$\;
 $s_\mathrm{tracker} \leftarrow \emph{Tracking}$\;
 
-\tcc{Step 4: Split Criteria}
+\tcc*[h]{Step 4: Split Criteria}\tcp*{see \secref{sec:slam:online:splitting-merging}}
 \If{$\mathrm{splittingCriterion}(\mathcal{S},
  \mathbf{x}_{R,\mathrm{kf}}, \boldsymbol{\sigma})$ \emph{triggers}}{
   $\mathcal{M}_{\mathrm{kf}} \leftarrow
@@ -73,7 +73,7 @@ $s_\mathrm{tracker} \leftarrow \emph{Tracking}$\;
   \Return
 }
 
-\tcc{Step 5: Merge Criteria}
+\tcc*[h]{Step 5: Merge Criteria}\tcp*{see \secref{sec:slam:online:splitting-merging}}
 \If{$\mathrm{mergingCriterion}(\mathcal{S},
  \mathbf{x}_{R,\mathrm{kf}}, \boldsymbol{\sigma})$ \emph{triggers}}{
   $\mathrm{merger}.\mathrm{merge}(\mathcal{P}, \mathcal{S},
