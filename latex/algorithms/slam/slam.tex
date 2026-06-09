@@ -4,10 +4,10 @@
 \label{alg:slam:online}
 \KwIn{2D~laser scan $\mathcal{S}$,
 external odometry estimate
-$\mathbf{x}_{\mathrm{ext}}\in SE(2)$ (optional)}
+$\mathbf{x}_{R,\mathrm{ext}}\in SE(2)$ (optional)}
 \KwOut{Updated pose graph, robot pose \gls{wrt} world
 $\mathbf{x}_{R,W}\in SE(2)$, and pose history}
-$\mathrm{tracker}.\mathrm{processScan}(\mathcal{S}, \mathbf{x}_{\mathrm{ext}})$
+$\mathrm{tracker}.\mathrm{processScan}(\mathcal{S}, \mathbf{x}_{R,\mathrm{ext}})$
 \tcp*{see \chapref{chap:distance-maps} and \algref{alg:slam:online:tracker}}
 \uIf{$\mathrm{tracker.status} = \emph{Initialized}$}{
   $\mathrm{insertFixedKeyframe}(\mathbf{x}_{\mathrm{kf}},\mathcal{M}_{\mathrm{kf}})$\;

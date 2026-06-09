@@ -316,6 +316,88 @@ short-loop candidate is available, the relocalization policy described in
 \secref{sec:slam:online:relocalization} may transfer the tracker into an
 existing graph node instead of growing the graph further.
 
+\subsection{Splitting and merging criteria}
+\label{sec:slam:online:splitting-merging}
+
+The tracker is responsible for maintaining the local map attached to
+the current keyframe, serving as the reference cloud for 2D~point cloud
+registration (see \chapref{chap:distance-maps} and
+\secref{sec:slam:online:overview}). Two complementary criteria control
+the update on the local map: a splitting criterion that decides when
+the local map should be replaced by a new keyframe and inserted into
+the back-end pose graph, and a merging criterion that triggers
+the integration of the moving cloud from the latest 2D~laser scan message into
+the active local map by the ray-based merger
+(see~\secref{sec:slam:dynamics:online}), updating both
+the reference point cloud and its precomputed distance map, while adding
+the latest laser message to the keyframe's history of aggregated scans.
+
+Architecturally, both criteria types are implemented through the same interface,
+differing only in their parametrization and in the cadence at which
+the tracker resets the criteria's internal state. Each criterion type exposes
+a common compute method, evaluated for every successfully registered scan
+(see \algref{alg:slam:online:tracker}), considering the scan timestamp ($t$),
+the current robot pose \gls{wrt} the local frame ($\mathbf{x}_{R,\mathrm{kf}}$),
+and the inlier ratio reported by the aligner ($\eta_\mathrm{inliers}$). All
+criteria store an internal state composed by an $SE(2)$ reference pose
+($\mathbf{x}_{R,\mathrm{ref}}$) and a reference timestamp ($t_\mathrm{ref}$),
+updated upon triggering events or when the tracker changes its local map.
+As a result, all criteria types based on $SE(2)$ displacement use
+\eqref{eq:slam:online:splitting-merging:delta} to evaluate triggering events,
+based on the logarithmic mapping defined in
+\eqref{eq:distance-maps:alignment:problem:x:log}.
+\begin{equation}
+\label{eq:slam:online:splitting-merging:delta}
+\boldsymbol{\Delta} =
+\left(\boldsymbol{\Delta}_{\mathbf{t}}^{T},\ \Delta_{\theta}\right)^{T}
+=
+\log\!\left(\mathbf{x}_{R,\mathrm{ref}}^{-1}\cdot
+\mathbf{x}_{R,\mathrm{kf}}\right) \in \mathbb{R}^{3}, \;
+% \mathrm{where} \;
+\boldsymbol{\Delta}_{\mathbf{t}} = \left(\Delta_x, \Delta_y\right)
+\end{equation}
+
+Moreover, the splitting criterion is reset once per keyframe lifecycle,
+at the moment the local map is created, with the reference pose always set to
+the identity $\mathbf{x}_{R,\mathrm{ref}} =
+\left[\mathbf{I}_{2\times 2}\,|\,\mathbf{0}_{2\times 1}\right]$.
+Thus, its displacement $\boldsymbol{\Delta}_{\mathrm{split}}$
+measures the total displacement accumulated since the creation of the current
+keyframe. In contrast, the merging criterion is reset not only at keyframe
+creation but also after each successful merge event, with the reference pose
+updated to the robot pose at the last merge event
+$\mathbf{x}_{R,\mathrm{ref}} = \mathbf{x}_{R,\mathrm{kf}}$.
+As a result, its displacement $\boldsymbol{\Delta}_{\mathrm{merge}}$ measures
+the incremental displacement since the last update of the local map.
+
+RicoSLAM implements several criteria types as follows, all built on
+\eqref{eq:slam:online:splitting-merging:delta} unless noted otherwise:
+\begin{itemize}
+\item \textbf{translation:} $\|\boldsymbol{\Delta}_{\mathbf{t}}\|_{2} > d_{\min}$;
+\item \textbf{rotation:} $|\Delta_{\theta}| > \theta_{\min}$;
+\item \textbf{viewpoint:} combination of the previous two;
+\item \textbf{grid cell:} $|\Delta_{x}| > s/2$ or $|\Delta_{y}| > s/2$ for a
+cell of side length $s$ centered on the frame $\mathbf{x}_{R,\mathrm{ref}}$;
+\item \textbf{inlier ratio:} $\eta_{\mathrm{inliers}} < \eta_{\max}$, while
+providing configurable minimum displacement $(d_{\min},\theta_{\min})$
+requirements before triggering, or an unconditional maximum displacement rule
+$(d_{\max},\theta_{\max})$;
+\item \textbf{time:} $t-t_{\mathrm{ref}} > \Delta t_{\max}$
+\end{itemize}
+Additionally, the framework provides a force trigger interface through external
+\gls{ros}~\cite{ros} services for all the criteria types mentioned before,
+while also providing an empty type option to turn off the triggering mechanisms.
+The latter only allows trigger events through the forcing interface.
+
+In typical configurations, RicoSLAM uses the same type for both roles,
+with the merging thresholds set tighter than the splitting thresholds so that
+multiple merges accumulate within a keyframe's lifecycle before
+the splitting criterion triggers. Assigning the no-op variant to either role
+gives rise to two practical operating modes: a scan-based graph \gls{slam} mode
+and a local maps variant. The former has the merging criterion disabled and
+every registered scan becomes its own keyframe. The latter has both criteria
+active and multiple scans are aggregated per keyframe before a split.
+
 \section{Dynamics Removal}\label{sec:slam:dynamics}
 
 TBC
