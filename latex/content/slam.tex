@@ -585,6 +585,59 @@ This incremental optimization policy avoids the cost of running the
 back-end on every scan while ensuring that every newly added loop closure
 constraint is propagated through the rest of the graph.
 
+\subsection{Relocalization into the existing graph}
+\label{sec:slam:online:relocalization}
+
+A common problem in online graph \gls{slam} is unbounded graph growth when
+the robot revisits a previously mapped area where incoming scans continue
+to trigger the creation of new keyframes even when existing ones
+already cover the same location. A method widely used in
+the literature is graph sparsification, which identifies and removes
+redundant nodes by marginalizing the removed variables and
+introducing edges between their neighbors to preserve
+the original information content~\cite{sousa:jfr:2023}.
+In contrast, RicoSLAM mitigates unbounded graph growth through
+a relocalization mechanism. After a loop closure, RicoSLAM may change
+the current keyframe on the tracker to the best-matching existing node
+in the short-loop set $\mathcal{H}_s$ rather than inserting a new one.
+This approach reuses the existing graph information
+instead of expanding it or removing redundant nodes.
+
+Let $\mathcal{H}_s$ be the short-loop hint set returned by the loop finder
+(see~\secref{sec:slam:online:loop-closure}). When relocalization is enabled
+and $\mathcal{H}_s$ is non-empty, RicoSLAM uses the loop aligner also to
+register the moving point cloud from the latest scan message in the local map
+of short hints. Then, the system evaluates the two distances formulated in
+\eqref{eq:slam:online:relocalization:distances} for the closest candidate
+$h_s^*$ with successful registration from the loop aligner.
+\begin{equation}
+\label{eq:slam:online:relocalization:distances}
+d_{\mathrm{loop}} =
+\left\|\left(\mathbf{x}_{h_s^*}^{-1}\cdot\mathbf{x}_{R,W}\right)
+       .\mathrm{translation}()\right\|_2,
+\;
+d_{\mathrm{local}} =
+\left\|\mathbf{t}_{R,\mathrm{kf}}\right\|_2
+\end{equation}
+
+The distance $d_{\mathrm{loop}}$ is between the current robot pose and
+the best short-loop candidate in the world frame, while $d_{\mathrm{local}}$
+measures the distance between the robot and the current keyframe. Whenever
+$d_{\mathrm{loop}} < d_{\mathrm{local}}$, RicoSLAM changes the current keyframe
+of the tracker to the candidate by resetting its local map to the one
+associated with $h_s^*$. This relocalization forces subsequent scan registrations
+against an existing graph node rather than creating new ones.
+In scan-based mode, the relocalization makes the robot pose being tracked
+within the existing graph structure. In local map mode, relocalization not only
+tracks the robot within the existing graph but also mergers new observations
+into an existing keyframe's local map rather than creating new nodes.
+The relocalization policy yields in both cases the benefit of the graph size
+becoming bounded by the spatial extent of the explored environment rather than
+by the duration of the run. The impact of this mechanism on trajectory accuracy
+and graph growth is evaluated experimentally in
+\secref{sec:slam:results:iilabs3d} and
+\secref{sec:slam:results:relocalization}, respectively.
+
 \section{Dynamics Removal}\label{sec:slam:dynamics}
 
 TBC
