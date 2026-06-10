@@ -682,7 +682,125 @@ back-end graph optimization on the recovered trajectory.
 
 \section{Dynamics Removal}\label{sec:slam:dynamics}
 
-TBC
+Mobile robots deployed in industrial, intralogistics, and service-oriented
+applications typically operate in environments with transient, dynamic obstacles
+(people, other robots and manual operated platforms, moving carts, pallets) that
+conflict with the static-world assumption underlying classical 2D~\gls{slam}
+formulations. RicoSLAM addresses these dynamics at two distinct stages.
+\secref{sec:slam:dynamics:online} describes the online dynamics removal
+mechanism embedded in RicoSLAM's runtime operation, which maintains
+the local map of each keyframe during tracking upon merge-triggering events.
+\secref{sec:slam:dynamics:offline} describes the offline dynamics removal that
+operates during 2D~occupancy grid map generation, exploiting
+Bresenham~\cite{bresenham:ibm:1965,zingl:uas:2016} line rasterization and
+the laser ray model to ignore dynamic returns when integrating
+all scans into the final map.
+
+\subsection{Online dynamics removal via ray analysis}
+\label{sec:slam:dynamics:online}
+
+The online dynamics removal mechanism is executed whenever the merging criterion
+triggers (see~\secref{sec:slam:online:splitting-merging}), integrating
+the moving cloud from the latest laser scan message into the current keyframe's
+local map. Then, the merger (see~\figref{fig:slam:ricoslam}
+and~\algref{alg:slam:online:tracker}) evaluates for every laser ray of
+the current scan whether the observation is consistent with the points of
+the local map that lie on the same ray.
+
+Let $\mathcal{M} = \{\mathbf{m}_j\}_{j=1}^{N_m}$ denote the local map point
+cloud of the current keyframe, expressed in the keyframe's sensor frame
+$S_{\mathrm{kf}}$. Let $\mathcal{P} = \{\mathbf{z}_i\}_{i=1}^{N_z}$ denote
+the current moving cloud, expressed in the latest scan's sensor frame
+$S_{\mathrm{curr}}$. Let $\mathbf{T}_{S_{\mathrm{kf}}}^{S_{\mathrm{curr}}}$ be
+the $SE(2)$ transformation from the keyframe's sensor frame $S_{\mathrm{kf}}$ to
+the current sensor frame $S_{\mathrm{curr}}$, considering
+the current robot pose \gls{wrt} the keyframe $\mathbf{x}_{R,\mathrm{kf}}$ and
+the sensor \gls{wrt} the robot transformation $\mathbf{T}_S^R$
+(see \secref{sec:distance-maps:alignment:problem}).
+For each map point $\mathbf{m}_j$, the merger expresses it in the current
+sensor frame, following \eqref{eq:slam:dynamics:online:transform}.
+Then, the merger queries $\mathrm{ptToRayIdx}(\cdot)$ based on the current scan
+angle parametrization (minimum scanning angle $\alpha_{\mathcal{S},\min}$,
+angle increment between consecutive rays $\Delta\alpha_{\mathcal{S}}$) to
+recover the ray index $k_j$ on which $\mathbf{m}_j$ would fall if observed by
+the current scan (see~\eqref{eq:slam:dynamics:online:ray-assignment}).
+\begin{equation}
+\label{eq:slam:dynamics:online:transform}
+\mathbf{m}_j^{S_{\mathrm{curr}}} =
+\mathbf{T}_R^S
+\mathbf{x}_{R,\mathrm{kf}}^{-1}
+\mathbf{T}_S^R
+\mathbf{m}_j =
+\mathbf{T}_{S_{\mathrm{kf}}}^{S_{\mathrm{curr}}}\,\mathbf{m}_j
+\end{equation}
+\begin{equation}
+\label{eq:slam:dynamics:online:ray-assignment}
+k_j = \mathrm{ptToRayIdx}\!\left(\mathbf{m}_j^{S_{\mathrm{curr}}}\right) =
+\left\lfloor
+  \frac{\atan2( m.y_j^{S_{\mathrm{curr}}} , m.x_j^{S_{\mathrm{curr}}} ) -
+        \alpha_{\mathcal{S},\min}}{\Delta\alpha_{\mathcal{S}}}
+\right\rceil
+\end{equation}
+
+For each sensor ray, the merger retains the closest map point along that ray.
+This assumption is consistent with the single-return model of a 2D~laser
+scanner, in which each ray yields at most one range measurement corresponding to
+the nearest surface. Although in the point cloud representation of the local map
+multiple points may project onto the same ray, retaining only the closest one
+keeps the merger computationally efficient regardless of local map density.
+Let ${\mathbf{m}^{S_{\mathrm{curr}}}_{k}}^{*}$ be the closest local map point on
+ray $k$, with range
+$\rho_{\mathcal{M},k} = \|{\mathbf{m}^{S_{\mathrm{curr}}}_{k}}^{*}\|_2$.
+Let $\mathbf{z}_k$ be the current observation on ray $k$, with range
+$\rho_{\mathcal{S},k} = \|\mathbf{z}_k\|_2$. The range
+difference $\Delta\rho_k = \rho_{\mathcal{S},k} - \rho_{\mathcal{M},k}$
+drives the update rules formulated in
+\eqref{eq:slam:dynamics:online:rules}, where $\tau_{\mathrm{new}} > 0$ (m)
+and $\tau_{\mathrm{through}} > 0$ (m) are user-defined thresholds of RicoSLAM.
+These thresholds avoid updating the local map when the range difference is
+closer to 0, given that the sensor is affected by measurement noise.
+\begin{equation}
+\label{eq:slam:dynamics:online:rules}
+\text{Action on ray } k =
+\begin{cases}
+\text{add } \mathbf{z}_k \text{ as a new map point} &
+\text{if no representative local point on ray } k,\\
+\text{add } \mathbf{z}_k \text{ as a new map point} &
+\text{if } \Delta\rho_k < -\tau_{\mathrm{new}}
+\quad (\mathbf{z}_k \text{ in front of } {\mathbf{m}^{S_{\mathrm{curr}}}_{k}}^{*}),\\
+\text{replace map point with } \mathbf{z}_k &
+\text{if } \Delta\rho_k > +\tau_{\mathrm{through}}
+\quad \text{(see-through)},\\
+\text{keep map unchanged} &
+\text{otherwise.}
+\end{cases}
+\end{equation}
+
+The see-through rule is responsible for removing online dynamics in RicoSLAM.
+If the current observation reports a range substantially larger than
+the existing map point on the same ray, the laser must have seen past
+the previously mapped obstacle, which was therefore likely a dynamic return.
+In this case, the merger replaces the map point with the new observation,
+erasing the dynamic obstacle from the local map.
+Conversely, the add-new rule handles new observations in front of existing map
+points following the ray model of the sensor, allowing the local map to update
+unobserved regions of the keyframe continuously.
+RicoSLAM allows also an optional averaging of existing map points with
+the current observation on the same ray using weights
+$(w_{\mathrm{old}}, w_{\mathrm{new}})$ with
+$w_{\mathrm{old}} + w_{\mathrm{new}} = 1$, smoothing points across multiple
+observations, when the keep the map unchanged rule from
+\eqref{eq:slam:dynamics:online:rules} fires. Still, this option is not
+considered in the experiments in the scope of this PhD~Thesis.
+
+Whenever an update is performed in the local map, the distance map data
+structure attached to the keyframe variable is rebuilt from the updated point
+cloud using the same propagation algorithm of
+\secref{sec:distance-maps:alignment:dmaps:computation}, with the same
+resolution, size, and truncation distance parameters initially set by the user.
+This approach guarantees that the next alignment iteration of the tracker
+against the updated keyframe queries a distance map representation consistent
+with the latest local map state.
 
 \section{Global Bundle Adjustment}\label{sec:slam:gba}
 
