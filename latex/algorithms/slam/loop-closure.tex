@@ -1,0 +1,31 @@
+\begin{algorithm}[!t]
+\DontPrintSemicolon
+\caption[Loop finder procedure in RicoSLAM]{Loop finder procedure in
+RicoSLAM.}
+\label{alg:slam:online:loop-finder}
+\KwIn{Pose graph $\mathcal{G}$, current keyframe $\mathbf{x}_{\mathrm{kf}}$,
+robot pose $\mathbf{x}_{R,W}$, max distance $d_{\ell,\max}$ (m),
+min graph length $L_{\ell,\min}$ (\#edges)}
+\KwOut{Loop hint set $\mathcal{H}$, short-loop hint set $\mathcal{H}_s$}
+$\mathcal{H}\leftarrow\emptyset$\;
+$\mathcal{H}_s\leftarrow\emptyset$\;
+\ForAll{$\mathbf{x}_c = \left[\mathbf{R}_c | \mathbf{t}_c \right]\in\mathcal{G}.\text{variables}\setminus\{\mathbf{x}_{\mathrm{kf}}\}$}
+{
+  \If{$\|\mathbf{t}_c - \mathbf{t}_{R,W}\|_2 \leq d_{\ell,\max}$}{
+    $\hat{\mathbf{x}}_{R,c} \leftarrow
+       \mathbf{x}_c^{-1}\cdot\mathbf{x}_{\mathrm{kf}}\cdot
+       \mathbf{x}_{R,\mathrm{kf}}$\;
+    Insert hint $\langle\mathbf{x}_c,\hat{\mathbf{x}}_{R,c}\rangle$
+    into $\mathcal{H}_s$\;
+  }
+}
+$\mathrm{visitor.expandFrom}(\mathbf{x}_{\mathrm{kf}})$
+\tcp*{BFS-like expansion (graph distance)}
+\ForAll{$h\in\mathcal{H}_s$}{
+  $l_{\ell,h} \leftarrow \mathrm{visitor.graphLengthTo}(h.\mathbf{x}_c)$\;
+  \If{$l_{\ell,h} \geq L_{\ell,\min}$}{
+    Insert $h$ into $\mathcal{H}$\;
+  }
+}
+\Return{$\mathcal{H},\,\mathcal{H}_s$}\;
+\end{algorithm}

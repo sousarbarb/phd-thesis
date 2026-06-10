@@ -322,7 +322,7 @@ existing graph node instead of growing the graph further.
 The tracker is responsible for maintaining the local map attached to
 the current keyframe, serving as the reference cloud for 2D~point cloud
 registration (see \chapref{chap:distance-maps} and
-\secref{sec:slam:online:overview}). Two complementary criteria control
+\secref{sec:slam:online:overview}). Two criteria control
 the update on the local map: a splitting criterion that decides when
 the local map should be replaced by a new keyframe and inserted into
 the back-end pose graph, and a merging criterion that triggers
@@ -530,6 +530,60 @@ Hessian $\mathbf{H}$ at convergence; see
 to a user-specified diagonal, typically giving higher confidence to the heading
 component than to the translational ones. RicoSLAM supports both options
 in terms of the framework parametrization.
+
+\subsection{Loop closure detection}\label{sec:slam:online:loop-closure}
+
+Loop closure detection in RicoSLAM considers geometric and topological distance
+when searching for candidate keyframes. \algref{alg:slam:online:loop-finder}
+summarizes the loop finder procedure implemented in the scope of this PhD~Thesis.
+In the first stage, all graph variables whose Euclidean distance to the current
+robot pose in the world frame falls below $d_{\ell,\max}$ are inserted into
+a short-loop hint set $\mathcal{H}_s$, together with the relative pose
+$\hat{\mathbf{x}}_{R,c} =
+\mathbf{x}_c^{-1}\cdot\mathbf{x}_{\mathrm{kf}}\cdot\mathbf{x}_{R,\mathrm{kf}}$
+that propagates the robot pose into the candidate keyframe's coordinate frame.
+This relative pose may be used as the initial guess of the loop aligner.
+In the second stage, a graph visitor computes the topological distance
+(in number of edges) from the current keyframe to each candidate.
+The visitor implements a best-first wavefront expansion analogous to the one
+used in \secref{sec:distance-maps:alignment:dmaps:computation},
+but operating on the pose graph topology rather than on a cell grid:
+sources are pushed into a priority queue, and entries are expanded through
+the graph factors incident to each variable. A candidate $h$ is promoted from
+the short-loop set $\mathcal{H}_s$ to the loop hint set $\mathcal{H}$ only when
+its graph length $l_{\ell,h}$ exceeds the threshold $L_{\min}$.
+The motivation of considering a minimum topological distance on the loop chain
+is to avoid attempting loop closures between graph nodes that are connected
+through a short path of odometry edges, since such constraints carry no
+significant topological information and are likely to be redundant
+with the existing pose-pose factors.
+
+\input{algorithms/slam/loop-closure.tex}
+
+Each hint is then validated by running the loop aligner on the
+moving point cloud against the candidate keyframe's local map.
+Two initial guesses are attempted in sequence, when enabled by the user:
+\begin{itemize}[nosep]
+\item the \emph{pose graph guess}
+$\hat{\mathbf{x}}_{R,c}$, propagated from the current pose graph estimate;
+\item the \emph{same-place guess}
+$\mathbf{x}_{\mathrm{same}} = \exp\!\left((0, 0, \theta_{\hat{\mathbf{x}}_{R,c}})^T\right)$,
+which considers the robot at the origin of the candidate frame but with
+the heading from the pose graph guess, equivalent to seeing the same place
+from a different perspective.
+\end{itemize}
+If either guess yields a successful registration of the moving cloud in
+the local map of a hint from the loop set $\mathcal{H}$,
+the back-end of RicoSLAM inserts the corresponding $SE(2)$ pose-pose geosedic
+factor (see~\secref{sec:slam:online:factor}) with a measurement
+$\mathbf{z} = \hat{\mathbf{x}}_{R,c}^{\,*} \cdot
+\mathbf{x}_{R,\mathrm{kf}}^{-1}$, where $\hat{\mathbf{x}}_{R,c}^{\,*}$ is
+the estimated pose returned by the loop aligner.
+When at least one loop closure factor is added to graph, the
+back-end solver optimizes the whole pose graph.
+This incremental optimization policy avoids the cost of running the
+back-end on every scan while ensuring that every newly added loop closure
+constraint is propagated through the rest of the graph.
 
 \section{Dynamics Removal}\label{sec:slam:dynamics}
 
