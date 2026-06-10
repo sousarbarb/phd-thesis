@@ -175,23 +175,23 @@ Jacobian derivations of this chapter.
 
 \section{Online SLAM}\label{sec:slam:online}
 
-\todo{CHECK INTRO}
-
 This section describes the online operation of RicoSLAM.
-\secref{sec:slam:online:overview} presents the processing pipeline triggered
-by each incoming 2D~laser scan, articulating the interaction between the
-tracker, the graph, the loop finder, and the relocalization module.
-\secref{sec:slam:online:splitting-merging} formalises the splitting and
-merging criteria used by the tracker to decide when the local map of the
-current keyframe should be expanded or when a new graph node should be
-added. \secref{sec:slam:online:factor} derives the $SE(2)$ pose-pose
-geodesic error factor that encodes binary constraints between
-keyframes, together with its Jacobians via right-sided perturbation.
-\secref{sec:slam:online:loop-closure} details the loop closure detection
-procedure, while \secref{sec:slam:online:relocalization} describes the
-relocalization policy that allows the system to re-enter previously visited
-keyframes, mitigating unbounded graph growth.
-Finally, \secref{sec:slam:online:pose-history} discusses the two pose
+First, \secref{sec:slam:online:overview} presents the runtime pipeline that
+processes each incoming 2D~laser scan message.
+Next, \secref{sec:slam:online:splitting-merging} explains the merging and
+splitting criteria used by the tracker to decide when
+the local map of the current keyframe should be updated or when
+a new node should be added to the back-end graph.
+\secref{sec:slam:online:factor} derives the $SE(2)$ pose-pose
+geodesic factor and its Jacobians via right-sided perturbation implemented in
+srrg2\_solver~\cite{grisetti:robotics:2020} that encodes pairwise constraints
+between keyframes.
+Furthermore, \secref{sec:slam:online:loop-closure} details the loop closure
+detection procedure in RicoSLAM.
+\secref{sec:slam:online:relocalization} describes the relocalization policy that
+allows the system to track the robot pose in keyframes already within the graph,
+mitigating the unbounded graph growth problem.
+Finally, \secref{sec:slam:online:pose-history} discusses the two robot pose
 history streams (online and offline corrected) logged by RicoSLAM
 for trajectory evaluation.
 
