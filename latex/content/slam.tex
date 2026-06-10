@@ -802,6 +802,122 @@ This approach guarantees that the next alignment iteration of the tracker
 against the updated keyframe queries a distance map representation consistent
 with the latest local map state.
 
+\subsection{Offline dynamics removal in 2D occupancy grid mapping}
+\label{sec:slam:dynamics:offline}
+
+After the online \gls{slam} run completes, RicoSLAM optionally produces
+a 2D~occupancy grid map suitable for \gls{ros}~\cite{ros}-oriented and
+downstream navigation applications. The procedure integrates all scans onto
+a discrete grid through two mechanisms: an optional ray-based stage that reuses
+the merger of the online dynamics removal mechanism
+(see~\secref{sec:slam:dynamics:online}) to filter dynamic returns out of
+a global map point cloud, and a probabilistic stage in which the per-cell
+occupancy probability is estimated from a beam-endpoint sensor model coupled
+with Bresenham~\cite{bresenham:ibm:1965,zingl:uas:2016}-based line
+rasterization. The ray-based stage represents the explicit offline removal of
+dynamics from the 2D~occupancy grid map representation
+proposed in the scope of this PhD~Thesis.
+
+RicoSLAM uses the laser scan messages stored in each keyframe's measurement
+owner (see~\secref{sec:slam:online:overview}) and on the final pose graph
+estimate to produce the 2D~occupancy grid map. For each retained scan
+$\mathcal{S}$ with the associated robot \gls{wrt} the local map pose
+$\mathbf{x}_{R,\mathrm{kf}}^{\mathcal{S}}$ and the optimized parent keyframe
+estimate \gls{wrt} the world $\mathbf{x}_{\mathrm{kf}}^{\mathcal{S}}$, the
+sensor pose in the world frame $\mathbf{x}_{S,W}^{\mathcal{S}}$ is reconstructed
+by \eqref{eq:slam:dynamics:offline:sensor-in-world}, where $\mathbf{T}_S^R$ is
+the sensor \gls{wrt} the robot pose
+(see~\secref{sec:distance-maps:alignment:problem}).
+\begin{equation}
+\label{eq:slam:dynamics:offline:sensor-in-world}
+\mathbf{x}_{S,W}^{\mathcal{S}} =
+\mathbf{x}_{\mathrm{kf}}^{\mathcal{S}}\cdot
+\mathbf{x}_{R,\mathrm{kf}}^{\mathcal{S}}\cdot\mathbf{T}_S^R
+\end{equation}
+
+Before the rasterization step, RicoSLAM invokes the same ray-based merger used
+at the online stage to build a cleaned global point cloud from all scans
+retained in the graph keyframes. This invocation differs from
+the online dynamics removal by globally evaluating the ray-based model
+rather than affecting only the local map of the current keyframe at runtime.
+The merger is enabled whenever the user configures either of the two ray-based
+thresholds (see~\secref{sec:slam:dynamics:online}) to generate the grid map:
+$\tau_{\mathrm{new}}$, the minimum distance
+for an incoming beam to be considered a see-through of an existing map point,
+and $\tau_{\mathrm{new}}$, the minimum distance for a new return to be
+considered in front of a previously unobserved point.
+When enabled, the merger processes the scans one at a time, using
+the world-frame sensor pose $\mathbf{x}_{S,W}^{\mathcal{S}}$
+(see~\eqref{eq:slam:dynamics:offline:sensor-in-world}) to project each scan
+into the global frame. Map points consistently seen by later beams are removed,
+and new returns in front of existing map points are added to the global cloud.
+The output of this stage is a cleaned global point cloud paired with a
+scan-to-map-point correspondence that records, for each retained scan, which of
+its endpoints survived the filtering. This correspondence is required for
+Bresenham~\cite{bresenham:ibm:1965,zingl:uas:2016}-like rasterization, ensuring
+that endpoints discarded by the merger do not contribute to
+the hit-pass frequency counters.
+
+Each grid cell of the 2D~occupancy grid map stores two counters,
+$\mathbf{f}(r,c) = (n_{\mathrm{hit}}, n_{\mathrm{pass}}) \in \mathbb{N}^2$,
+representing respectively the number of times the cell has been
+observed as occupied (beam endpoint) and the number of times it has
+been traversed by a beam (free pass). For each valid range
+$\rho_\alpha\in[\rho_{\min},\rho_{\max}]$ of the scan, the beam
+endpoint is computed in the world frame by
+\eqref{eq:slam:dynamics:offline:beam-endpoint}, where
+$\alpha\in[\alpha_{\min},\alpha_{\max}]$ is the beam angle in the
+sensor frame and $\mathrm{angleDistToPt}(\alpha,\rho)$ converts a
+polar pair into its Cartesian representation in the sensor frame.
+\begin{equation}
+\label{eq:slam:dynamics:offline:beam-endpoint}
+\mathbf{p}_\alpha^{W} =
+\mathbf{x}_{S,W}^{\mathcal{S}}\cdot
+\mathrm{angleDistToPt}(\alpha,\rho_\alpha) =
+\mathbf{x}_{S,W}^{\mathcal{S}}\cdot
+\rho_\alpha\cdot
+\begin{bmatrix}
+\cos(\alpha)\\
+\sin(\alpha)
+\end{bmatrix}
+\end{equation}
+
+The grid indices $(r_0,c_0)$ and $(r_e,c_e)$ associated, respectively,
+with the beam origin $\mathbf{x}_{S,W}^{\mathcal{S}}$ and the beam endpoint
+$\mathbf{p}_\alpha^{W}$ are obtained via the affine mapping introduced
+in \eqref{eq:distance-maps:alignment:dmaps:conversion:global2local},
+adapted to the occupancy grid resolution. Then, the set of intermediate cells
+traversed by the beam is computed following an implementation of the
+Bresenham~\cite{bresenham:ibm:1965} line rasterization algorithm that handles
+negative gradients or reversed lines~\cite{zingl:uas:2016}.
+This traversal incrementally walks from $(r_0,c_0)$ to $(r_e,c_e)$ updating
+the integer error term that selects the next pixel along the
+dominant axis, guaranteeing an integer-only implementation.
+For each cell $(r,c)$ visited along the beam, the pass counter is incremented:
+$n_{\mathrm{pass}}(r,c) \mathrel{+}= 1$. At the endpoint cell, the
+hit counter is also incremented,
+$n_{\mathrm{hit}}(r_e,c_e) \mathrel{+}= 1$, provided that the beam
+length is within the user-defined usable range. Beams that exceed
+the usable range have their endpoints clipped to the maximum range and
+update only the pass counter, since no static obstacle was confirmed by
+the line rasterization algorithm.
+
+After all scans have been integrated, the occupancy
+probability of each cell is estimated as
+\eqref{eq:slam:dynamics:offline:occ-probability}.
+Cells with $n_{\mathrm{pass}}(r,c) = 0$ are marked as \emph{unknown}.
+The remaining cells are classified as \emph{free} when
+$p_{\mathrm{occ}}(r,c) \leq p_{\mathrm{free}}$, as \emph{occupied}
+when $p_{\mathrm{occ}}(r,c) \geq p_{\mathrm{occ}}$, and as
+\emph{unknown} otherwise, with
+$0 \leq p_{\mathrm{free}} < p_{\mathrm{occ}} \leq 1$.
+\begin{equation}
+\label{eq:slam:dynamics:offline:occ-probability}
+p_{\mathrm{occ}}(r,c) =
+\frac{n_{\mathrm{hit}}(r,c)}{n_{\mathrm{pass}}(r,c)},
+\quad n_{\mathrm{pass}}(r,c) > 0
+\end{equation}
+
 \section{Global Bundle Adjustment}\label{sec:slam:gba}
 
 TBC
