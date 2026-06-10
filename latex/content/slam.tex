@@ -638,6 +638,48 @@ and graph growth is evaluated experimentally in
 \secref{sec:slam:results:iilabs3d} and
 \secref{sec:slam:results:relocalization}, respectively.
 
+\subsection{Pose history logging}\label{sec:slam:online:pose-history}
+
+In addition to the laser odometry from the tracker, RicoSLAM logs
+two pose history streams that can be used for robot trajectory evaluation or
+consumed by other applications: the online and offline corrected pose streams.
+The online stream represents the robot pose
+$\mathbf{x}_{R,W}^{\mathrm{online}}(t)$ in the world frame during
+scan processing, using only the online estimation of the robot \gls{wrt}
+the current keyframe $\mathbf{x}_{R,\mathrm{kf}}(t)$ and the current
+keyframe's pose in the world frame $\mathbf{x}_{\mathrm{kf}}(t)$,
+as formulated in \eqref{eq:slam:online:pose-history:online}. This stream is
+consistent with RicoSLAM's real-time operation and is the one consumed by
+downstream modules that subscribe to the robot pose topic at runtime.
+\begin{equation}
+\label{eq:slam:online:pose-history:online}
+\mathbf{x}_{R,W}^{\mathrm{online}}(t) =
+\mathbf{x}_{\mathrm{kf}}(t)\cdot\mathbf{x}_{R,\mathrm{kf}}(t)
+\end{equation}
+
+On the other hand, the offline corrected stream stores only the current keyframe
+identifier $\mathrm{id}_{\mathrm{kf}}(t)$ and the local pose of the robot
+\gls{wrt} the keyframe $\mathbf{x}_{R,\mathrm{kf}}(t)$ together with
+the scan timestamp $t$ at runtime. Upon user request, the world-frame are
+reconstructed \emph{a posteriori} using the optimized keyframe poses from the
+complete pose graph. The resulting offline corrected pose
+$\mathbf{x}_{R,W}^{\mathrm{offline}}(t)$ is defined by
+\eqref{eq:slam:online:pose-history:offline}, which substitutes the incremental
+keyframe global pose from the online counterpart by the optimized keyframe
+estimate $\mathbf{x}_{\mathrm{id}_{\mathrm{kf}}(t)}^{\,*}(t)$.
+\begin{equation}
+\label{eq:slam:online:pose-history:offline}
+\mathbf{x}_{R,W}^{\mathrm{offline}}(t) =
+\mathbf{x}_{\mathrm{id}_{\mathrm{kf}}(t)}^{\,*}(t)\cdot
+\mathbf{x}_{R,\mathrm{id}_{\mathrm{kf}}(t)}(t)
+\end{equation}
+
+The benefit of the offline corrected stream is that past poses
+inherit the corrections from future loop closures. Experiments presented in
+\secref{sec:slam:results:iilabs3d} report the results considering both online
+and offline pose streams, exposing the impact of loop closures and
+back-end graph optimization on the recovered trajectory.
+
 \section{Dynamics Removal}\label{sec:slam:dynamics}
 
 TBC
