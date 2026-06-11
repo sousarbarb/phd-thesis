@@ -167,7 +167,7 @@ $\mathbf{x}_{R,W} = \mathbf{x}_{\mathrm{kf}} \cdot \mathbf{x}_{R,\mathrm{kf}}$,
 where $\mathbf{x}_{\mathrm{kf}}$ is the current keyframe estimate and
 $\mathbf{x}_{R,\mathrm{kf}}$ is the local laser odometry estimate of
 the robot \gls{wrt} that keyframe. The right-sided perturbation update
-$\mathbf{x} \oplus \boldsymbol{\xi} = \mathbf{x}\cdot\exp(\boldsymbol{\xi})$
+$\mathbf{x} \oplus \mathbf{\Delta x} = \mathbf{x}\cdot\exp(\mathbf{\Delta x})$
 adopted in
 \secref{sec:distance-maps:background:least-squares:manifold} and
 \secref{sec:distance-maps:alignment:problem} is used in all error and
@@ -445,25 +445,25 @@ $\mathbf{e} = \left(\mathbf{t}_E^T,\;\atan2(r_{E,21}, r_{E,22})\right)^T$.
 \label{sec:slam:online:factor:jacobian}
 
 Applying the right-sided perturbation
-$\mathbf{x}_{\mathrm{from}}\oplus\boldsymbol{\xi}_{\mathrm{from}}
-= \mathbf{x}_{\mathrm{from}}\cdot\exp(\boldsymbol{\xi}_{\mathrm{from}})$
-and $\mathbf{x}_{\mathrm{to}}\oplus\boldsymbol{\xi}_{\mathrm{to}}
-= \mathbf{x}_{\mathrm{to}}\cdot\exp(\boldsymbol{\xi}_{\mathrm{to}})$, with
-$\boldsymbol{\xi}_{\mathrm{from}},\boldsymbol{\xi}_{\mathrm{to}}\in\mathbb{R}^3$,
+$\mathbf{x}_{\mathrm{from}}\oplus\mathbf{\Delta x}_{\mathrm{from}}
+= \mathbf{x}_{\mathrm{from}}\cdot\exp(\mathbf{\Delta x}_{\mathrm{from}})$
+and $\mathbf{x}_{\mathrm{to}}\oplus\mathbf{\Delta x}_{\mathrm{to}}
+= \mathbf{x}_{\mathrm{to}}\cdot\exp(\mathbf{\Delta x}_{\mathrm{to}})$, with
+$\mathbf{\Delta x}_{\mathrm{from}},\mathbf{\Delta x}_{\mathrm{to}}\in\mathbb{R}^3$,
 the perturbed residual on the manifold is given by
 \eqref{eq:slam:online:factor:perturbed}.
 \begin{equation}
 \label{eq:slam:online:factor:perturbed}
 \begin{aligned}
 \mathbf{e}\!\left(
-  \mathbf{x}_{\mathrm{from}}\oplus\boldsymbol{\xi}_{\mathrm{from}},\,
-  \mathbf{x}_{\mathrm{to}}\oplus\boldsymbol{\xi}_{\mathrm{to}}
+  \mathbf{x}_{\mathrm{from}}\oplus\mathbf{\Delta x}_{\mathrm{from}},\,
+  \mathbf{x}_{\mathrm{to}}\oplus\mathbf{\Delta x}_{\mathrm{to}}
 \right)
 & = \log\!\left(\mathbf{z}^{-1}\cdot
-                \exp(-\boldsymbol{\xi}_{\mathrm{from}})\cdot
+                \exp(\mathbf{\Delta x}_{\mathrm{from}})^{-1}\cdot
                 \mathbf{x}_{\mathrm{from}}^{-1}\cdot
                 \mathbf{x}_{\mathrm{to}}\cdot
-                \exp(\boldsymbol{\xi}_{\mathrm{to}})\right)
+                \exp(\mathbf{\Delta x}_{\mathrm{to}})\right)
 \end{aligned}
 \end{equation}
 
@@ -471,13 +471,13 @@ The Jacobian matrices
 $\mathbf{J}_{\mathrm{from}},\mathbf{J}_{\mathrm{to}}\in\mathbb{R}^{3\times3}$
 are obtained by differentiating
 \eqref{eq:slam:online:factor:perturbed} \gls{wrt}
-$\boldsymbol{\xi}_{\mathrm{from}}$ and
-$\boldsymbol{\xi}_{\mathrm{to}}$ at
-$\boldsymbol{\xi}_{\mathrm{from}}=\boldsymbol{\xi}_{\mathrm{to}}=\mathbf{0}$.
+$\mathbf{\Delta x}_{\mathrm{from}}$ and
+$\mathbf{\Delta x}_{\mathrm{to}}$ at
+$\mathbf{\Delta x}_{\mathrm{from}}=\mathbf{\Delta x}_{\mathrm{to}}=\mathbf{0}$.
 The derivation applies the chain rule to the logarithmic mapping that
 extracts $(t_x, t_y, \theta)$ from an $SE(2)$ pose.
 The block structure of both Jacobians, with $\mathbf{R}_E$ the rotation
-matrix of the residual $SE(2)$ pose at $\boldsymbol{\xi}=\mathbf{0}$,
+matrix of the residual $SE(2)$ pose at $\mathbf{\Delta x}=\mathbf{0}$,
 the rotation matrix $\mathbf{R}_z$ of the relative pose measurement
 $\mathbf{z}$, and $\mathbf{R}_{\mathrm{from}}$, $\mathbf{R}_{\mathrm{to}}$
 the rotation matrices of the variables under linearization, separates
@@ -947,6 +947,255 @@ where all $SE(2)$ pose variables in the graph are estimated simultaneously by
 minimizing the aggregate distance map cost. \secref{sec:slam:gba:p2p} derives
 the point-to-point factor and its Jacobians via right-sided perturbation, while
 \secref{sec:slam:gba:p2pl} derives the point-to-plane variant.
+
+\subsection{Point-to-point factor with distance maps}
+\label{sec:slam:gba:p2p}
+
+Let $\mathbf{x}_{\mathrm{from}},\mathbf{x}_{\mathrm{to}}\in SE(2)$ be the
+two keyframe variables connected by the factor, considering the sensor \gls{wrt}
+the robot transformation $\mathbf{T}_S^R$ required to transform the keyframes'
+local maps from the sensor to the variables' coordinate frames
+(see~\secref{sec:distance-maps:alignment:problem}).
+Let $\mathbf{z}_i\in\mathbb{R}^2$ be a point of the
+moving cloud held by $\mathbf{x}_{\mathrm{from}}$, expressed in the sensor
+frame $S_{\mathrm{from}}$, and
+$\mathcal{D}_{\mathrm{to}}: \mathbb{R}^2 \to \mathbb{R}_0^+$ denote the
+distance map associated to $\mathbf{x}_{\mathrm{to}}$
+(see~\secref{sec:distance-maps:alignment:dmaps}), computed in the sensor
+frame $S_{\mathrm{to}}$.
+
+The point-to-point distance map \gls{gba} residual proposed in this PhD~Thesis
+is the scalar value returned by $\mathcal{D}_{\mathrm{to}}$ when $\mathbf{z}_i$
+is projected from the sensor frame $S_{\mathrm{from}}$ into $S_{\mathrm{to}}$,
+as formulated in \eqref{eq:slam:gba:p2p:error}. This projection results into
+the projected moving point $\tilde{\mathbf{z}}_i^{S_{\mathrm{to}}}$.
+\begin{equation}
+\label{eq:slam:gba:p2p:error}
+e_i^{\mathrm{p2p}}\!\left(\mathbf{x}_{\mathrm{from}},\mathbf{x}_{\mathrm{to}}\right) =
+\mathcal{D}_{\mathrm{to}}\!\left(\tilde{\mathbf{z}}_i^{S_{\mathrm{to}}}\right) =
+\mathcal{D}_{\mathrm{to}}\!\left(
+  \mathbf{T}_R^S\cdot\mathbf{x}_{\mathrm{to}}^{-1}\cdot
+  \mathbf{x}_{\mathrm{from}}\cdot\mathbf{T}_S^R\,\mathbf{z}_i
+\right) \in \mathbb{R}
+\end{equation}
+
+\subsubsection{Jacobian matrices via right-sided perturbation}
+\label{sec:slam:gba:p2p:jacobian}
+
+Applying the right-sided perturbations
+$\mathbf{x}_{\mathrm{from}}\oplus\mathbf{\Delta x}_{\mathrm{from}}$ and
+$\mathbf{x}_{\mathrm{to}}\oplus\mathbf{\Delta x}_{\mathrm{to}}$ to
+\eqref{eq:slam:gba:p2p:error}, the perturbed error for the proposed
+point-to-point \gls{gba} error formulation based on distance maps is given by
+\eqref{eq:slam:gba:p2p:perturbed}.
+\begin{equation}
+\label{eq:slam:gba:p2p:perturbed}
+e_i^{\mathrm{p2p}}\!\left(\mathbf{x}_{\mathrm{from}}\oplus\mathbf{\Delta x}_{\mathrm{from}},\,
+                          \mathbf{x}_{\mathrm{to}}\oplus\mathbf{\Delta x}_{\mathrm{to}}\right) =
+\mathcal{D}_{\mathrm{to}}\!\left(
+  \mathbf{T}_R^S\cdot
+  \exp(\mathbf{\Delta x}_{\mathrm{to}})^{-1}\cdot
+  \mathbf{x}_{\mathrm{to}}^{-1}\cdot
+  \mathbf{x}_{\mathrm{from}}\cdot
+  \exp(\mathbf{\Delta x}_{\mathrm{from}})\cdot
+  \mathbf{T}_S^R\,\mathbf{z}_i
+\right)
+\end{equation}
+
+The Jacobians $\mathbf{J}_{i,\mathrm{from}}^{\mathrm{p2p}},
+\mathbf{J}_{i,\mathrm{to}}^{\mathrm{p2p}}\in\mathbb{R}^{1\times3}$ are
+obtained by differentiating \eqref{eq:slam:gba:p2p:perturbed} \gls{wrt}
+$\mathbf{\Delta x}_{\mathrm{to}}$ and $\mathbf{\Delta x}_{\mathrm{from}}$ at
+$\mathbf{\Delta x}=\mathbf{0}$, applying the chain rule with the spatial
+gradient $\bm{\nabla}\mathcal{D}_{\mathrm{to}}$ of the distance map.
+\eqref{eq:slam:gba:p2p:jacobian-to} and
+\eqref{eq:slam:gba:p2p:jacobian-from} present the resulting Jacobians,
+where $\mathbf{R}_{\mathrm{from}}$ and $\mathbf{R}_{\mathrm{to}}$
+denote the rotation matrices of $\mathbf{x}_{\mathrm{from}}$ and
+$\mathbf{x}_{\mathrm{to}}$, respectively, and
+$\lfloor\cdot\rfloor$ is the 2D~skew operator introduced in
+\eqref{eq:distance-maps:alignment:problem:skew}.
+\begin{equation}
+\label{eq:slam:gba:p2p:jacobian-to}
+\mathbf{J}_{i,\mathrm{to}}^{\mathrm{p2p}} =
+\bm{\nabla}\mathcal{D}_{\mathrm{to}}\!\left(\tilde{\mathbf{z}}_i^{S_{\mathrm{to}}}\right)^T
+\cdot
+\underbrace{
+  \mathbf{R}_R^S \cdot
+  \left(-\mathbf{I}_{2\times2}\;\big|\;
+    \lfloor -\mathbf{x}_{\mathrm{to}}^{-1}\cdot
+          \mathbf{x}_{\mathrm{from}}\cdot
+          \mathbf{T}_S^R\,\mathbf{z}_i
+    \rfloor
+  \right)}_{\mathbf{J}_{i,\mathrm{to}}^{\mathrm{p2p,ICP}}}
+\in\mathbb{R}^{1\times3}
+\end{equation}
+\begin{equation}
+\label{eq:slam:gba:p2p:jacobian-from}
+\mathbf{J}_{i,\mathrm{from}}^{\mathrm{p2p}} =
+\bm{\nabla}\mathcal{D}_{\mathrm{to}}\!\left(\tilde{\mathbf{z}}_i^{S_{\mathrm{to}}}\right)^T \cdot
+\underbrace{
+  \mathbf{R}_R^S\,\mathbf{R}_{\mathrm{to}}^T\,\mathbf{R}_{\mathrm{from}} \cdot
+  \left(\mathbf{I}_{2\times2}\;\big|\;
+    \lfloor \mathbf{T}_S^R\,\mathbf{z}_i\rfloor
+  \right)}_{\mathbf{J}_{i,\mathrm{from}}^{\mathrm{p2p,ICP}}}
+\in\mathbb{R}^{1\times3}
+\end{equation}
+
+\subsection{Point-to-plane factor with distance maps and moving normals}
+\label{sec:slam:gba:p2pl}
+
+The point-to-plane variant of the offline \gls{gba} factors proposed in this
+PhD~Thesis follows the same principles of
+\secref{sec:distance-maps:alignment:pt2pl}, adapted to the multi-keyframe
+formulation. The surface normal $\mathbf{n}_{\mathbf{z}_i}\in\mathbb{R}^2$ is
+estimated on the moving cloud of the variable $\mathbf{x}_{\mathrm{from}}$ by
+the \gls{pca}-based procedure of
+\secref{sec:distance-maps:alignment:pt2pl:normals}, remaining constant
+throughout the iterative optimization. Since all rotations in $SO(2)$ are planar
+and therefore commutative (see~\secref{sec:distance-maps:alignment:pt2pl}),
+the sensor \gls{wrt} the robot transformation cancels itself in the rotation
+chain when projecting the moving normal $\mathbf{n}_{\mathbf{z}_i}$ in
+the sensor frame $S_{\mathrm{from}}$ into $S_{\mathrm{to}}$, as formulated by
+\eqref{eq:slam:gba:p2pl:normal-rotation}.
+\begin{equation}
+\label{eq:slam:gba:p2pl:normal-rotation}
+\tilde{\mathbf{n}}_{\mathbf{z}_i}^{S_{\mathrm{to}}} =
+\mathbf{R}_R^S\,\mathbf{R}_{\mathrm{to}}^T\,\mathbf{R}_{\mathrm{from}}\,
+\mathbf{R}_S^R\,\mathbf{n}_{\mathbf{z}_i} =
+\mathbf{R}_{\mathrm{to}}^T\,\mathbf{R}_{\mathrm{from}}\,\mathbf{n}_{\mathbf{z}_i}
+\end{equation}
+
+Let
+$\hat{\bm{\nabla}}\mathcal{D}_{\mathrm{to}}\!\left(\tilde{\mathbf{z}}_i^{S_{\mathrm{to}}}\right)
+= \bm{\nabla}\mathcal{D}_{\mathrm{to}}\!\left(\tilde{\mathbf{z}}_i^{S_{\mathrm{to}}}\right)
+/ \|\bm{\nabla}\mathcal{D}_{\mathrm{to}}\!\left(\tilde{\mathbf{z}}_i^{S_{\mathrm{to}}}\right)\|_2$
+denote the normalized spatial gradient of the distance map at the projected
+point. The product
+$\hat{\bm{\nabla}}\mathcal{D}_{\mathrm{to}}\cdot
+\mathcal{D}_{\mathrm{to}}$ recovers the displacement vector from the
+projected moving point to its nearest reference point in the
+sensor frame $S_{\mathrm{to}}$, similar to
+\secref{sec:distance-maps:alignment:pt2pl}. The point-to-plane
+residual projects this displacement onto the rotated surface normal, as
+formulated in \eqref{eq:slam:gba:p2pl:error}.
+\begin{equation}
+\label{eq:slam:gba:p2pl:error}
+e_i^{\mathrm{p2pl}}\!\left(\mathbf{x}_{\mathrm{from}},\,
+                           \mathbf{x}_{\mathrm{to}}\right) =
+\left(\tilde{\mathbf{n}}_{\mathbf{z}_i}^{S_{\mathrm{to}}}\right)^T\cdot
+\hat{\bm{\nabla}}\mathcal{D}_{\mathrm{to}}\!\left(\tilde{\mathbf{z}}_i^{S_{\mathrm{to}}}\right)\cdot
+\mathcal{D}_{\mathrm{to}}\!\left(\tilde{\mathbf{z}}_i^{S_{\mathrm{to}}}\right)
+\in \mathbb{R}
+\end{equation}
+
+\subsubsection{Jacobian matrices via right-sided perturbation}
+\label{sec:slam:gba:p2pl:jacobian}
+
+Applying the right-sided perturbations
+$\mathbf{x}_{\mathrm{from}}\oplus\mathbf{\Delta x}_{\mathrm{from}}$ and
+$\mathbf{x}_{\mathrm{to}}\oplus\mathbf{\Delta x}_{\mathrm{to}}$ to
+\eqref{eq:slam:gba:p2pl:error}, the perturbed error for the proposed
+point-to-plane \gls{gba} error formulation based on distance maps is given by
+\eqref{eq:slam:gba:p2pl:perturbed}.
+\begin{equation}
+\label{eq:slam:gba:p2pl:perturbed}
+e_i^{\mathrm{p2pl}}\!\left(\mathbf{x}_{\mathrm{from}}\oplus\mathbf{\Delta x}_{\mathrm{from}},\,
+                           \mathbf{x}_{\mathrm{to}}\oplus\mathbf{\Delta x}_{\mathrm{to}}\right) =
+\mathbf{n}_{\mathbf{z}_i}^T \cdot
+\mathbf{R}_{\mathbf{\Delta x},\mathrm{from}}^T \,
+\mathbf{R}_{\mathrm{from}}^T \cdot
+\mathbf{R}_{\mathrm{to}} \,
+\mathbf{R}_{\mathbf{\Delta x},\mathrm{to}} \cdot
+\hat{\bm{\nabla}}\mathcal{D}_{\mathrm{to}}\!\left(\cdot\right)\cdot
+\mathcal{D}_{\mathrm{to}}\!\left(\cdot\right)
+\end{equation}
+
+The differentiation of \eqref{eq:slam:gba:p2pl:perturbed} \gls{wrt}
+$\mathbf{\Delta x}_{\mathrm{to}}$ and $\mathbf{\Delta x}_{\mathrm{from}}$ at
+$\mathbf{\Delta x}=\mathbf{0}$ result into the jacobians
+$\mathbf{J}_{i,\mathrm{to}}^{\mathrm{p2pl}},
+\mathbf{J}_{i,\mathrm{from}}^{\mathrm{p2pl}} \in \mathbb{R}^{1\times 3}$
+formulated in \eqref{eq:slam:gba:p2pl:jacobian:to} and
+\eqref{eq:slam:gba:p2pl:jacobian:from}, respectively.
+Similarly to the point-to-plane Jacobian of
+\eqref{eq:distance-maps:alignment:pt2pl:jacobian} for 2D~point cloud
+registration, each Jacobian of the point-to-plane distance map-based \gls{gba}
+factor decomposes into three additive contributions by the product rule.
+The first contribution accounts for the rotation of the normal under
+the perturbation of the corresponding variable, the second for change in
+gradient direction as the projected point moves under that perturbation, and
+the third contribution is for the change in the distance value at
+the new projected point. In the limit
+$\mathbf{x}_{\mathrm{to}} = \mathbf{I}$,
+\eqref{eq:slam:gba:p2pl:jacobian:from} reduces to
+\eqref{eq:distance-maps:alignment:pt2pl:jacobian} of
+\secref{sec:distance-maps:alignment:pt2pl:jacobian}, consistent with the
+point-to-plane alignment formulation proposed in
+\secref{sec:distance-maps:alignment:pt2pl}.
+\begin{equation}
+\begin{aligned}
+\label{eq:slam:gba:p2pl:jacobian:to}
+\mathbf{J}_{i,\mathrm{to}}^{\mathrm{p2pl}} & =
+\underbrace{
+  \tilde{\mathbf{n}}_{\mathbf{z}_i}^{S_{\mathrm{to}},T}
+  \left(\mathbf{0}_{2\times 2}\,\Big|\,
+    \left\lfloor  \hat{\bm{\nabla}}\mathcal{D}_{\mathrm{to}}\!\left(\tilde{\mathbf{z}}_i^{S_{\mathrm{to}}}\right) \cdot
+                  \mathcal{D}_{\mathrm{to}}\!\left(\tilde{\mathbf{z}}_i^{S_{\mathrm{to}}}\right)
+    \right\rfloor
+  \right)
+}_{\text{rotation of the normal}}
+\\
+&\quad+
+\underbrace{
+  \tilde{\mathbf{n}}_{\mathbf{z}_i}^{S_{\mathrm{to}},T} \cdot
+  \mathbf{H}_{\mathcal{D}_{\mathrm{to}}}\!\left(\tilde{\mathbf{z}}_i^{S_{\mathrm{to}}}\right) \cdot
+  \mathcal{D}_{\mathrm{to}}\!\left(\tilde{\mathbf{z}}_i^{S_{\mathrm{to}}}\right) \cdot
+  \mathbf{J}_{i,\mathrm{to}}^{\mathrm{p2p,ICP}}
+}_{\text{change in gradient direction}}
+\\
+&\quad+
+\underbrace{
+  \tilde{\mathbf{n}}_{\mathbf{z}_i}^{S_{\mathrm{to}},T} \cdot
+  \hat{\bm{\nabla}}\mathcal{D}_{\mathrm{to}}\!\left(\tilde{\mathbf{z}}_i^{S_{\mathrm{to}}}\right) \cdot
+  \bm{\nabla}\mathcal{D}_{\mathrm{to}}\!\left(\tilde{\mathbf{z}}_i^{S_{\mathrm{to}}}\right)^T \cdot
+  \mathbf{J}_{i,\mathrm{to}}^{\mathrm{p2p,ICP}}
+}_{\text{change in distance value}}
+\in\mathbb{R}^{1\times3}
+\end{aligned}
+\end{equation}
+\begin{equation}
+\begin{aligned}
+\label{eq:slam:gba:p2pl:jacobian:from}
+\mathbf{J}_{i,\mathrm{from}}^{\mathrm{p2pl}} & =
+\underbrace{
+  \mathbf{n}_{\mathbf{z}_i}^{T}
+  \left(\mathbf{0}_{2\times 2}\,\Big|\,
+    \left\lfloor -\mathbf{R}_{\mathrm{from}}^T \mathbf{R}_{\mathrm{to}} \cdot
+                  \hat{\bm{\nabla}}\mathcal{D}_{\mathrm{to}}\!\left(\tilde{\mathbf{z}}_i^{S_{\mathrm{to}}}\right) \cdot
+                  \mathcal{D}_{\mathrm{to}}\!\left(\tilde{\mathbf{z}}_i^{S_{\mathrm{to}}}\right)
+    \right\rfloor
+  \right)
+}_{\text{rotation of the normal}}
+\\
+&\quad+
+\underbrace{
+  \tilde{\mathbf{n}}_{\mathbf{z}_i}^{S_{\mathrm{to}},T} \cdot
+  \mathbf{H}_{\mathcal{D}_{\mathrm{to}}}\!\left(\tilde{\mathbf{z}}_i^{S_{\mathrm{to}}}\right) \cdot
+  \mathcal{D}_{\mathrm{to}}\!\left(\tilde{\mathbf{z}}_i^{S_{\mathrm{to}}}\right) \cdot
+  \mathbf{J}_{i,\mathrm{from}}^{\mathrm{p2p,ICP}}
+}_{\text{change in gradient direction}}
+\\
+&\quad+
+\underbrace{
+  \tilde{\mathbf{n}}_{\mathbf{z}_i}^{S_{\mathrm{to}},T} \cdot
+  \hat{\bm{\nabla}}\mathcal{D}_{\mathrm{to}}\!\left(\tilde{\mathbf{z}}_i^{S_{\mathrm{to}}}\right) \cdot
+  \bm{\nabla}\mathcal{D}_{\mathrm{to}}\!\left(\tilde{\mathbf{z}}_i^{S_{\mathrm{to}}}\right)^T \cdot
+  \mathbf{J}_{i,\mathrm{from}}^{\mathrm{p2p,ICP}}
+}_{\text{change in distance value}}
+\in\mathbb{R}^{1\times3}
+\end{aligned}
+\end{equation}
 
 \section{Experimental Results and Discussion}\label{sec:slam:results}
 

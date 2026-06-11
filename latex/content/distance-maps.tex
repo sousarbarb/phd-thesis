@@ -1737,7 +1737,7 @@ the surface normal rotated to the reference sensor frame, as formulated in
 e_i^{\mathrm{p2pl}}(\mathbf{x}) =
 \left(\mathbf{R}(\theta)\,\mathbf{n}_{z_i}\right)^T \cdot
 \hat{\bm{\nabla}}\mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right) \cdot
-\mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right)
+\mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right) \in \mathbb{R}
 \end{equation}
 
 The normal $\mathbf{n}_{z_i}$ is expressed in the sensor frame of
@@ -1790,7 +1790,7 @@ $\mathbf{J}_i^{\mathrm{p2p,ICP}} \in \mathbb{R}^{2\times3}$ defined in
 \underbrace{
   \mathbf{n}_{z_i}^{T}
   \left(\mathbf{0}_{2\times2} \mid
-    \left\lfloor \mathbf{R}(\theta)^T \cdot
+    \left\lfloor -\mathbf{R}(\theta)^T \cdot
       \hat{\bm{\nabla}}\mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right) \cdot
       \mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right)
     \right\rfloor
@@ -1812,6 +1812,7 @@ $\mathbf{J}_i^{\mathrm{p2p,ICP}} \in \mathbb{R}^{2\times3}$ defined in
   \bm{\nabla}\mathcal{D}\!\left(\tilde{\mathbf{z}}_i\right)^T \cdot
   \mathbf{J}_i^{\mathrm{p2p,ICP}}
 }_{\text{change in distance value}}
+\in \mathbb{R}^{1\times3}
 \end{aligned}
 \end{equation}
 
