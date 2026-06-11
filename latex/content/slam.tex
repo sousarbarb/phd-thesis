@@ -907,10 +907,10 @@ probability of each cell is estimated as
 \eqref{eq:slam:dynamics:offline:occ-probability}.
 Cells with $n_{\mathrm{pass}}(r,c) = 0$ are marked as \emph{unknown}.
 The remaining cells are classified as \emph{free} when
-$p_{\mathrm{occ}}(r,c) \leq p_{\mathrm{free}}$, as \emph{occupied}
-when $p_{\mathrm{occ}}(r,c) \geq p_{\mathrm{occ}}$, and as
+$p_{\mathrm{occ}}(r,c) \leq \gamma_{\mathrm{free}}$, as \emph{occupied}
+when $p_{\mathrm{occ}}(r,c) \geq \gamma_{\mathrm{occ}}$, and as
 \emph{unknown} otherwise, with
-$0 \leq p_{\mathrm{free}} < p_{\mathrm{occ}} \leq 1$.
+$0 \leq \gamma_{\mathrm{free}} < p_{\mathrm{occ}}(r,c) < \gamma_{\mathrm{occ}} \leq 1$.
 \begin{equation}
 \label{eq:slam:dynamics:offline:occ-probability}
 p_{\mathrm{occ}}(r,c) =
@@ -920,7 +920,33 @@ p_{\mathrm{occ}}(r,c) =
 
 \section{Global Bundle Adjustment}\label{sec:slam:gba}
 
-TBC
+The online \gls{slam} described in \secref{sec:slam:online} produces
+a pose graph whose constraints are $SE(2)$ pose-pose measurements
+generated either by the tracker or by the loop aligner. The online formulation
+summarizes the alignment between two keyframes that involves multiple point
+correspondences into a single relative-pose constraint, discarding the geometric
+information contained in the raw correspondences once the geodesic factor has
+been inserted into the graph. When the online graph is used to produce
+a map representation of the environment
+(see~\secref{sec:slam:dynamics:offline}), the loss of per-point information
+contributes to inter-keyframe misalignments that may manifest as
+global geometric distortions, blurred and double walls in the resulting map.
+
+This PhD~Thesis explores the limitation of the online graph \gls{slam} in terms
+of global inter-keyframe misalignments by proposing novel distance map-based
+\glslink{gba}{\glsentryfull{gba}} constraints. These distance-based \gls{gba}
+factors augment the pose-pose constraints of the online graph by
+per-point distance map factors. Each factor draws a point $\mathbf{z}_i$ from
+the moving point cloud held by the \emph{from} keyframe's local map, transforms
+it into the sensor frame of the \emph{to} keyframe through the current pose
+graph estimate, and evaluates its residual against the distance map data
+structure attached to the \emph{to} keyframe. This formulation extends
+the pairwise distance map alignment introduced in
+\secref{sec:distance-maps:alignment} to a joint multi-keyframe optimization,
+where all $SE(2)$ pose variables in the graph are estimated simultaneously by
+minimizing the aggregate distance map cost. \secref{sec:slam:gba:p2p} derives
+the point-to-point factor and its Jacobians via right-sided perturbation, while
+\secref{sec:slam:gba:p2pl} derives the point-to-plane variant.
 
 \section{Experimental Results and Discussion}\label{sec:slam:results}
 
