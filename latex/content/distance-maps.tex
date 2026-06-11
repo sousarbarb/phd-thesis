@@ -1352,9 +1352,9 @@ iterate over all stored entries.
 \begin{equation}
 \label{eq:distance-maps:alignment:dmaps:computation:hash-key}
 \mathrm{key}(r, c) =
-\bigl(\texttt{uint64}(r) \ll 32\bigr)
+\left(\texttt{uint64}(r) \ll 32\right)
 \;\big|\;
-\bigl(\texttt{uint64}(c) \;\&\; \texttt{0xFFFFFFFF}\bigr)
+\left(\texttt{uint64}(c) \;\&\; \texttt{0xFFFFFFFF}\right)
 \end{equation}
 
 \paragraph{Computation of the data structures}
@@ -1994,9 +1994,11 @@ The four synthetic scenes considered in this work are defined as follows:
       cannot extract surface normals from such data.
 \end{itemize}
 
-Each scene is evaluated over $N=100$ independent trials. In every
-trial, a ground-truth perturbation $\mathbf{T}_\mathrm{gt}\in SE(2)$ is sampled
-from a uniform distribution:
+Each scene is evaluated over $N=100$ independent trials, given that runs with
+larger sample sizes produced negligible changes in the per-scene aggregated
+statistics reported in this benchmark.
+In every trial, the true pose $\mathbf{x}^{*}\in SE(2)$ is
+sampled from a uniform distribution:
 translations up to $\pm\SI{1.5}{\metre}$ in $x$ and $y$ coordinates
 (reduced to $\pm\SI{0.5}{\metre}$ in $y$ and $\pm\SI{0.15}{\metre}$ in both
 axes for the corridor and random scenes, respectively) and rotations up to
@@ -2026,33 +2028,68 @@ independent alignments, while also being sub-optimal in \gls{slam} evaluation.
 \sum_{t=1}^{T}\left(\mathbf{x}_t\ominus\mathbf{x}_t^*\right)^2
 \end{equation}
 
-Still, in our case, the goal of the synthetic benchmark for 2D~point cloud
+In our case, the goal of the synthetic benchmark for 2D~point cloud
 registration presented in this work is to evaluate independent pairwise
 alignments in the same scene, not throughout a robot trajectory.
 Focusing on a single pairwise alignment,
-\eqref{eq:distance-maps:results:synthetic:pose-error} presents the
-\emph{logarithmic mapping} of the pose error
-$\boldsymbol{\varepsilon}\!\left(\mathbf{x}\right)$ on
-the manifold $SE(2)$ between the pose estimate ($\mathbf{x}$) and its true value
-($\mathbf{x}^*$) \gls{wrt} the target frame,
-where the rotation matrix ($\mathbf{R}_{\boldsymbol{\varepsilon}_\mathbf{x}}$)
-represents the angle difference error between
-the estimated orientation ($\theta$) and the ground-truth value ($\theta^*$),
-and the translation vector ($\mathbf{t}_{\boldsymbol{\varepsilon}_\mathbf{x}}$)
-represents the $x$ and $y$ error components.
+\eqref{eq:distance-maps:results:synthetic:pose-error} presents the pose
+error $\boldsymbol{\varepsilon}\!\left(\mathbf{x}\right) \in \mathbb{R}^3$
+assembled from the translation and rotation components of the residual
+transformation $\mathbf{x}\cdot{\mathbf{x}^{*}}^{-1} \in SE(2)$ between
+the pose estimate ($\mathbf{x}$) and its ground-truth value ($\mathbf{x}^*$),
+with both components expressed in the target (reference) frame.
+The rotation matrix $\mathbf{R}_{\boldsymbol{\varepsilon}_\mathbf{x}}$
+encodes the angular residual
+$\theta_{\boldsymbol{\varepsilon}_\mathbf{x}}=\theta-\theta^*$ between the
+estimated and ground-truth orientations, while the translation vector
+$\mathbf{t}_{\boldsymbol{\varepsilon}_\mathbf{x}}$ collects the $x$ and $y$
+residual components in the target frame.
 \begin{equation}
 \label{eq:distance-maps:results:synthetic:pose-error}
+\mathbf{x}\cdot{\mathbf{x}^{*}}^{-1} =
+\left[\mathbf{R}\mid\mathbf{t}\right] \cdot
+\left[{\mathbf{R}^*}^T \mid -{\mathbf{R}^*}^T\mathbf{t}^*\right] =
+\left[\mathbf{R}(\theta-\theta^*) \;\big|\;
+\mathbf{t} - \mathbf{R}\,{\mathbf{R}^*}^T\mathbf{t}^*\right] =
+\left[\mathbf{R}_{\boldsymbol{\varepsilon}_\mathbf{x}} \;\big|\;
+\mathbf{t}_{\boldsymbol{\varepsilon}_\mathbf{x}}\right],
+\;
 \boldsymbol{\varepsilon}\!\left(\mathbf{x}\right) =
-\log\!\left(\mathbf{x}\cdot{\mathbf{x}^{*}}^{-1}\right) =
-\log\!\left(\left[\mathbf{R}|\mathbf{t}\right] \cdot
-\left[{\mathbf{R}^*}^T|-{\mathbf{R}^*}^T\mathbf{t}^*\right]\right) =
-\log\!\left(\left[
-  \mathbf{R}(\theta-\theta^*) |
-  \mathbf{t} - {\mathbf{R}^*}^T\mathbf{t}^*
-\right]\right) =
-\log\!\left(\left[ \mathbf{R}_{\boldsymbol{\varepsilon}_\mathbf{x}} |
-       \mathbf{t}_{\boldsymbol{\varepsilon}_\mathbf{x}} \right]\right)
+\left(\mathbf{t}_{\boldsymbol{\varepsilon}_\mathbf{x}}^{\,T},\;
+\theta_{\boldsymbol{\varepsilon}_\mathbf{x}}\right)^T
 \end{equation}
+
+A formulation of the error $\boldsymbol{\varepsilon}$ expressed in the moving
+frame, built from the residual transformation
+${\mathbf{x}^{*}}^{-1}\cdot\mathbf{x}$, would have its
+translation part ${\mathbf{R}^*}^T\!\left(\mathbf{t}-\mathbf{t}^*\right)$
+decoupled from the rotation residual, depending only on the ground-truth
+orientation $\mathbf{R}^*$ and on the translation difference
+$\left(\mathbf{t}-\mathbf{t}^*\right)$. Such formulation would be
+expressed in the same tangent space as the information matrix
+$\boldsymbol{\Omega}$ returned by the Gauss--Newton solver under the
+right-sided perturbation update of
+\eqref{eq:distance-maps:alignment:problem:gauss-newton:addition}, yielding
+a consistent Mahalanobis-squared statistic in
+\eqref{eq:distance-maps:results:synthetic:chi2}.
+
+In this work, the target-frame formulation of
+\eqref{eq:distance-maps:results:synthetic:pose-error} is preferred instead
+because of its diagnostic value in degenerate scenes. Its translation part
+$\mathbf{t} - \mathbf{R}\,{\mathbf{R}^*}^T\mathbf{t}^*$ admits the
+decomposition $(\mathbf{t}-\mathbf{t}^*) +
+(\mathbf{I}-\mathbf{R}\,{\mathbf{R}^*}^T)\mathbf{t}^*$, in which the
+second term couples the rotation residual to the translation part through
+the ground-truth pose $\mathbf{x}^*$ itself: a non-zero angular residual
+produces a non-zero translation vector whenever $\mathbf{t}^*$ is non-zero,
+even when $\mathbf{t}=\mathbf{t}^*$ exactly. Paired with the moving-frame
+$\boldsymbol{\Omega}$, this coupling makes
+$\chi^2_{\boldsymbol{\varepsilon}}$ sensitive to residuals aligned with
+unobservable directions of the scene: such residuals get projected,
+through the coupling, onto the observable directions of
+$\boldsymbol{\Omega}$ where they are weighted by its large eigenvalues.
+The resulting $\chi^2_{\boldsymbol{\varepsilon}}$ inflates visibly whenever
+the alignment fails along a degenerate axis.
 
 \paragraph{Translation error}
 The first metric considered in this work for the synthetic benchmark is
@@ -2091,18 +2128,18 @@ the rotational \gls{dof} is degenerate by the scene's symmetry.
   r_{\boldsymbol{\varepsilon}_\mathbf{x},1,1}\right)\right|
 \end{equation}
 
-\paragraph{Mahalanobis-squared consistency metric}
+\paragraph{Pose-error consistency metric}
 Finally, alongside pose accuracy, the internal consistency of each solver's
 uncertainty estimate based on the discussion presented in
-\secref{sec:distance-maps:background:least-squares}
-is assessed via the Mahalanobis-squared error formulated in
-\eqref{eq:distance-maps:results:synthetic:chi2},
-where $\boldsymbol{\varepsilon}\!\left(\mathbf{x}\right)$ is the pose error
+\secref{sec:distance-maps:background:least-squares} is assessed via the
+Hessian-weighted residual norm formulated in
+\eqref{eq:distance-maps:results:synthetic:chi2}, where
+$\boldsymbol{\varepsilon}\!\left(\mathbf{x}\right)$ is the pose error
 (see \eqref{eq:distance-maps:results:synthetic:pose-error}) and
 $\boldsymbol{\Omega} \in \mathbb{R}^{3 \times 3}$ is the information matrix
 returned by the Gauss--Newton solver (see
-\secref{sec:distance-maps:background:least-squares})
-for the estimated pose $\mathbf{x}$ of the moving \gls{wrt} the target
+\secref{sec:distance-maps:background:least-squares}) for the estimated
+pose $\mathbf{x}$ of the moving \gls{wrt} the target
 frame~\cite{kummerle:ar:2009}.
 \begin{equation}
 \label{eq:distance-maps:results:synthetic:chi2}
@@ -2111,15 +2148,38 @@ frame~\cite{kummerle:ar:2009}.
     \boldsymbol{\Omega} \cdot
     \boldsymbol{\varepsilon}\!\left(\mathbf{x}\right)
 \end{equation}
+Strictly speaking, $\chi^2_{\boldsymbol{\varepsilon}}$ is not a Mahalanobis
+statistic against the body-frame $\boldsymbol{\Omega}$ returned by the
+solver, since $\boldsymbol{\varepsilon}\!\left(\mathbf{x}\right)$ is built
+from the target-frame parametrization of the residual transformation
+$\mathbf{x}\cdot{\mathbf{x}^{*}}^{-1}$, while $\boldsymbol{\Omega}$ is in
+the moving-frame tangent space at $\mathbf{x}^*$, given the right-sided
+perturbation update of
+\eqref{eq:distance-maps:alignment:problem:gauss-newton:addition}. However, for
+small angular residuals, the metric coincides with a Mahalanobis statistic
+against the adjoint-twisted information matrix
+$\mathrm{Ad}_{\mathbf{x}^*}^T\,\boldsymbol{\Omega}\,\mathrm{Ad}_{\mathbf{x}^*}$,
+and the adjoint factor is a deterministic function of $\mathbf{x}^*$ that
+acts identically on all error formulations in a given trial. The
+cross-formulation comparison of $\chi^2_{\boldsymbol{\varepsilon}}$ at a
+given scene is therefore a meaningful relative assessment of how well
+each formulation's information matrix matches the empirical residual
+covariance, with additional sensitivity to alignment failures along
+degenerate directions of the scene.
 
-In the ideal case, $\chi_{\boldsymbol{\varepsilon}}^2 = 0$ corresponds to a
-perfect alignment. Large values indicate either poor alignment accuracy,
-an overconfident information matrix $\boldsymbol{\Omega}$, or both.
-In degenerate scenes, $\boldsymbol{\Omega}$ becomes ill-conditioned along
-unobservable directions, inflating $\chi_{\boldsymbol{\varepsilon}}^2$ even when
-observable components of the alignment are accurate.
-Translation and rotation errors are aggregated over the $N=100$ independent
-trials and reported as the \gls{rmse}, whilst
+In the ideal case, $\chi_{\boldsymbol{\varepsilon}}^2 = 0$ corresponds to
+a perfect alignment. Large values indicate poor alignment accuracy,
+an overconfident $\boldsymbol{\Omega}$, or residuals coupled by the
+target-frame parametrization into the observable directions of
+$\boldsymbol{\Omega}$. In degenerate scenes, residuals aligned with
+unobservable directions of the scene are projected, through the
+$(\mathbf{I}-\mathbf{R}\,{\mathbf{R}^*}^T)\mathbf{t}^*$ coupling in the
+target-frame translation slice and the frame mismatch with
+$\boldsymbol{\Omega}$, onto the observable subspace of
+$\boldsymbol{\Omega}$, inflating $\chi^2_{\boldsymbol{\varepsilon}}$ even
+when the observable components of the alignment are accurate.
+Translation and rotation errors are aggregated over the $N=100$
+independent trials and reported as the \gls{rmse}, whilst
 $\chi_{\boldsymbol{\varepsilon}}^2$ is reported as the mean over trials.
 
 \subsubsection{Registration accuracy and uncertainty}
@@ -2239,7 +2299,7 @@ scanner model.
 Next, the synthetic experimental results show a numerical equivalence between
 $\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$ and
 $\mathrm{ICP}_{\mathcal{D},\mathrm{p2pl}}$ across all scenes, resolutions, and
-noise levels. This result is confirms the expected theoretical equivalence
+noise levels. This result confirms the expected theoretical equivalence
 between the original point-to-plane \gls{icp}~\cite{chen-medioni:icra:1991} and
 the point-to-plane formulation based on distance maps proposed in this work
 (see~\secref{sec:distance-maps:alignment:pt2pl}).
@@ -2428,7 +2488,8 @@ continuous tracking scenarios, where successive scans are acquired at varying
 sensor-to-surface distances and density non-uniformity accumulates over time.
 
 \paragraph{Uncertainty estimation}
-The Mahalanobis-squared $\chi_{\boldsymbol{\varepsilon}}^2$ statistic exposes systematic differences in
+The pose-error consistency metric $\chi_{\boldsymbol{\varepsilon}}^2$ exposes
+systematic differences in
 information matrix estimation across formulations and scenes considered in
 the synthetic benchmark. The $\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$ and
 $\mathrm{ICP}_{\mathcal{D},\mathrm{p2pl}}$ formulations produce identical
@@ -2453,7 +2514,7 @@ possibly due to the unobservable heading component contributing a large positive
 term to the quadratic form compared to other formulations, both
 $\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$ and
 $\mathrm{ICP}_{\mathcal{D},\mathrm{p2pl}}$ still achieve much lower values for
-the Mahalanobis-squared $\chi_{\boldsymbol{\varepsilon}}^2$ statistic.
+the error consistency metric $\chi_{\boldsymbol{\varepsilon}}^2$.
 Overall, $\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$ and
 $\mathrm{ICP}_{\mathcal{D},\mathrm{p2pl}}$ formulations obtained the best
 $\chi_{\boldsymbol{\varepsilon}}^2$ statistic results across all conditions in the synthetic benchmark,
@@ -3173,9 +3234,10 @@ The exception is on the Loop sequence, where the robot traverses in and out of
 the Nav~A space through its external corridor. Indeed, even at the 90\%
 threshold, the point-to-plane formulations consistently outperform their
 point-to-point counterparts on that sequence. These results indicate that
-point-to-plane metrics retaining its consistency better than point-to-point
-counterparts when traversing different spaces of the same environment through
-doors.
+point-to-plane metrics retain its consistency better than point-to-point
+counterparts when traversing large spaces through narrow passages or doors,
+given that point-to-point residuals remain limited by the sampling discrepancy
+inherent to the laser scanner model.
 
 \paragraph{Precomputed point-to-point formulation}
 Another observation from the evaluation on the
