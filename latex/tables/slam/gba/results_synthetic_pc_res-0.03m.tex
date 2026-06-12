@@ -2,8 +2,42 @@
 \begin{table}[!t]
 \centering
 \caption[%
-    TBC]{%
-    TBC}
+    Pose error of the distance map-based \gls{gba} formulations on a synthetic
+    Manhattan-like benchmark]{%
+    Pose error of the distance map-based \gls{gba} formulations
+    (see~\secref{sec:slam:gba}) on the synthetic Manhattan-like benchmark,
+    consisting of 289 $SE(2)$ ground-truth poses arranged in
+    a $(2g+1)\times(2g+1)$ grid with $g = 8$,
+    placed inside a square scene of half-side $\SI{10}{\metre}$ and observed
+    by synthetic scans of a Hokuyo~UST-10LX-like 2D laser scanner sensor
+    ($\SI{30}{\metre}$ maximum range, $\SI{0.25}{\degree}$ angular resolution,
+    but with a $\SI{360}{\degree}$ field-of-view).
+    Pairwise factors connect every pair of variables within a loop-closure
+    radius of $r_{\mathrm{loop}} = \SI{1.1}{\metre}$; the first variable is
+    fixed and the remaining poses are perturbed by uniform noise of
+    $\pm\SI{1.5}{\metre}$ on translation and $\pm\SI{20}{\degree}$ on rotation
+    before the optimization stage.
+    Two factor formulations are evaluated:
+    point-to-point distance map (\ $\mathcal{D}_{\mathrm{p2p}}$,
+    see~\secref{sec:slam:gba:p2p}), with representation levels
+    $\mathcal{M}_l \in \{\mathcal{M}_0, \mathcal{M}_1\}$, and
+    point-to-plane distance map (\ $\mathcal{D}_{\mathrm{p2pl}}$,
+    see~\secref{sec:slam:gba:p2pl}), with
+    $\mathcal{M}_l \in \{\mathcal{M}_0, \mathcal{M}_2\}$.
+    Each formulation
+    and representation level is evaluated with (\cmark) and without (\xmark)
+    voxelization of the moving point clouds at the distance map resolution
+    $\delta = \SI{0.03}{\metre}$.
+    Two metrics are reported for each configuration across the noise-free
+    case (No Noise) and the case with Gaussian range noise of standard
+    deviation $\sigma = \SI{0.03}{\metre}$:
+    $\varepsilon_{\mathbf{t}}$ (\si{\metre}), the translational \gls{rmse}
+    of \eqref{eq:slam:results:gba:metrics:trans}, and $\varepsilon_{\theta}$
+    (\si{\degree}), the rotational \gls{rmse} of
+    \eqref{eq:slam:results:gba:metrics:rot}, both aggregated over the 288
+    non-fixed poses of the grid. Bold entries mark the best result
+    per metric within each noise condition.%
+}
 \label{tab:slam:results:gba}
 \begin{tabular}{
     l     % method family  (multirow label)

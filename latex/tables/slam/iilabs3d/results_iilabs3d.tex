@@ -2,8 +2,35 @@
 \begin{table}[!t]
 \centering
 \caption[%
-    TBC]{%
-    TBC%
+    Trajectory accuracy of RicoSLAM, SLAM~Toolbox, and GMapping on
+    four planar sequences of the IILABS~3D dataset
+    (Nav~A~Diff, Nav~A~Omni, Loop, and Slippage)]{%
+    Trajectory accuracy of RicoSLAM,
+    SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021},
+    and GMapping~\cite{grisetti:tro:2007} on four planar sequences of
+    the IILABS~3D~\cite{ribeiro:access:2025} dataset
+    (Nav~A~Diff, Nav~A~Omni, Loop, and Slippage).
+    Both SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021} and
+    GMapping~\cite{grisetti:tro:2007} are evaluated with different splitting
+    configurations (translation/rotation thresholds).
+    RicoSLAM is evaluated in five modes:
+    \emph{scan} (each keyframe represents a scan),
+    \emph{scan w/reloc.} (scan-based with relocalization within existing graph),
+    \emph{local} (each keyframe represents a local map),
+    \emph{local w/upd.} (local maps with information matrix update),
+    and \emph{local w/reloc.} (local maps with relocalization).
+    Evaluation metrics:
+    \glslink{ate}{\glsentryfull{ate}},
+    \glslink{rte}{\glsentryfull{rte}}, and
+    \glslink{rre}{\glsentryfull{rre}}, in which \gls{rte} and \gls{rre} are
+    evaluated over a \SI{10}{\metre} segment length.
+    Bold entries indicate the best result of online vs offline methods
+    within a tolerance of \SI{0.005}{\metre} for \gls{ate},
+    \SI{0.05}{\percent} for \gls{rte}, and
+    \SI{0.005}{\degree\per\metre} for and \gls{rre}.
+    respectively.
+    Underlined entries indicate the best result
+    within each method (across its variants).
 }
 \label{tab:slam:results:iilabs3d}
 \begin{tabular}{
@@ -159,7 +186,14 @@
 
 \multicolumn{14}{l}{%
     \footnotesize
-    $^{\dagger}$ offline pose correction (accounting with loop closures).}\\
+    $^{\dagger}$ offline corrected pose stream
+    (see~\secref{sec:slam:online:pose-history}) for the same configurations as
+    the online RicoSLAM results, in which}\\
+\multicolumn{14}{l}{%
+    \footnotesize
+    \phantom{$^{\dagger}$} past poses are reconstructed
+    \emph{a posteriori} from the optimized keyframe estimates after
+    loop closures.}\\
 
 
 \end{tabular}

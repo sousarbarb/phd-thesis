@@ -2,8 +2,28 @@
 \begin{table}[!t]
 \centering
 \caption[%
-    TBC]{%
-    \#n number nodes; \#s number of scans; \#e number of edges%
+    Scalability results of RicoSLAM, SLAM~Toolbox, and GMapping at the end of
+    each IILABS~3D sequence (Nav~A~Diff, Nav~A~Omni, Loop, and Slippage)]{%
+    Scalability results of RicoSLAM,
+    SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021},
+    and GMapping~\cite{grisetti:tro:2007} at the end of each
+    IILABS~3D~\cite{ribeiro:access:2025} sequence
+    (Nav~A~Diff, Nav~A~Omni, Loop, and Slippage).
+    Evaluation metrics:
+    \#n, number of keyframe variables (nodes) in the graph;
+    \#s, total number of scan messages aggregated by the methods;
+    and \#e, the number of pose-pose factors (edges).
+    The \#n and \#e metrics are reported only for graph-based systems
+    (RicoSLAM and SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021}), since
+    GMapping~\cite{grisetti:tro:2007} is a particle filter-based system.
+    For SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021},
+    $\#s = \#n$ since each scan represents a keyframe.
+    The methods and variants follow the same convention as
+    \tabref{tab:slam:results:iilabs3d}.
+    Bold entries indicate the best (smallest) graph size results across
+    the full tables.
+    Underlined entries indicate the best (smallest) graph size
+    within each method (across its variants).%
 }
 \label{tab:slam:results:iilabs3d:graph}
 \begin{tabular}{
