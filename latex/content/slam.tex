@@ -1219,19 +1219,201 @@ Lastly, \secref{sec:slam:results:gba} evaluates the accuracy of the distance
 map-based \gls{gba} formulations introduced in \secref{sec:slam:gba}
 in a synthetic benchmark with ground-truth poses.
 
-\input{tables/slam/iilabs3d/results_iilabs3d.tex}
+\subsection{Trajectory accuracy on the IILABS~3D dataset}
+\label{sec:slam:results:iilabs3d}
 
-Algorithms:
+This experiment evaluates the trajectory accuracy of RicoSLAM against
+established 2D \gls{slam} baselines
+(GMapping~\cite{grisetti:tro:2007} and
+SLAM Toolbox~\cite{macenski-jambrecic:joss:2021}) on the IILABS~3D
+dataset~\cite{ribeiro:access:2025}, extending the laser odometry evaluation of
+\secref{sec:distance-maps:results:iilabs3d} from the front-end tracker alone to
+the complete online and offline pipelines for pose estimation of RicoSLAM.
+
+\subsubsection{Experimental setup}
+\label{sec:slam:results:iilabs3d:setup}
+
+The evaluation reuses the four planar sequences from the
+IILABS~3D~\cite{ribeiro:access:2025} dataset
+(Nav~A~Diff, Nav~A~Omni, Loop, and Slippage) described in
+\secref{sec:distance-maps:results:iilabs3d:setup} and
+the same TUM~\cite{sturm:iros:2012} trajectory format for
+the ground-truth poses provided by the OptiTrack motion capture system.
+The three methods considered in this experiment are introduced as follows.
+
+\paragraph{RicoSLAM}
+All five variants of the RicoSLAM framework introduced in
+this chapter share the same front-end and back-end configuration.
+The tracker uses the precomputed $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$
+point-to-point formulation based on distance maps introduced in
+\chapref{chap:distance-maps}, with the parameter values identified as best
+performing in \secref{sec:distance-maps:results:iilabs3d}:
+a distance map resolution of \SI{0.03}{\metre}, voxelization enabled with the
+voxel size the same as the distance map resolution, bi-linear interpolation
+disabled, distance map truncation distance set at \SI{0.50}{\metre},
+and a \SI{30}{\metre} maximum laser range.
+Outlier observations are down-weighted via a Cauchy robustifier
+(see \tabref{tab:distance-maps:background:least-squares:robust-losses})
+operating in two sequential stages: a coarse one of 5~iterations with
+$c^2=0.250$ (\SI{0.50}{\metre} threshold); followed by a fine stage up to
+15~iterations with $c^2 = 0.005$ (\SI{0.06}{\metre} threshold), similar to
+the same configuration used in \secref{sec:distance-maps:results:iilabs3d}.
+The front-end Gauss-Newton solver terminates when the step norm falls below
+\num{1e-3} or when reaching the maximum of 20~iterations.
+Independently of this termination criterion, the tracker flags the latest scan
+alignment as failed when its inlier ratio falls below \SI{20}{\percent},
+triggering a keyframe change.
+We disable wheel odometry initialization in all variants of the RicoSLAM
+tracker. This choice intends to demonstrate that the proposed system does not
+depend on wheel odometry, unlike the other two baselines, which do require it.
+
+As for the back-end configuration, the loop aligner in this evaluation re-uses
+the tracker's registration formulation, with three differences:
+a tighter fine-stage robustifier with $c^2 = 0.001$
+(\SI{0.03}{\metre} threshold) to refine the loop candidate alignment,
+a higher failure threshold of \SI{30}{\percent} on the inlier ratio,
+and configuring an additional loop closure acceptance policy that requires
+the mean Mahalanobis distance of the inlier residuals to be below
+$\chi^2_{\mathrm{inliers}} \le 0.001$.
+Loop candidates are only considered between keyframes separated by at least
+a 5~graph-distance and at most \SI{3.00}{\metre} in Euclidean distance.
+The back-end solver is the
+\texttt{srrg2\_solver}~\cite{grisetti:robotics:2020} framework, configured
+with a maximum of $25$ iterations, an initial damping factor of $1.0$, and
+a $10^{-3}$ step-norm termination criterion.
+
+We evaluate five configurations of RicoSLAM, differing only in the keyframe
+split/merge criteria of the tracker's local mapping stage and in whether
+relocalization or factor information-matrix updates are enabled:
 \begin{itemize}
-\item RicoSLAM (online + offline corrected pose, 0.03m resolution,
-      voxelization enabled, bi-linear interpolation disabled, M1 representation)
-\item SLAM Toolbox
-\item GMapping
-\item Cartographer (optional, SLAM Toolbox already provides a graph-based formulation)
-\item HectorSLAM (optional, very low priority)
+\item \textbf{scan:} a \SI{50}{\percent} inlier-ratio threshold as splitting
+      criterion and the merging criterion disabled, as every registered scan in
+      the back-end graph becomes its own keyframe;
+\item \textbf{scan w/ reloc.:} same as the \emph{scan} variant, with
+      the relocalization policy enabled. Given that the relocalization re-uses
+      the loop aligner to decide whether to switch the current keyframe,
+      we raise the inlier-ratio failure threshold from \SI{30}{\percent} to
+      \SI{70}{\percent} to avoid swapping keyframes without sufficient
+      observation overlap;
+\item \textbf{local:} local maps mode with relocalization disabled.
+      The splitting criterion activated by a \SI{2.50}{\metre} translation
+      threshold, which enforces approximately uniform spatial spacing between
+      consecutive keyframes along the trajectory and bounds the tracker noise
+      that propagates into each keyframe's local map.
+      The merging criterion is an inlier-ratio threshold of \SI{80}{\percent},
+      and the merger uses a \SI{0.20}{\metre} distance for its
+      $\tau_{\mathrm{new}}$ (add new point) and $\tau_{\mathrm{through}}$
+      (see-through) threshold for the ray tracing model;
+\item \textbf{local w/upd.:} same as the \emph{local} variant, with
+      the automatic update enabled of the information matrices of
+      the incident factors at keyframe-change time.
+      A keyframe's local map accumulates information between its creation and
+      the spawning of the next keyframe. As a result, with the information
+      matrices of its outgoing factors should be re-evaluated at swap time
+      rather than remaining fixed since the keyframes' creation;
+\item \textbf{local w/reloc.:} same as \emph{local}, with the relocalization
+      policy enabled and the minimum graph-distance for loop candidates reduced
+      from $5$ to $3$ edges, since the local maps mode with relocalization
+      produces fewer keyframes than scan and standard local map modes.
 \end{itemize}
 
-Metrics:
+For RicoSLAM, we report results for two pose history streams:
+the online estimation
+$\mathbf{x}_{R,W}^{\mathrm{online}}(t)$
+(see~\eqref{eq:slam:online:pose-history:online}), denoted simply as
+\emph{RicoSLAM} in the results, and the offline corrected stream
+$\mathbf{x}_{R,W}^{\mathrm{offline}}(t)$
+(see~\eqref{eq:slam:online:pose-history:offline}) that corrects all robot
+poses \emph{a posteriori} from the optimized keyframe estimates, denoted as
+\emph{RicoSLAM$^{\dagger}$}. This distinction exposes the contribution of
+the back-end optimization and the loop closures to the final trajectory accuracy
+in the offline pose stream, in contrast to the online operation of RicoSLAM.
+Also, GMapping~\cite{grisetti:tro:2007} and
+SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021} only expose
+the online estimation for the robot pose.
+
+\paragraph{SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021}}
+A state-of-the-art open-source 2D~graph \gls{slam} system, using the
+Ceres~\cite{ceres:sw:2023} framework for back-end pose-graph optimization.
+Each incoming laser scan is matched against a rasterized grid built from
+a sliding window of recent scans, and only the scans accepted by
+the splitting criterion are inserted into the pose graph as new keyframes.
+Two splitting viewpoint configurations are considered with minimum
+translation and rotation displacement values for new keyframes of
+\SI{0.3}{\metre}/\SI{0.3}{\radian} and
+\SI{0.5}{\metre}/\SI{0.5}{\radian}.
+Larger splitting thresholds were also tested
+(\SI{1.0}{\metre}/\SI{1.0}{\radian},
+\SI{1.5}{\metre}/\SI{1.5}{\radian}, and \SI{2.5}{\metre} translation
+with the minimum angular displacement set to $\SI{10.0}{\radian}$ to
+disable rotation-driven splits). However,
+SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021} consistently failed to track
+the full trajectories of the IILABS~3D~\cite{ribeiro:access:2025} sequences
+with those larger thresholds.
+The remaining parameters are similar to the default ones for asynchronous
+mapping (process all laser scan messages without throttling) with
+SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021}, but matching the map
+resolution with the distance map resolution of RicoSLAM
+($\delta = \SI{0.03}{\metre}$) and a \SI{30}{\metre} maximum laser range.
+Also, we had to decrease the minimum chain size to look for a loop closure from
+10 to 5 and increase the space dimension of the search grid size from 8 to 10
+for the SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021} algorithm to close the
+loop in the Loop sequence from the IILABS~3D~\cite{ribeiro:access:2025} dataset.
+
+Unlike RicoSLAM, which reports a pose for every laser scan message processed by
+its front-end, SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021} only
+corrects the robot pose when a scan is registered into its back-end
+pose graph. Between registration events, the pose published by
+SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021} follows the wheel odometry
+estimation, with the latest graph correction held fixed on
+the \texttt{map}~$\rightarrow$~\texttt{odom} transform
+of the \gls{ros}~\cite{ros} transform tree.
+In order to produce an evaluation trajectory at the same rate as RicoSLAM,
+we synchronize the pose estimation from the
+SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021} transform tree with the laser
+data by querying the tree with the timestamp of every laser scan message.
+The resulting sampled poses are exported as a TUM trajectory
+file~\cite{sturm:iros:2012}.
+
+\paragraph{GMapping~\cite{grisetti:tro:2007}}
+A particle filter-based 2D~\gls{slam} system, included in this evaluation as
+a non-graph baseline. We evaluate three configurations, differing only in
+the minimum translation and rotation displacement that trigger
+an observation-model update of the particle filter:
+\SI{0.3}{\metre}/\SI{0.3}{\radian},
+\SI{0.5}{\metre}/\SI{0.5}{\radian}, and
+\SI{1.0}{\metre}/\SI{1.0}{\radian}.
+Between these updates, the particles are propagated solely by the
+wheel-odometry motion model. So, similar to
+SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021},
+GMapping~\cite{grisetti:tro:2007} only incorporates new laser information for
+its pose estimate at these update events.
+In order to produce an evaluation of the trajectory accuracy at the laser scan
+rate, comparable with the one reported by RicoSLAM, we modified the official
+\gls{ros}~\cite{ros} wrapper with two changes:
+(i)~support for offline ROSbag processing without dropping messages, mirroring
+the offline mode we implemented in RicoSLAM; and (ii)~logging the pose of the
+best particle (selected via \texttt{getBestParticleIndex()}, as in the online
+API of the original implementation) at every laser scan message read from
+the ROSbag into a TUM trajectory file~\cite{sturm:iros:2012}. The modified
+wrapper is available in a public
+repository\footnote{\url{https://github.com/sousarbarb/slam_gmapping}}.
+
+The remaining parameters follow the default ones from the official
+\gls{ros}~\cite{ros} wrapper of GMapping~\cite{grisetti:tro:2007}.
+Still, similar to SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021},
+we set a \SI{0.03}{\metre} resolution for the 2D~occupancy grid map of
+GMapping~\cite{grisetti:tro:2007} and a \SI{30}{\metre} maximum laser range
+for fair comparison. We tried to increase from 30~to 250~particles,
+inflate the odometry-noise covariances to widen the particle distribution, and
+enlarge the laser-likelihood sigma to reduce the confidence in
+individual laser observations. However, GMapping~\cite{grisetti:tro:2007}
+consistently failed to close the loop on the \emph{Loop} sequence from the
+IILABS~3D~\cite{ribeiro:access:2025} dataset.
+As a result, we reverted the parameters to the defaults ones and set
+the particles count to $N = 100$, only changing the minimum linear and angular
+update thresholds across the three configurations evaluated in this work.
+
 \begin{itemize}
 \item ATE (Absolute Trajectory Error)
 \item RTE (Relative Translation Error)
