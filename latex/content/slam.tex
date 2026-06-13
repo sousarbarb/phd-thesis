@@ -1414,15 +1414,46 @@ As a result, we reverted the parameters to the defaults ones and set
 the particles count to $N = 100$, only changing the minimum linear and angular
 update thresholds across the three configurations evaluated in this work.
 
+\subsubsection{Evaluation metrics}
+\label{sec:slam:results:iilabs3d:metrics}
+
+The trajectory accuracy evaluation on the IILABS~3D~\cite{ribeiro:access:2025}
+dataset considers the same toolchain as in
+\secref{sec:distance-maps:results:iilabs3d:metrics}:
+the open-source evo framework~\cite{grupp:evo} with a maximum time
+synchronization difference of \SI{0.01}{\second} between matched poses and
+the Umeyama method~\cite{umeyama:tpami:1991} for trajectory alignment,
+computing the accuracy metrics from the estimated and ground-truth
+TUM trajectory files~\cite{sturm:iros:2012}.
+Furthermore, we extend the metrics in this experiment from the laser odometry
+drift evaluation to incorporate the absolute trajectory error after the
+alignment step. Thus, this experiment considers the following metrics:
 \begin{itemize}
-\item ATE (Absolute Trajectory Error)
-\item RTE (Relative Translation Error)
-\item RRE (Relative Rotational Error)
+\item \textbf{\glslink{ate}{\glsentryfull{ate}}}:
+      \gls{rmse} of the translational component of the absolute
+      pose error after the Umeyama~\cite{umeyama:tpami:1991}-based alignment
+      of the estimated trajectory to the ground-truth one.
+      The \gls{ate} reflects the global consistency of the trajectory estimated
+      by the \gls{slam} baselines and is sensitive to the loop closure
+      performance of the systems, given that loop closures correct accumulated
+      drift along the trajectory.
+      Let $\mathbf{x}_t$ and $\mathbf{x}_t^*$ denote the estimated and
+      ground-truth poses at time $t$, respectively, the \gls{ate} is
+      formulated in \eqref{eq:slam:results:iilabs3d:ate}~\cite{geiger:cvpr:2012};
+
+\item \textbf{\glslink{rte}{\glsentryfull{rte}} and
+      \glslink{rre}{\glsentryfull{rre}}}:
+      relative translation and rotation errors over fixed trajectory segments of
+      $\Delta d = \SI{10}{\metre}$, consistent with the IILABS~3D benchmark
+      study~\cite{ribeiro:access:2025} and the laser odometry evaluation
+      introduced in \secref{sec:distance-maps:results:iilabs3d:metrics}~\cite{geiger:cvpr:2012}.
 \end{itemize}
-
-
-SLAM Toolbox with 1.00m/1.00rad, 1.50m/1.50rad, and 2.50m (setting minimum angle to 10.0 to avoid splitting due to angular displacement)
-fails. Only with 0.3m/0.3rad and 0.5m/0.5rad...
+\begin{equation}
+\label{eq:slam:results:iilabs3d:ate}
+\mathrm{ATE} =
+\sqrt{\frac{1}{N}\sum_{t=1}^{N}
+      \left\|\mathbf{x}_t^* \ominus \mathbf{x}_t\right\|_2^2}
+\end{equation}
 
 \subsection{Scalability and graph growth with relocalization}\label{sec:slam:results:relocalization}
 
