@@ -1199,9 +1199,25 @@ point-to-plane alignment formulation proposed in
 
 \section{Experimental Results and Discussion}\label{sec:slam:results}
 
-\subsection{Trajectory accuracy on the IILABS3D Dataset}\label{sec:slam:results:iilabs3d}
-
-\todo{TBC}
+This section presents four experiments with the RicoSLAM framework that evaluate
+the contributions presented in this chapter.
+First, \secref{sec:slam:results:iilabs3d} presents a trajectory accuracy
+benchmark on the IILABS~3D dataset~\cite{ribeiro:access:2025}, comparing
+RicoSLAM against established 2D graph-based and particle-filter-based \gls{slam}
+baselines, evaluating both the online and offline corrected pose streams from
+RicoSLAM.
+Second, \secref{sec:slam:results:relocalization} analyses the scalability of
+RicoSLAM and the \gls{slam} baselines from the first experiment on the same
+dataset, quantifying the impact of the relocalization policy on
+the back-end graph growth.
+Third, \secref{sec:slam:results:dynamics} assesses the effect of
+the offline dynamics removal mechanism on the resulting 2D occupancy grid
+representation, considering not only the IILABS~3D
+dataset~\cite{ribeiro:access:2025} but also additional sequences from \gls{amr}
+deployments in industrial scenarios with dynamic, noisy observations.
+Lastly, \secref{sec:slam:results:gba} evaluates the accuracy of the distance
+map-based \gls{gba} formulations introduced in \secref{sec:slam:gba}
+in a synthetic benchmark with ground-truth poses.
 
 \input{tables/slam/iilabs3d/results_iilabs3d.tex}
 
