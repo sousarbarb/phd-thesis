@@ -1,0 +1,61 @@
+{\setlength{\tabcolsep}{4pt}
+\begin{table}[!t]
+\centering
+\caption[%
+    Sequence statistics for the Avantgarde, Cappero, Flowbotic, and Kuka
+    datasets used in the mapping experiment with offline dynamics removal]{%
+    Sequence statistics for the Avantgarde, Cappero, Flowbotic, and Kuka
+    datasets used in the mapping experiment with offline dynamics removal.
+    Sequence statistics: $T$ -- duration; $L$ -- path length.
+    The corresponding statistics for the IILABS~3D~\cite{ribeiro:access:2025}
+    dataset are documented in \secref{sec:distance-maps:results:iilabs3d:setup}
+    and in the benchmark paper.%
+}
+\label{tab:slam:results:dyn-rmv:datasets}
+\begin{tabular}{
+    l   % data source (multirow label)
+    l|  % sequence label
+    c                                            % T            (s)
+    S[table-format=4.1]                          % L            (m)
+}
+\hline
+\multicolumn{1}{c}{} &
+\multicolumn{1}{c|}{} &
+\multicolumn{2}{c}{\textbf{Statistics}}\\
+\multicolumn{1}{c}{} &
+\multicolumn{1}{c|}{} &
+\multicolumn{1}{c}{$T$} &
+\multicolumn{1}{c}{$L$}\\
+\multicolumn{1}{l}{\textbf{Dataset}} &
+\multicolumn{1}{l|}{\textbf{Sequence}} &
+\multicolumn{1}{c}{(\si{\hour}/\si{\minute}/\si{\second})} &
+\multicolumn{1}{c}{(\si{\metre})}\\
+\hline
+
+% Avantgarde -----------------------------------------------------------------
+\multirow{7}{*}{Avantgarde}
+  & run0     & 59m33s & 1210.5 \\ % 3573
+  & run1     & 01h10m37s &  630.0 \\ % 4237
+  & run2     & 24m37s &  298.2 \\ % 1477
+  & run3     & 22m57s &  293.7 \\ % 1377
+  & run4     & 44m49s &  420.6 \\ % 2689
+  & run5     & 38m16s &  481.8 \\ % 2296
+  & run6     & 25m02s &  342.2 \\ % 1502
+\hline
+
+% Cappero --------------------------------------------------------------------
+Cappero & -- & 17m45s &  592.9 \\
+\hline
+
+% Flowbotic ------------------------------------------------------------------
+\multirow{3}{*}{Flowbotic~\cite{flowbotic}}
+  & 20251024 &  15m43s &  289.5 \\ % 943
+  & 20251027 &  10m48s &  199.2 \\ % 648
+  & 20251028 &  11m27s &  205.3 \\ % 687
+\hline
+
+% KUKA -----------------------------------------------------------------------
+Kuka & --    &  01h18m19s & 2610.2 \\ % 4699
+\hline
+\end{tabular}
+\end{table}}
