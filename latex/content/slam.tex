@@ -1687,9 +1687,44 @@ this experiment are the following ones:
 
 \input{tables/slam/dyn-rmv/results_std-vs-dyn-rmv_datasets.tex}
 
+For each dataset sequence, RicoSLAM is executed with the configuration
+described in the corresponding dataset entry above. Next, the back-end factor
+graph is serialized to a human-readable JSON file at the end of the run through
+the serialization framework made available by the
+srrg2\_solver~\cite{grisetti:robotics:2020}. This serialized graph includes
+the final pose estimates of the keyframe variables, the $SE(2)$ pose-pose
+geodesic factors and their alignment measurements, the 2D~point clouds
+associated with each keyframe variable, and the laser scan messages
+aggregated within each keyframe's local map.
+Then, the offline 2D~occupancy grid mapper described in
+\secref{sec:slam:dynamics:offline} is applied to the final pose graph
+and the retained scan messages, producing two grid maps for each sequence and
+operating mode:
 \begin{itemize}
-\item probability distribution of the occupancy cell values
+\item \textbf{standard}: the rasterization stage is invoked on
+      the retained scans and their corresponding world-frame poses through
+      the Bresenham~\cite{bresenham:ibm:1965,zingl:uas:2016} line
+      algorithm, accumulating hit and pass counts per cell.
+      This grid map serves as the baseline for this experiment;
+\item \textbf{dyn-rmv}: the ray tracing-based offline merger discussed in
+      \secref{sec:slam:dynamics:offline} is first applied to the
+      retained scans, removing the dynamic observations from the point cloud
+      representation for the global map. The cleaned set of scan-to-global map
+      point correspondences is then processed by the same rasterization stage
+      with the Bresenham~\cite{bresenham:ibm:1965,zingl:uas:2016} line algorithm
+      to accumulate the hit and pass counts per cell.
 \end{itemize}
+
+Both \emph{standard} and \emph{dyn-rmv} grid maps for each sequence and
+operating mode are generated with a cell resolution of \SI{0.03}{\metre},
+a maximum laser range matching the value used by the corresponding RicoSLAM
+configuration, and a threshold of $\gamma_{\mathrm{occ}} = 0.3$ on the cell
+occupancy probability $p_{\mathrm{occ}}(r,c)$ defined in
+\eqref{eq:slam:dynamics:offline:occ-probability}.
+In the case of the \emph{dyn-rmv} grid map, the add-new and see-through
+thresholds of the offline ray-based merger
+(see~\eqref{eq:slam:dynamics:online:rules}) are set to
+$\tau_{\mathrm{new}} = \tau_{\mathrm{through}} = \SI{0.10}{\metre}$.
 
 \subsection{Global bundle adjustment with synthetic data}\label{sec:slam:results:gba}
 
