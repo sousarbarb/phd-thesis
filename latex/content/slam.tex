@@ -1791,6 +1791,59 @@ and is deferred to future work. Nevertheless, this synthetic benchmark intends
 to validate the convergence behavior and accuracy of the proposed \gls{gba}
 factors with ground-truth data.
 
+\subsubsection{Evaluation metrics}
+\label{sec:slam:results:gba:metrics}
+
+For each non-fixed pose $i$ in the graph, the post-optimization pose error
+is defined by \eqref{eq:slam:results:gba:metrics:residual},
+where $\mathbf{x}_i$ is the pose estimate optimized by the \gls{gba} factors
+proposed in \secref{sec:slam:gba} and $\mathbf{x}_i^*$ the ground-truth pose
+introduced in \secref{sec:slam:results:gba:setup}.
+The translational and rotational components of $\mathbf{e}_i$ are
+extracted as in \secref{sec:slam:online:factor} and aggregated over
+all $N$ non-fixed poses using the \gls{rmse} formulated in
+\eqref{eq:slam:results:gba:metrics:trans} for the translational error
+$\varepsilon_{\mathbf{t}}$ and in
+\eqref{eq:slam:results:gba:metrics:rot} for the rotational error
+$\varepsilon_{\theta}$.
+\begin{equation}
+\label{eq:slam:results:gba:metrics:residual}
+\mathbf{e}_i = {\mathbf{x}_i^{*}}^{-1}\cdot\mathbf{x}_i =
+\left[ {\mathbf{R}_i^{*}}^T | -{\mathbf{R}_i^{*}}^T  \, \mathbf{t}_i^{*} \right]
+\cdot \left[ \mathbf{R}_i | \mathbf{t}_i \right] =
+\left[ {\mathbf{R}_i^{*}}^T \mathbf{R}_i |
+       {\mathbf{R}_i^{*}}^T \cdot \left( \mathbf{t}_i - \mathbf{t}_i^{*} \right) \right] \in SE(2),
+\end{equation}
+\begin{equation}
+\label{eq:slam:results:gba:metrics:trans}
+\varepsilon_{\mathbf{t}} =
+\sqrt{\frac{1}{N}\sum_{i=1}^{N}\|\mathbf{t}_{\mathbf{e}_i}\|_2^2}
+\quad(\si{\metre})
+\end{equation}
+\begin{equation}
+\label{eq:slam:results:gba:metrics:rot}
+\varepsilon_{\theta} =
+\sqrt{\frac{1}{N}\sum_{i=1}^{N}\theta_{\mathbf{e}_i}^2}
+\quad(\si{\degree})
+\end{equation}
+
+The residual definition in \eqref{eq:slam:results:gba:metrics:residual} differs
+from the one adopted in the synthetic registration benchmark of
+\secref{sec:distance-maps:results:synthetic}, where the error was defined as
+$\mathbf{e}_i = \mathbf{x}_i\cdot\mathbf{x}_i^{*,-1}$. The latter definition was
+required to express the residual in the target frame of the aligner due to its
+diagnostic value of the estimated information matrix $\boldsymbol{\Omega}$ in
+degenerate scenes. In contrast, this experiment focuses exclusively on the pose
+estimation accuracy of the proposed \gls{gba} factors and does not report an
+information matrix calibration analysis.
+Thus, the residual defined by \eqref{eq:slam:results:gba:metrics:residual}
+is the natural choice for pose error evaluation on the $SE(2)$ manifold,
+given the independence of the translation and orientation errors contribution.
+A unified residual formulation that supports the simultaneous evaluation of
+pose accuracy and information matrix calibration is left for future work,
+possibly considering a full Lie-group algebraic formulation of both quantities
+on a common tangent space of $SE(2)$.
+
 \input{tables/slam/gba/results_synthetic_pc_res-0.03m.tex}
 
 \section{Summary and Conclusions}\label{sec:slam:conclusions}
