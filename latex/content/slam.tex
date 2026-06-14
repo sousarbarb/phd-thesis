@@ -1726,6 +1726,58 @@ thresholds of the offline ray-based merger
 (see~\eqref{eq:slam:dynamics:online:rules}) are set to
 $\tau_{\mathrm{new}} = \tau_{\mathrm{through}} = \SI{0.10}{\metre}$.
 
+\subsubsection{Evaluation metrics}
+\label{sec:slam:results:dynamics:metrics}
+
+Since this experiment focuses on the removal of dynamic observations from
+the environment map representation, the evaluation assesses the empirical
+probability distribution of the cell occupancy values $p_{\mathrm{occ}}(r,c)$
+defined in \eqref{eq:slam:dynamics:offline:occ-probability} over the observed
+cells of each generated grid map (\emph{standard}, \emph{dyn-rmv}).
+Cells marked as unknown (equivalent to those for which
+$n_{\mathrm{pass}}(r,c) = 0$) are excluded from this analysis.
+The principle behind this evaluation is that a sharper occupancy distribution,
+where most observed cells are concentrated near the cell states
+$p_{\mathrm{occ}} = 0$ (free) or $p_{\mathrm{occ}} = 1$ (occupied), corresponds
+to a less ambiguous environment representation. Conversely, cells with
+$p_{\mathrm{occ}} \approx 0.5$ reflect inconsistent hit-pass evidence,
+which may be due to dynamic returns in the integrated scans or to
+registration noise. The dynamics removal mechanism is expected to
+reduce the latter category by filtering out dynamic returns before
+integrating the scan observations into the occupancy grid map.
+
+In order to quantify this effect, the evaluation of this experiment adopts the
+peak-versus-middle mass partition of the empirical occupancy distribution.
+For a threshold $\tau \in (0, 0.5)$, the peak mass $m_{\mathrm{peak}}(\tau)$
+counts the fraction of observed cells with strong evidence of being either
+free or occupied, while the middle mass $m_{\mathrm{mid}}(\tau)$ counts
+the fraction of cells with weak evidence, as formulated in
+\eqref{eq:slam:results:dynamics:metrics:peak-vs-middle}.
+\begin{equation}
+\label{eq:slam:results:dynamics:metrics:peak-vs-middle}
+m_{\mathrm{peak}}(\tau) =
+\Pr\!\left[p_{\mathrm{occ}}(r,c) \in
+           \left[0,\tau\right] \cup \left[1-\tau, 1\right]\right],
+\;
+m_{\mathrm{mid}}(\tau) =
+\Pr\!\left[p_{\mathrm{occ}}(r,c) \in
+           \left(\tau, 1-\tau\right)\right]
+\end{equation}
+
+By construction, $m_{\mathrm{peak}}(\tau) + m_{\mathrm{mid}}(\tau) = 1$
+for any value of $\tau$. The experiment reports the
+$(m_{\mathrm{peak}}, m_{\mathrm{mid}})$ pair for two threshold values
+$\tau \in \{0.05, 0.10\}$, in order to verify that the effect of the
+dynamics removal mechanism is consistent across reasonable values of
+$\tau$ rather than being a consequence of a specific threshold value.
+In addition, the number of valid (observed) cells $N_{\mathrm{obs}}$
+and its delta $\Delta N_{\mathrm{obs}}$ between the \emph{standard} and
+\emph{dyn-rmv} results quantify how many cells are reclassified as
+unknown by the ray-based filtering. This metric exposes a
+complementary contribution of the proposed mechanism: cells whose only
+supporting beam endpoints were dynamic returns are removed from the
+occupancy grid representation entirely.
+
 \subsection{Global bundle adjustment with synthetic data}\label{sec:slam:results:gba}
 
 \todo{TBC}
