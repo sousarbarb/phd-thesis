@@ -1778,9 +1778,18 @@ complementary contribution of the proposed mechanism: cells whose only
 supporting beam endpoints were dynamic returns are removed from the
 occupancy grid representation entirely.
 
-\subsection{Global bundle adjustment with synthetic data}\label{sec:slam:results:gba}
+\subsection{Global Bundle Adjustment~(GBA) with synthetic data}\label{sec:slam:results:gba}
 
-\todo{TBC}
+This experiment evaluates the distance map-based \gls{gba} factors proposed in
+\secref{sec:slam:gba} on a synthetic benchmark with known ground-truth poses,
+isolating the contribution of the \gls{gba} factor formulations from
+the online operation of RicoSLAM.
+The integration of the proposed \gls{gba} stage with the online RicoSLAM
+pipeline for end-to-end evaluation on real-world sequences and global map
+refinement remains a work in progress at the time of writing this PhD~Thesis,
+and is deferred to future work. Nevertheless, this synthetic benchmark intends
+to validate the convergence behavior and accuracy of the proposed \gls{gba}
+factors with ground-truth data.
 
 \input{tables/slam/gba/results_synthetic_pc_res-0.03m.tex}
 
