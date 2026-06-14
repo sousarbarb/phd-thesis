@@ -1462,6 +1462,52 @@ This experiment evaluates how the relocalization policy discussed in
 same sequences from the IILABS~3D~\cite{ribeiro:access:2025} dataset
 (Nav~A~Diff, Nav~A~Omni, Loop, and Slippage), while comparing with
 the same baselines from the previous experiment.
+The experimental setup matches the one from
+\secref{sec:slam:results:iilabs3d:setup}, considering the same configurations
+for the RicoSLAM, GMapping~\cite{grisetti:tro:2007}, and
+SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021} algorithms.
+
+\subsubsection{Evaluation metrics}
+\label{sec:slam:results:relocalization:metrics}
+
+This experiment evaluates the scalability of each \gls{slam} system with
+three metrics measured at the end of each sequence run reported in
+\secref{sec:slam:results:iilabs3d}:
+\begin{itemize}
+\item \textbf{\#n:} number of keyframe variables (nodes) in the back-end graph
+      at the end of the sequence;
+\item \textbf{\#s:} the total number of laser scan messages incorporated
+      into each system's internal state estimate.
+      For pose graph systems operating
+      in scan mode (RicoSLAM in its \emph{scan} and \emph{scan w/reloc.}
+      variants, and SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021}),
+      each accepted scan is promoted to a keyframe,
+      making $\text{\#s} = \text{\#n}$.
+      In the case of operation in local map mode (RicoSLAM
+      in its \emph{local}, \emph{local w/upd.}, and
+      \emph{local w/reloc.} variants), $\#s$ aggregates every scan that
+      contributed to any keyframe's local map.
+      As for the particle filter-based GMapping~\cite{grisetti:tro:2007}
+      evaluation, $\#s$ counts the scans that
+      triggered an observation model update of the particle filter,
+      following the configured translation and rotation thresholds.
+\item \textbf{\#e:} number of pose-pose factors (edges) in the back-end pose
+      graph at the end of the sequence, including odometric edges from the
+      tracker and loop closure edges from loop detection.
+\end{itemize}
+
+The metrics $\#n$ and $\#e$ apply only to graph-based systems and are
+therefore reported for RicoSLAM and
+SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021}, but not for
+GMapping~\cite{grisetti:tro:2007}, which does not maintain a pose graph.
+Also, for RicoSLAM, the back-end pose graph at the end of a run is independent
+of which pose stream is considered for accuracy evaluation of the estimated
+trajectory. Indeed, the offline-corrected pose stream uses only the keyframe
+poses from the final optimized graph, without triggering any further
+optimization or graph modification. Therefore, the scalability results from
+this experiment are reported once per RicoSLAM variant, rather than
+separately for each pose stream as presented in
+\secref{sec:slam:results:iilabs3d}.
 
 \input{tables/slam/iilabs3d/results_iilabs3d_graph.tex}
 
