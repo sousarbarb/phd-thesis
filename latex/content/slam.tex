@@ -1776,20 +1776,163 @@ this experiment are reported once per RicoSLAM variant, rather than
 separately for each pose stream as presented in
 \secref{sec:slam:results:iilabs3d}.
 
+\subsubsection{Analysis and discussion}
+\label{sec:slam:results:relocalization:analysis}
+
+\tabref{tab:slam:results:iilabs3d:graph} presents the back-end graph size
+for each system at the end of the four sequences (Nav~A~Diff, Nav~A~Omni, Loop,
+and Slippage) of the IILABS~3D~\cite{ribeiro:access:2025} dataset.
+Figures~\ref{fig:slam:results:relocalization:nav-a-diff-omni}
+and~\ref{fig:slam:results:relocalization:loop-slippage}
+show the final back-end pose graph produced by the
+\emph{local~w/reloc.} variant of RicoSLAM on the same sequences.
+This variant is the one with the lowest number of nodes from
+\tabref{tab:slam:results:iilabs3d:graph}.
+
 \input{tables/slam/iilabs3d/results_iilabs3d_graph.tex}
 
-Algorithms:
-\begin{itemize}
-\item RicoSLAM (no relocalization versus with relocalization, 0.03m resolution,
-      voxelization enabled, bi-linear interpolation disabled, M1 representation)
-\item SLAM Toolbox
-\end{itemize}
+\begin{figure}[t]
+  \centering
+  \subfloat[][]{\scalebox{1}[1]{\includegraphics[width=0.8\textwidth]{slam/iilabs3d_scalability/local-map_w-relocalization_iilabs3d_nav_a_diff_cropped.png}}
+  \label{fig:slam:results:relocalization:nav-a-diff}}\\[\smallskipamount]
+  \subfloat[][]{\scalebox{1}[1]{\includegraphics[width=0.8\textwidth]{slam/iilabs3d_scalability/local-map_w-relocalization_iilabs3d_nav_a_omni_cropped.png}}
+  \label{fig:slam:results:relocalization:nav-a-omni}}
+\caption[%
+    Final back-end pose graphs of the local w/reloc. variant of
+    RicoSLAM on the Nav~A~Diff and Nav~A~Omni sequences of the IILABS~3D dataset]{%
+    Final back-end pose graphs of the \emph{local~w/reloc.}\ variant of
+    RicoSLAM on the Nav~A~Diff and Nav~A~Omni sequences of
+    the IILABS~3D~\cite{ribeiro:access:2025} dataset:
+    (a) Nav~A~Diff ($17$~keyframes, $23$~factors);
+    (b) Nav~A~Omni ($17$~keyframes, $23$~factors).}
+  \label{fig:slam:results:relocalization:nav-a-diff-omni}
+\end{figure}
 
-Metrics:
-\begin{itemize}
-\item number of nodes along time
-\item number of edges along time
-\end{itemize}
+\begin{figure}[t]
+  \centering
+  \subfloat[][]{\scalebox{1}[1]{\includegraphics[width=0.8\textwidth]{slam/iilabs3d_scalability/local-map_w-relocalization_iilabs3d_loop_cropped.png}}
+  \label{fig:slam:results:relocalization:loop}}\\[\smallskipamount]
+  \subfloat[][]{\scalebox{-1}[-1]{\includegraphics[width=0.8\textwidth]{slam/iilabs3d_scalability/local-map_w-relocalization_iilabs3d_slippage_cropped.png}}
+  \label{fig:slam:results:relocalization:slippage}}
+\caption[%
+    Final back-end pose graphs of the local w/reloc. variant of
+    RicoSLAM on the Loop and Slippage sequences of the IILABS~3D dataset]{%
+    Final back-end pose graphs of the \emph{local~w/reloc.}\ variant of
+    RicoSLAM on the Loop and Slippage sequences of
+    the IILABS~3D~\cite{ribeiro:access:2025} dataset:
+    (a) Loop ($18$~keyframes, $18$~factors);
+    (b) Slippage ($8$~keyframes, $7$~factors).}
+  \label{fig:slam:results:relocalization:loop-slippage}
+\end{figure}
+
+\paragraph{Pose graph footprint relative to the baselines}
+Across the four IILABS~3D~\cite{ribeiro:access:2025} sequences, all
+RicoSLAM variants produce smaller back-end pose graphs than
+SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021} for comparable, and often
+better, trajectory accuracy (see~\tabref{tab:slam:results:iilabs3d}).
+As discussed in \secref{sec:slam:results:iilabs3d:setup},
+the \emph{scan} variant is configured with a \SI{50}{\percent} inlier ratio
+threshold as its splitting criterion and disables the merging policy.
+This variant produces $75$, $31$, $83$, and $10$ keyframes (and $168$,
+$47$, $158$, and $11$ factors) on the Nav~A~Diff, Nav~A~Omni,
+Loop, and Slippage sequences, respectively, against the $310$, $126$,
+$261$, and $46$ keyframes (and $470$, $163$, $393$, and $59$ edges)
+of the most compact SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021}
+configuration in this experiment (\SI{0.5}{\metre}/\SI{0.5}{\radian}).
+The contrast is even larger against the \SI{0.3}{\metre}/\SI{0.3}{\radian}
+configuration of SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021}, which
+reaches up to $541$ keyframes on Nav~A~Diff alone.
+Combined with the trajectory accuracy results discussed in
+\secref{sec:slam:results:iilabs3d:analysis}, this result indicates the
+potential of inlier ratio-based splitting criteria to keep the back-end
+graph compact without compromising trajectory accuracy. The inlier criterion
+only commits a new keyframe to the back-end graph when the tracker's aligner can
+no longer maintain the $\eta_{\mathrm{inliers}} \ge \SI{50}{\percent}$
+requirement against the current keyframe's local map.
+This behavior contrasts with fixed translational or rotational displacements as
+in the viewpoint-based splitting criterion employed by
+SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021} that creates new keyframes
+constantly.
+
+Although GMapping~\cite{grisetti:tro:2007} is a particle filter system
+and does not maintain a pose graph, scalability is also a concern for
+its operation. Each particle stores the full robot trajectory, so
+the computational cost grows with the run duration and the explored area.
+The number of scans integrated by GMapping~\cite{grisetti:tro:2007} into
+its observation-model updates is approximately proportional to the keyframe
+count of the RicoSLAM \emph{local} variant, especially under the
+\SI{1.0}{\metre}/\SI{1.0}{\radian} update thresholds. At this
+configuration, the rotation threshold of \SI{1.0}{\radian}
+($\approx \SI{57.3}{\degree}$) is rarely reached before the robot
+travels \SI{1.0}{\metre} on the IILABS~3D~\cite{ribeiro:access:2025}
+sequences, so the update events are predominantly translation-driven.
+For instance, on Nav~A~Diff, GMapping~\cite{grisetti:tro:2007} triggers
+$273$ observation-model updates, approximately \num{2.6} times the
+$106$ keyframes committed by the RicoSLAM \emph{local} variant, which
+is consistent with the ratio of their corresponding translation
+thresholds (\SI{1.00}{\metre} versus \SI{2.50}{\metre}).
+The same proportionality is observed on the remaining sequences (ratios of
+\num{2.6}, \num{2.6}, and \num{2.8} for Nav~A~Omni, Loop, and Slippage,
+respectively). A coarser update threshold would reduce the
+GMapping~\cite{grisetti:tro:2007} scan count further, as expected from
+translation and rotational-based thresholds. However, as
+discussed in \secref{sec:slam:results:iilabs3d:setup}, increasing the
+translation threshold beyond \SI{1.0}{\metre} resulted in tracking
+failures, given the dependence of GMapping~\cite{grisetti:tro:2007} on
+wheel odometry to propagate the particles between observation-model updates.
+
+Overall, RicoSLAM demonstrates the most favorable scalability behavior
+across all systems considered in this experiment. Future work in this direction
+includes the comparison against additional 2D~\gls{slam} baselines such as
+Cartographer~\cite{hess:icra:2016}, the evaluation on further sequences from
+the literature, and the explicit measurement of the front-end and back-end
+computation times together with memory usage of the RicoSLAM system.
+
+\paragraph{Bounding the graph growth through relocalization}
+The relocalization policy described in
+\secref{sec:slam:online:relocalization} achieves its intended effect
+of bounding the back-end graph, reducing its dependence on the
+duration of the run and the path length.
+On Nav~A~Diff, the \emph{scan~w/reloc.}\ variant reduces the keyframe
+count from $75$ to $34$ (\SI{-55}{\percent} reduction) and the edge
+count from $168$ to $36$ (\SI{-79}{\percent}). The same effect is
+more pronounced on Loop, where \emph{scan~w/reloc.}\ commits only
+$19$ keyframes to the back-end graph against the $83$ of the non-relocalizing
+\emph{scan} variant (\SI{-77}{\percent} reduction), and similarly on Slippage,
+where the keyframe count drops from $10$ to $8$.
+
+As for the local map variants without relocalization, the
+\emph{local} and \emph{local~w/upd.}\ configurations produce
+essentially the same back-end graph as each other.
+Similar to \emph{scan}, these variants exhibit a graph size that grows with
+the path length. On Nav~A~Diff, both \emph{local} and \emph{local~w/upd.}\
+variants yield $106$ nodes and approximately $240$ edges.
+This graph size is larger than the $75$ nodes and $168$ edges
+of \emph{scan}, but also with more scans aggregated into
+each keyframe's local map. The $373$ scans reported under $\#s$ for
+both local variants on this sequence correspond to roughly $3.5$
+scans per keyframe on average, which the ray-based merger of
+\secref{sec:slam:dynamics:online} integrates into the local maps.
+The \emph{local~w/upd.}\ variant differs only from \emph{local} on the
+Nav~A~Diff sequence, where the former commits $238$ edges instead of $240$.
+This small change is attributable to the additional information-matrix
+update performed at keyframe transitions in \emph{local~w/upd.},
+which alters the optimized graph structure, possibly impacting the loop closure
+detection from RicoSLAM based on nodes proximity.
+
+Compared to \emph{scan~w/reloc.}, the reduction in graph size is even more
+pronounced for the \emph{local~w/reloc.}\ variant, which combines the
+bounded growth of the relocalization policy with the scan aggregation of the
+local maps mode. This configuration produces the fewest keyframes across
+all RicoSLAM configurations on the four sequences -- $17$, $17$,
+$18$, and $8$ on Nav~A~Diff, Nav~A~Omni, Loop, and Slippage,
+respectively (tying with \emph{scan~w/reloc.}\ on Slippage) -- while
+aggregating $89$, $80$, $82$, and $31$ scans into the back-end pose
+graph through the ray-based merger. This result indicates that the
+joint use of the relocalization policy and the local-map maintenance produces
+a back-end whose size depends primarily on the spatial extent of
+the explored environment rather than on the duration of operation or path
+length, even when the robot revisits the same locations multiple times.
 
 \subsection{Mapping with dynamics removal}\label{sec:slam:results:dynamics}
 
