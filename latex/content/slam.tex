@@ -1201,6 +1201,8 @@ point-to-plane alignment formulation proposed in
 
 This section presents four experiments with the RicoSLAM framework that evaluate
 the contributions presented in this chapter.
+A public YouTube playlist\footnote{\url{https://www.youtube.com/playlist?list=PLvp8fJUEPxYR6GQ2JIyaQezfa_YsO3M4T}}
+is available with videos for all four experiments.
 First, \secref{sec:slam:results:iilabs3d} presents a trajectory accuracy
 benchmark on the IILABS~3D dataset~\cite{ribeiro:access:2025}, comparing
 RicoSLAM against established 2D graph-based and particle-filter-based \gls{slam}
@@ -1455,7 +1457,272 @@ alignment step. Thus, this experiment considers the following metrics:
       \left\|\mathbf{x}_t^* \ominus \mathbf{x}_t\right\|_2^2}
 \end{equation}
 
-\subsection{Scalability and graph growth with relocalization}\label{sec:slam:results:relocalization}
+\subsubsection{Analysis and discussion}
+\label{sec:slam:results:iilabs3d:analysis}
+
+\tabref{tab:slam:results:iilabs3d} presents the trajectory accuracy results
+across the four sequences from the IILABS~3D~\cite{ribeiro:access:2025}
+dataset. Figures~\ref{fig:slam:results:iilabs3d:nav-a-diff},
+\ref{fig:slam:results:iilabs3d:nav-a-omni},
+\ref{fig:slam:results:iilabs3d:loop}, and
+\ref{fig:slam:results:iilabs3d:slippage} show the estimated trajectories
+produced by GMapping~\cite{grisetti:tro:2007},
+SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021}, and RicoSLAM on
+the Nav~A~Diff, Nav~A~Omni, Loop, and Slippage sequences, respectively.
+
+\input{tables/slam/iilabs3d/results_iilabs3d.tex}
+
+\begin{figure}[t]
+  \centering
+  \subfloat[][]{\includegraphics[width=\textwidth]{slam/iilabs3d/nav_a_diff_gmapping_slam-toolbox.eps}
+  \label{fig:slam:results:iilabs3d:nav-a-diff:gmapping-slam-toolbox}}\\[\smallskipamount]
+  \subfloat[][]{\includegraphics[width=\textwidth]{slam/iilabs3d/nav_a_diff_ricoslam.eps}
+  \label{fig:slam:results:iilabs3d:nav-a-diff:ricoslam}}
+\caption[%
+    Estimated trajectories on the Nav~A~Diff sequence of
+    the IILABS~3D dataset]{%
+    Estimated trajectories on the Nav~A~Diff sequence of
+    the IILABS~3D~\cite{ribeiro:access:2025} dataset:
+    (a) GMapping~\cite{grisetti:tro:2007}
+        (\emph{gmap}, \SI{1.0}{\metre}/\SI{1.0}{\radian}) and
+        SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021}
+        (\emph{stool}, \SI{0.5}{\metre}/\SI{0.5}{\radian});
+    (b) RicoSLAM (\emph{local} vs \emph{scan}$^{\dagger}$).}
+  \label{fig:slam:results:iilabs3d:nav-a-diff}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \subfloat[][]{\includegraphics[width=\textwidth]{slam/iilabs3d/nav_a_omni_gmapping_slam-toolbox.eps}
+  \label{fig:slam:results:iilabs3d:nav-a-omni:gmapping-slam-toolbox}}\\[\smallskipamount]
+  \subfloat[][]{\includegraphics[width=\textwidth]{slam/iilabs3d/nav_a_omni_ricoslam.eps}
+  \label{fig:slam:results:iilabs3d:nav-a-omni:ricoslam}}
+\caption[%
+    Estimated trajectories on the Nav~A~Omni sequence of
+    the IILABS~3D dataset]{%
+    Estimated trajectories on the Nav~A~Omni sequence of
+    the IILABS~3D~\cite{ribeiro:access:2025} dataset:
+    (a) GMapping~\cite{grisetti:tro:2007}
+        (\emph{gmap}, \SI{0.5}{\metre}/\SI{0.5}{\radian}) and
+        SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021}
+        (\emph{stool}, \SI{0.5}{\metre}/\SI{0.5}{\radian});
+    (b) RicoSLAM (\emph{local w/upd.} vs \emph{scan}$^{\dagger}$).}
+  \label{fig:slam:results:iilabs3d:nav-a-omni}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \subfloat[][]{\includegraphics[width=\textwidth]{slam/iilabs3d/loop_gmapping_slam-toolbox.eps}
+  \label{fig:slam:results:iilabs3d:loop:gmapping-slam-toolbox}}\\[\smallskipamount]
+  \subfloat[][]{\includegraphics[width=\textwidth]{slam/iilabs3d/loop_ricoslam.eps}
+  \label{fig:slam:results:iilabs3d:loop:ricoslam}}
+\caption[%
+    Estimated trajectories on the Loop sequence of
+    the IILABS~3D dataset]{%
+    Estimated trajectories on the Loop sequence of
+    the IILABS~3D~\cite{ribeiro:access:2025} dataset:
+    (a) GMapping~\cite{grisetti:tro:2007}
+        (\emph{gmap}, \SI{1.0}{\metre}/\SI{1.0}{\radian}) and
+        SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021}
+        (\emph{stool}, \SI{0.5}{\metre}/\SI{0.5}{\radian});
+    (b) RicoSLAM (\emph{local w/upd.} vs \emph{scan}$^{\dagger}$).}
+  \label{fig:slam:results:iilabs3d:loop}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \subfloat[][]{\includegraphics[width=\textwidth]{slam/iilabs3d/slippage_gmapping_slam-toolbox.eps}
+  \label{fig:slam:results:iilabs3d:slippage:gmapping-slam-toolbox}}\\[\smallskipamount]
+  \subfloat[][]{\includegraphics[width=\textwidth]{slam/iilabs3d/slippage_ricoslam.eps}
+  \label{fig:slam:results:iilabs3d:slippage:ricoslam}}
+\caption[%
+    Estimated trajectories on the Slippage sequence of
+    the IILABS~3D dataset]{%
+    Estimated trajectories on the Slippage sequence of
+    the IILABS~3D~\cite{ribeiro:access:2025} dataset:
+    (a) GMapping~\cite{grisetti:tro:2007}
+        (\emph{gmap}, \SI{0.5}{\metre}/\SI{0.5}{\radian}) and
+        SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021}
+        (\emph{stool}, \SI{0.3}{\metre}/\SI{0.3}{\radian});
+    (b) RicoSLAM (\emph{scan w/reloc.} vs \emph{scan w/reloc.}$^{\dagger}$).}
+  \label{fig:slam:results:iilabs3d:slippage}
+\end{figure}
+
+\paragraph{Comparison against the baselines}
+Across the four IILABS~3D~\cite{ribeiro:access:2025} sequences, both
+RicoSLAM and SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021} reduce the
+\gls{ate} consistently below the values obtained by
+GMapping~\cite{grisetti:tro:2007}. Although
+GMapping~\cite{grisetti:tro:2007} triggers its observation-model updates
+under a translation/rotation threshold policy analogous to the one used by
+SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021}, the dependence of
+its particle filter on the sensor likelihood, on the covariances of
+the motion-propagation model, and on the selection of the best particle
+to estimate the robot pose makes its estimation less accurate and less
+stable than SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021} and RicoSLAM,
+which rely on point cloud registration.
+Additionally, the particle filter of GMapping~\cite{grisetti:tro:2007} updates
+the map only at the pose increments triggered by the configured thresholds,
+leaving the intermediate poses determined by the wheel-odometry motion model.
+Although SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021} also relies on
+wheel odometry between scan registration events, its scan-to-grid
+matching seems to be more precise than the GMapping~\cite{grisetti:tro:2007}
+particle filter, based on the results in \tabref{tab:slam:results:iilabs3d},
+narrowing the gap to RicoSLAM.
+A particular failure worth noting is that GMapping~\cite{grisetti:tro:2007} is
+unable to close the loop on the Loop sequence when the robot re-enters the
+Nav~A space, as already referred in \secref{sec:slam:results:iilabs3d:setup}.
+This failure is reflected in the \gls{ate} of \SI{0.107}{\metre} of its best
+configuration, against the \SI{0.040}{\metre} and
+\SI{0.033}{\metre} achieved by SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021}
+and RicoSLAM, respectively.
+
+RicoSLAM results in the most accurate online \gls{slam} compared to the
+baselines in terms of \gls{ate} in the IILABS~3D dataset~\cite{ribeiro:access:2025}.
+Its best online configuration achieves \SI{0.047}{\metre}, \SI{0.030}{\metre},
+\SI{0.033}{\metre}, and \SI{0.014}{\metre} \gls{ate} on
+Nav~A~Diff, Nav~A~Omni, Loop, and Slippage, respectively, against
+the \SI{0.053}{\metre}, \SI{0.061}{\metre}, \SI{0.040}{\metre}, and
+\SI{0.042}{\metre} results from the best
+SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021} configurations.
+Unlike the laser odometry evaluation of \chapref{chap:distance-maps},
+the \gls{rte} and \gls{rre} values reported here are computed over
+the pose trajectories that incorporate loop closure corrections, reflecting
+the combined behavior of the front-end aligner and the back-end optimization.
+On these relative metrics, the only configuration on which
+SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021} surpasses RicoSLAM is on
+the Loop sequence, where its \SI{0.5}{\metre}/\SI{0.5}{\radian} variant
+attains \SI{0.055}{\degree\per\metre} \gls{rre} against the
+\SI{0.068}{\degree\per\metre} of the best RicoSLAM online configuration.
+Based on the results from \secref{sec:distance-maps:results:iilabs3d}, this
+result can be a consequence of SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021}
+changing keyframe more frequently than RicoSLAM, resulting in lower accumulation
+of rotational errors.
+Also, the qualitative comparison against the ground-truth trajectories in
+Figures~\ref{fig:slam:results:iilabs3d:nav-a-diff:gmapping-slam-toolbox}--%
+\ref{fig:slam:results:iilabs3d:slippage:ricoslam} reinforces the same
+overall conclusion: RicoSLAM tracks the ground-truth trajectory more closely
+than SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021} and
+GMapping~\cite{grisetti:tro:2007} across all four sequences. Overall, these
+results indicate that RicoSLAM outperforms both baselines on the most of the
+trajectory accuracy metrics considered in this evaluation,
+with the single exception noted previously.
+
+\paragraph{Online versus offline corrected stream}
+The benefit of the offline pose-correction stream
+$\mathbf{x}_{R,W}^{\mathrm{offline}}(t)$
+(see~\eqref{eq:slam:online:pose-history:offline}) is most evident on
+the three longer sequences with revisits (Nav~A~Diff, Nav~A~Omni, and Loop),
+where the loop closures detected by RicoSLAM correct accumulated drift along
+the entire trajectory. For the \emph{scan} variant, the \gls{ate} drops from
+\SI{0.063}{\metre} to \SI{0.022}{\metre} on Nav~A~Diff
+(\SI{-65}{\percent} reduction), from \SI{0.053}{\metre} to
+\SI{0.023}{\metre} on Nav~A~Omni (\SI{-57}{\percent}), and from
+\SI{0.037}{\metre} to \SI{0.023}{\metre} on Loop (\SI{-38}{\percent}).
+The same pattern is observed across all five RicoSLAM variants, with
+the offline stream consistently obtaining the smallest \gls{ate} per variant.
+On the Slippage sequence, the offline stream matches its online counterpart
+(\SI{0.014}{\metre} for \emph{scan w/reloc.} in both modes; less than
+\SI{0.002}{\metre} of difference for the remaining variants), which is expected
+given the short straight-line trajectory of that sequence. As a result,
+when the robot returns back to its initial pose, there is no significant
+new information from the 2D laser scanner through which past poses can be
+corrected \emph{a~posteriori} from future loop closures.
+
+Another observation is that the best offline trajectory accuracy is obtained by
+the \emph{scan} variant on the sequences Nav~A~Diff, Nav~A~Omni, and Loop, and
+by \emph{scan~w/reloc.} on Slippage, rather than by any of the local maps
+variants from RicoSLAM. This result is consistent with the additional error
+sources that local maps variants accumulate during the keyframe lifecycle, \eg,
+the residual of the tracker's aligner upon every merge event and the measurement
+noise from the sensor itself integrated into the keyframe's local cloud through
+the ray-based merger (see~\secref{sec:slam:dynamics:online}). These additional
+error sources cannot be undone once the merger has incorporated the scan.
+The \emph{scan} variant treats each scan integrated into the graph back-end as
+an unique keyframe whose point cloud is never modified after the creation of the
+keyframe. Although the local maps modes may improve the online tracking by
+performing scan-to-local map alignment with a richer and more updated reference
+cloud compared to scan-to-scan alignment, the resulting keyframe representation
+of the underlying scene usually have less error with scan-based variants
+compared to the local map implementation. This conclusion is also demonstrated
+numerically by the lower \gls{ate} metrics of the offline pose results from the
+\emph{scan} variant compared to local maps.
+Still, the offline stream of the \emph{local~w/upd.}\ variant obtains
+\gls{ate} values within \SI{0.005}{\metre} of the \emph{scan} variant
+on Nav~A~Diff, Nav~A~Omni, and Loop sequences (\SI{0.027}{\metre},
+\SI{0.026}{\metre}, and \SI{0.027}{\metre} against \SI{0.022}{\metre},
+\SI{0.023}{\metre}, and \SI{0.023}{\metre}, respectively).
+This variant re-evaluates the information matrices of the incident factors at
+keyframe-change time. Consequently, these results indicate that this automatic
+update on the information matrices may help reduce the offline accuracy loss
+introduced by the local maps maintenance.
+
+Complementary to the \gls{ate} reduction noted in the results from the
+offline corrected pose streams, another interesting observation concerns
+the dispersion of the absolute translation error around its mean.
+The evo~\cite{grupp:evo} framework reports the standard deviation $\sigma_{\mathrm{ATE}}$
+of the per-pose translational error magnitudes that contribute to the \gls{ate}
+definition in \eqref{eq:slam:results:iilabs3d:ate} alongside the \gls{ate}
+itself. In the results of the online pose stream from the \emph{scan} variant,
+RicoSLAM obtains $\sigma_{\mathrm{ATE}} = \SI{0.042}{\metre}$ on Nav~A~Diff,
+$\SI{0.029}{\metre}$ on Nav~A~Omni, and $\SI{0.022}{\metre}$ on
+Loop, with \gls{ate} values of $\SI{0.063}{\metre}$,
+$\SI{0.053}{\metre}$, and $\SI{0.037}{\metre}$, respectively.
+The corresponding offline stream reduces $\sigma_{\mathrm{ATE}}$ to
+$\SI{0.009}{\metre}$, $\SI{0.011}{\metre}$, and $\SI{0.010}{\metre}$
+on the same sequences, against \gls{ate} values of
+$\SI{0.022}{\metre}$, $\SI{0.023}{\metre}$, and $\SI{0.023}{\metre}$.
+The Slippage sequence is the exception once more, with
+$\sigma_{\mathrm{ATE}} = \SI{0.0055}{\metre}$ in both modes for the
+\emph{scan~w/reloc.} variant.
+This difference of the trajectory error dispersion from a few centimeters in
+the online stream to approximately one centimeter or below in
+the offline stream suggests that, after loop closure corrections,
+the remaining translational error is dominated by systematic error sources,
+rather than by accumulated front-end drift.
+Examples of these systematic error could be the following ones:
+the extrinsic calibration of the laser scanner on the robot,
+the measurement noise of the sensor itself, and the precision of
+the OptiTrack ground-truth. This result motivates a potential application of
+the RicoSLAM offline pose stream as a pseudo-ground-truth source for calibration
+tasks in which the laser scanner pose is estimated by RicoSLAM
+(the framework supports performing \gls{slam} without requiring wheeled odometry
+nor the sensor pose \gls{wrt} the robot geometric frame), such as the
+automatic estimation of the wheel-odometry parameters of the platform
+and the laser scanner extrinsic transform on the robot simultaneously.
+The empirical validation of this application is left as future work.
+
+\paragraph{Effect of the splitting/merging configuration}
+Among the five RicoSLAM variants, the \emph{local~w/upd.}\ configuration is
+the best-performing online variant on Nav~A~Omni and Loop, obtaining
+\SI{0.030}{\metre} and \SI{0.033}{\metre} \gls{ate}, respectively, against
+the \SI{0.053}{\metre} and \SI{0.037}{\metre} results of the \emph{scan}
+baseline on the same sequences. The improvement is consistent with
+the proposed approach in \secref{sec:slam:online:splitting-merging}:
+aggregating multiple scans per keyframe through the merging stage produces
+denser local maps for the tracker's aligner, while re-evaluating the factor
+information matrices at keyframe change keeps the back-end consistent with
+the additional information accumulated in each local map between split events.
+Conversely, the \emph{scan w/reloc.}\ and \emph{local~w/reloc.}\ variants
+have a slight systematic degradation in \gls{ate} compared to their
+non-relocalizing counterparts, \eg, \SI{0.107}{\metre} versus \SI{0.063}{\metre}
+on Nav~A~Diff for \emph{scan~w/reloc.}\ vs.\ \emph{scan}. This degradation
+reflects the trade-off between bounding the graph size and integrating new
+information with additional keyframes and loop closure constraints.
+As discussed in \secref{sec:slam:results:relocalization:analysis},
+the relocalization variants result in a substantially smaller back-end graph
+while remain competitive in \gls{ate} once the offline pose correction is
+applied, exemplified by the \gls{ate} for
+\emph{scan w/reloc.}\textsuperscript{$\dagger$} of \SI{0.041}{\metre},
+\SI{0.041}{\metre}, and \SI{0.027}{\metre} on the Nav~A~Diff, Nav~A~Omni, and
+Loop sequences, respectively, compared to \SI{0.107}{\metre},
+\SI{0.057}{\metre}, and \SI{0.053}{\metre} by its online counterpart.
+These competitive \gls{ate} results in conjunction with bounding the graph size
+makes the relocalization policy a possible research direction when executing
+RicoSLAM in long-term operations.
+
+\subsection{Scalability and graph growth with relocalization on the IILABS~3D dataset}
+\label{sec:slam:results:relocalization}
 
 This experiment evaluates how the relocalization policy discussed in
 \secref{sec:slam:online:relocalization} affects the back-end graph growth on the
