@@ -1791,6 +1791,115 @@ and is deferred to future work. Nevertheless, this synthetic benchmark intends
 to validate the convergence behavior and accuracy of the proposed \gls{gba}
 factors with ground-truth data.
 
+\subsubsection{Experimental setup}
+\label{sec:slam:results:gba:setup}
+
+The synthetic benchmark constructs a Manhattan-like grid of $SE(2)$
+ground-truth poses in a square scene with a $\SI{20}{\metre}$ side length,
+following the same convention as the synthetic scenes described in
+\secref{sec:distance-maps:results:synthetic:setup}.
+A grid size parameter $g = 8$ generates a regular grid of $(2g+1)^2 = 289$
+poses placed at integer coordinates $(r, c) \in [-g, g]^2$, with the
+orientation of each pose set according to the parity of the index $(r, c)$
+to one of four cardinal headings $\{\SI{0}{\degree}, \SI{+90}{\degree},
+\SI{-180}{\degree}, \SI{-90}{\degree}\}$. This rotation pattern mimics
+the change of heading of a wheeled platform navigating a
+Manhattan-like grid network of corridors. For each pose, we generate a synthetic
+2D~laser scan using the same range model as
+\secref{sec:distance-maps:results:synthetic:setup} with the parameters
+of the Hokuyo~UST-10LX sensor ($\SI{30}{\metre}$ maximum range and
+$\SI{0.25}{\degree}$ angular resolution), and
+with a $\SI{360}{\degree}$ \gls{fov} in this benchmark.
+Each scan is associated with a distance map representation
+(see~\secref{sec:distance-maps:alignment:dmaps}) computed with cell
+resolution $\delta = \SI{0.03}{\metre}$ and truncation distance
+$d_{\max} = \SI{5}{\metre}$.
+\figref{fig:slam:results:gba:gt} illustrates the ground-truth poses
+and the synthetic laser scans generated in the scope of this experiment.
+
+\begin{figure}[t]
+  \centering
+  \subfloat[][]{\includegraphics[height=0.49\textwidth]{slam/gba/no-noise_gt.png}%
+  \label{fig:slam:results:gba:gt:no-noise}}
+  \hfill
+  \subfloat[][]{\includegraphics[height=0.49\columnwidth]{slam/gba/noise-0.03m_gt.png}%
+  \label{fig:slam:results:gba:gt:0.03m-noise}}
+  \caption[%
+      Ground-truth poses and synthetic laser scans of the Manhattan-like
+      grid considered in the synthetic benchmark of the proposed
+      distance map-based GBA factors]{%
+      Ground-truth poses and synthetic laser scans of the Manhattan-like
+      grid considered in the synthetic benchmark of the proposed
+      distance map-based \gls{gba} factors:
+      (a) noise-free synthetic scans;
+      (b) synthetic scans with a $\sigma = \SI{0.03}{\metre}$ Gaussian range
+      noise.}
+  \label{fig:slam:results:gba:gt}
+\end{figure}
+
+Then, the synthetic factor graph is assembled by adding a distance map-based
+\gls{gba} factor between every pair of variables $(v_1, v_2)$ whose
+ground-truth translations are within a loop closure radius of
+$\SI{1.1}{\metre}$. This radius reduces the graph connectivity to a sparse set
+of constraints that link each variable only to its four neighbors in the grid,
+replicating the local connectivity expected from a back-end pose graph populated
+by the online RicoSLAM pipeline. The first variable of the factor graph
+is marked as fixed (see~\secref{sec:slam:online:overview}),
+eliminating the global gauge freedom of the optimization problem.
+The remaining variables are perturbed by uniform noise, as illustrated in
+\figref{fig:slam:results:gba:perturb-init}:
+$\pm\SI{1.5}{\metre}$ on each translational component of the initial estimation
+for the graph variables and $\pm\SI{20}{\degree}$ on their orientation.
+
+\begin{figure}[t]
+  \centering
+  \subfloat[][]{\includegraphics[height=0.49\textwidth]{slam/gba/no-noise_pert-init.png}%
+  \label{fig:slam:results:gba:perturb-init:no-noise}}
+  \hfill
+  \subfloat[][]{\includegraphics[height=0.49\columnwidth]{slam/gba/noise-0.03m_pert-init.png}%
+  \label{fig:slam:results:gba:perturb-init:0.03m-noise}}
+  \caption[%
+      Initial guess of the GBA factor graph after applying the uniform
+      perturbation to each non-fixed variable]{%
+      Initial guess of the \gls{gba} factor graph after applying the
+      uniform perturbation ($\pm\SI{1.5}{\metre}$ on each translational
+      component and $\pm\SI{20}{\degree}$ on the orientation) to each
+      non-fixed variable:
+      (a) noise-free synthetic scans;
+      (b) synthetic scans with a $\sigma = \SI{0.03}{\metre}$ Gaussian range
+      noise.}
+  \label{fig:slam:results:gba:perturb-init}
+\end{figure}
+
+We evaluate two factor formulations in this experiment, each at two distance map
+representation levels, following the testing methodology of the synthetic
+registration benchmark in
+\secref{sec:distance-maps:results:synthetic:setup}:
+\begin{itemize}
+\item $\mathcal{D}_{\mathrm{p2p}}$: the point-to-point distance
+      map-based \gls{gba} factor proposed in
+      \secref{sec:slam:gba:p2p}, evaluated with representation levels
+      $\mathcal{M}_0$ and $\mathcal{M}_1$;
+\item $\mathcal{D}_{\mathrm{p2pl}}$: the point-to-plane variant
+      from \secref{sec:slam:gba:p2pl}, evaluated with
+      representation levels $\mathcal{M}_0$ and $\mathcal{M}_2$.
+\end{itemize}
+
+In addition, each configuration is evaluated with and without
+voxelization of the point cloud associated with eac variable at the distance map
+resolution $\delta = \SI{0.03}{\metre}$ before constructing the distance map
+representation. Subsequently, this approach results in 8~configurations per
+range noise condition. Two noise conditions are considered: a noise-free
+case ($\sigma = \SI{0.00}{\metre}$) and a Gaussian range noise with
+standard deviation $\sigma = \SI{0.03}{\metre}$, matching the
+repeatability of the Hokuyo~UST-10LX 2D~laser scanner sensor.
+Then, the factor graph is optimized using the Gauss-Newton solver
+from the srrg2\_solver~\cite{grisetti:robotics:2020} framework, with
+a sparse-block Cholesky linear solver, an initial damping factor of $1.0$,
+a maximum of 200 iterations, and a $10^{-3}$ step-norm termination criterion.
+Robust M-estimators are disabled, similarly to
+\secref{sec:distance-maps:results:synthetic:setup}.
+
 \subsubsection{Evaluation metrics}
 \label{sec:slam:results:gba:metrics}
 
