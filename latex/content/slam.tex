@@ -2922,8 +2922,57 @@ pose accuracy and information matrix calibration is left for future work,
 possibly considering a full Lie-group algebraic formulation of both quantities
 on a common tangent space of $SE(2)$.
 
+\subsubsection{Analysis and discussion}
+\label{sec:slam:results:gba:analysis}
+
+\tabref{tab:slam:results:gba} presents the translational and rotational
+\gls{rmse} for the four \gls{gba} factor formulations considered in this
+experiment, evaluated with and without voxelization of the moving point
+clouds and across the noise-free and noisy conditions.
+The results from \tabref{tab:slam:results:gba} are complemented by two images
+to illustrate the optimized factor graph at the end of the \gls{gba} stage.
+\figref{fig:slam:results:gba:p2p_m0_vox-n} shows the final
+configuration obtained with the point-to-point \gls{gba} factor
+$\mathcal{D}_{\mathrm{p2p}}(\mathcal{M}_0)$ when the moving point
+clouds are not voxelized under both noise conditions, illustrating
+the possible impact of the voxelization preprocessing step on \gls{gba} results.
+\figref{fig:slam:results:gba:precomputed:vox-y:noise-0.03}
+presents a representative example of the final configuration
+achieved by the precomputed-representation variants of the proposed \gls{gba}
+factors -- $\mathcal{D}_{\mathrm{p2p}}(\mathcal{M}_1)$ and
+$\mathcal{D}_{\mathrm{p2pl}}(\mathcal{M}_2)$ -- with voxelization
+enabled and under Gaussian range noise of
+$\sigma = \SI{0.03}{\metre}$, providing visual context for the post-optimization
+configuration of the graph that the proposed factors are able to achieve
+under range noise and initial perturbation added before the \gls{gba} stage
+(see~\figref{fig:slam:results:gba:perturb-init}).
+
 \input{tables/slam/gba/results_synthetic_pc_res-0.03m.tex}
 
-\section{Summary and Conclusions}\label{sec:slam:conclusions}
+\begin{figure}[t]
+  \centering
+  \subfloat[][]{\includegraphics[width=0.49\textwidth]{slam/gba/dmap_p2p_m0_vox-n_noise-0.00m_square_final.png}
+  \label{fig:slam:results:gba:p2p_m0_vox-n:noise-n}}
+  \hfill
+  \subfloat[][]{\includegraphics[width=0.49\textwidth]{slam/gba/dmap_p2p_m0_vox-n_noise-0.03m_square_final.png}
+  \label{fig:slam:results:gba:p2p_m0_vox-n:noise-0.03}}
+\caption[%
+    TBC]{%
+    TBC.}
+  \label{fig:slam:results:gba:p2p_m0_vox-n}
+\end{figure}
 
-TBC
+\begin{figure}[t]
+  \centering
+  \subfloat[][]{\includegraphics[width=0.49\textwidth]{slam/gba/dmap_p2p_m1_vox-y_noise-0.03m_square_final.png}
+  \label{fig:slam:results:gba:p2p_m1_vox-y:noise-0.03}}
+  \hfill
+  \subfloat[][]{\includegraphics[width=0.49\textwidth]{slam/gba/dmap_p2pl_m2_vox-y_noise-0.03m_square_final.png}
+  \label{fig:slam:results:gba:p2pl_m2_vox-y:noise-0.03}}
+\caption[%
+    TBC]{%
+    TBC.}
+  \label{fig:slam:results:gba:precomputed:vox-y:noise-0.03}
+\end{figure}
+
+\section{Summary and Conclusions}\label{sec:slam:conclusions}
