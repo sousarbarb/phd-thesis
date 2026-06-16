@@ -2348,13 +2348,13 @@ ambiguous occupancy states under the \emph{standard} variant.
     \hspace{1mm}%
     \rotatebox{-90}{\frame{\includegraphics[width=0.245\textwidth]{slam/dyn-rmv/local-map_iilabs3d_nav_a_diff_ricoslam_slam_occ_example-2_dyn-rmv.png}}}%
     \label{fig:slam:results:dynamics::diff:iilabs3d:nav-a-diff:2}}\\[\smallskipamount]
-  \subfloat[][Nav~A~Omni, region 1]{%
+  \subfloat[][Loop, region 1]{%
     \rotatebox{-90}{\frame{\includegraphics[width=0.245\textwidth]{slam/dyn-rmv/local-map_iilabs3d_loop_ricoslam_slam_occ_examples-1_dyn-rmv.png}}}%
     \hspace{1mm}%
     \rotatebox{-90}{\frame{\includegraphics[width=0.245\textwidth]{slam/dyn-rmv/local-map_iilabs3d_loop_ricoslam_slam_occ_examples-1_dyn-rmv.png}}}%
     \label{fig:slam:results:dynamics::diff:iilabs3d:loop:1}}
   \hfill
-  \subfloat[][Nav~A~Omni, region 2]{%
+  \subfloat[][Loop, region 2]{%
     \rotatebox{-90}{\frame{\includegraphics[width=0.245\textwidth]{slam/dyn-rmv/local-map_iilabs3d_loop_ricoslam_slam_occ_examples-2_std.png}}}%
     \hspace{1mm}%
     \rotatebox{-90}{\frame{\includegraphics[width=0.245\textwidth]{slam/dyn-rmv/local-map_iilabs3d_loop_ricoslam_slam_occ_examples-2_dyn-rmv.png}}}%
@@ -2594,6 +2594,158 @@ ambiguous occupancy states under the \emph{standard} variant.
       proposed offline dynamics removal stage.}
   \label{fig:slam:results:dynamics::diff:kuka}
 \end{figure}
+
+\paragraph{Sharpening of the empirical occupancy distribution}
+As shown by the quantitative results of
+\tabref{tab:slam:results:dyn-rmv}, the offline dynamics removal
+mechanism proposed in \secref{sec:slam:dynamics:offline} produces a
+sharper empirical occupancy distribution than the \emph{standard}
+rasterization baseline across every sequence, operating mode, and
+threshold reported. All entries in the \emph{dyn-rmv} columns are
+highlighted in bold, indicating that the peak mass
+$m_{\mathrm{peak}}(\tau)$ formulated in
+\eqref{eq:slam:results:dynamics:metrics:peak-vs-middle} is
+consistently larger and the middle mass $m_{\mathrm{mid}}(\tau)$
+consistently smaller than their \emph{standard} counterparts, for
+both thresholds $\tau \in \{0.05,\,0.10\}$.
+The magnitude of this mass exchange ranges from $\SI{0.08}{\percent}$
+to $\SI{1.26}{\percent}$ at $\tau = 0.05$ and from
+$\SI{0.06}{\percent}$ to $\SI{0.58}{\percent}$ at $\tau = 0.10$.
+These percentages translate into substantial cell counts and physical
+areas at the common map resolution $\delta = \SI{0.03}{\metre}$, where
+every cell covers $\SI{9}{\centi\metre\squared}$. For example, the
+$\SI{1.26}{\percent}$ exchange recorded for Nav~A~Diff in \emph{local}
+maps mode at $\tau = 0.05$ corresponds to approximately $\num{3000}$
+cells becoming more stable, equivalent to a physical area of
+$\SI{2.7}{\metre\squared}$. As anticipated in
+\secref{sec:slam:results:dynamics:setup}, the IILABS~3D sequences are
+predominantly static. Even so, the offline mechanism cleans measurable portions
+of the resulting occupancy map, consequent of sensor noise and low dynamics.
+
+The cleaning effect is more pronounced on the Flowbotic and
+Kuka datasets, both of which contain substantially more dynamic
+observations and sensor noise. At $\tau = 0.05$, RicoSLAM in \emph{local}
+maps mode produces a mass exchange of $\SI{0.71}{\percent}$,
+$\SI{0.67}{\percent}$, and $\SI{0.78}{\percent}$ on the Flowbotic
+\emph{20251024}, \emph{20251027}, and \emph{20251028} sequences,
+corresponding to approximately $\num{26764}$, $\num{20577}$, and
+$\num{19315}$ stabilized cells
+($\SI{24.09}{\metre\squared}$, $\SI{18.52}{\metre\squared}$, and
+$\SI{17.38}{\metre\squared}$, respectively). On the Kuka sequence,
+the $\SI{0.78}{\percent}$ mass exchange amounts to approximately
+$\num{87123}$ more stabilized cells, equivalent to a physical area of
+$\SI{78.41}{\metre\squared}$.
+Moreover, the mechanism remains effective even in \emph{scan} mode, where
+the lower number of scans being integrated into the back-end graph
+(scan mode represents each keyframe with a scan, while local maps accumulates
+several scans for the same node) exposes the dynamics removal stage to fewer
+rasterized observations. On the Avantgarde sequence with the longest path length
+(\emph{run0}), the offline dynamics removal results in a $\SI{0.12}{\percent}$
+mass exchange at $\tau = 0.05$, equivalent to roughly $\num{8263}$ stabilized
+cells, or $\SI{7.44}{\metre\squared}$, despite this dataset not having
+high dynamics. Similarly, in Cappero in which contains few dynamic observations,
+the mechanism still stabilizes $\num{4035}$ and
+$\num{4264}$ cells in \emph{scan} and \emph{local} maps modes,
+respectively ($\SI{3.63}{\metre\squared}$ and $\SI{3.84}{\metre\squared}$).
+Overall, these results demonstrate that the offline removal mechanism proposed
+in \secref{sec:slam:dynamics:offline} consistently sharpens the occupancy
+distribution of the back-end map, regardless of the operating mode or
+the dynamics in the underlying sequence.
+
+\paragraph{Cell reclassification through the ray model}
+A second effect of the offline mechanism is the reclassification of a
+non-negligible number of cells to \emph{unknown} state, which appears in
+\tabref{tab:slam:results:dyn-rmv} as a reduction in the number of
+valid cells $N_{\mathrm{obs}}$ under the \emph{dyn-rmv} variant.
+This reduction ranges, in magnitude, from $188$ cells
+($\SI{0.17}{\metre\squared}$) on the Slippage sequence in \emph{scan}
+mode up to $\num{112117}$ cells ($\SI{100.91}{\metre\squared}$) on
+the Kuka sequence. This pattern reflects the secondary effect of the
+offline ray model: cells whose only supporting beam endpoints were
+transient dynamic returns are removed from the occupancy grid
+representation entirely, rather than persisting as ambiguous cells under
+the \emph{standard} variant.
+Therefore, the proposed mechanism contributes to a cleaner final representation
+in two complementary ways. First, it sharpens the occupancy distribution over
+the cells that remain valid by suppressing dynamic returns. Second, it removes
+spurious cells whose only supporting observations were dynamic returns and
+that should not appear in the final static map.
+
+\paragraph{Qualitative analysis of the side-by-side examples}
+In terms of analyzing the resulting occupancy probability map,
+Figures~\ref{fig:slam:results:dynamics::diff:iilabs3d}
+to~\ref{fig:slam:results:dynamics::diff:kuka} provide
+representative crops illustrating the local impact of the offline
+dynamics removal stage on the final occupancy probability maps.
+On the IILABS~3D sequences,
+\figref{fig:slam:results:dynamics::diff:iilabs3d:nav-a-diff:1}
+and~\figref{fig:slam:results:dynamics::diff:iilabs3d:loop:1} cover
+areas containing the Prolynk system, whose metallic and reflective
+supports produce a noticeable amount of sensor noise during the
+sequence. The respective \emph{dyn-rmv} crops show that RicoSLAM is able to
+suppress this noise from the final occupancy probability map.
+Instead, \figref{fig:slam:results:dynamics::diff:iilabs3d:nav-a-diff:2}
+and~\figref{fig:slam:results:dynamics::diff:iilabs3d:loop:2}
+highlight regions where people in the laboratory were
+present during the acquisition, demonstrating the ability of the mechanism to
+remove the corresponding transient returns from the occupancy
+probability estimate. A similar behavior is observed on the Cappero
+dataset (\figref{fig:slam:results:dynamics::diff:cappero}), where
+occasional dynamic returns are likewise cleaned from the resulting
+map. In particular, \figref{fig:slam:results:dynamics::diff:cappero:3}
+shows an atrium of the \gls{diag} department of Sapienza Università di Roma, in
+which the contours of the chairs come through more sharply because the dynamics
+removal stage suppresses the sensor noise that would otherwise blur them.
+
+Furthermore, the Avantgarde side-by-side comparisons expose both the strengths
+and the limitations of the offline mechanism proposed in
+\secref{sec:slam:dynamics:offline}.
+Figures~\ref{fig:slam:results:dynamics::diff:avantgarde:run0:2},
+\ref{fig:slam:results:dynamics::diff:avantgarde:run2:2},
+and~\ref{fig:slam:results:dynamics::diff:avantgarde:run2:3} show
+regions containing moving platforms present during the sequences.
+In all three, RicoSLAM suppresses the corresponding
+dynamic returns from the final map. By contrast,
+Figures~\ref{fig:slam:results:dynamics::diff:avantgarde:run0:1},
+\ref{fig:slam:results:dynamics::diff:avantgarde:run0:3},
+and~\ref{fig:slam:results:dynamics::diff:avantgarde:run2:1}
+illustrate semi-static dynamics -- boxes left on the ground, and
+platforms that were still observed during the last sensor sweep
+integrated by the tracker. Here, the \emph{dyn-rmv} variant reduces the
+contribution of these returns to the final occupancy probability in some cases
+but does not clear the corresponding cells entirely. This residual
+contribution is a consequence of the simplified ray model
+adopted in \secref{sec:slam:dynamics:offline}, which considers only
+one map observation per sensor ray when evaluating the dynamics.
+In particular,
+Figures~\ref{fig:slam:results:dynamics::diff:avantgarde:run0:1}
+and~\ref{fig:slam:results:dynamics::diff:avantgarde:run2:1} show
+partial clearance of the box footprints,
+while~\figref{fig:slam:results:dynamics::diff:avantgarde:run0:3}
+illustrates the complementary failure mode in which the most recent
+observation along a given ray still witnessed the object, leaving the
+mechanism without contradicting evidence to remove the corresponding
+return.
+
+Finally, the larger industrial-scale environments of the Flowbotic
+and Kuka datasets are shown in
+\figref{fig:slam:results:dynamics::diff:flowbotic:20251024},
+\figref{fig:slam:results:dynamics::diff:flowbotic:2025102728},
+and~\figref{fig:slam:results:dynamics::diff:kuka}. On the Flowbotic
+examples, the \emph{dyn-rmv} variant suppresses a significant portion of
+the sensor and environment noise, yielding sharper static structures.
+The remaining artefacts correspond mostly to ground returns that the
+mechanism cannot resolve when no subsequent see-through observation
+along the same ray is available to contradict them. The Kuka crops
+exhibit comparable sharpening on the occupancy probability representation,
+without the ground-return noise characteristic from the Flowbotic sequences.
+Together, these two datasets show that
+RicoSLAM not only tracks the robot for long trajectories in
+highly dynamic environments affected by sensor and environment noise,
+but also leverages the proposed offline dynamics removal mechanism to
+produce a final occupancy probability representation cleaner than the
+\emph{standard} variant, suitable for downstream localization in
+autonomous operation.
 
 \subsection{GBA with synthetic data}\label{sec:slam:results:gba}
 
