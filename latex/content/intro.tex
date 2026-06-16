@@ -482,8 +482,11 @@ as well as the development of open-source software.
 \begin{description}[leftmargin=1cm,style=nextline,font=\normalfont]
 \item[\cite{ribeiro:dataset:2025}] \fullcite{ribeiro:dataset:2025}.
 \end{description}
-\subsection{Open-source Software}
+\subsection{Open-source software}
 \begin{itemize}[leftmargin=1cm,style=nextline,font=\normalfont]
+\item \url{https://github.com/INESCTEC/ricoslam}:
+the full framework \gls{slam} developed in the scope of this PhD~Thesis
+\textcolor{red}{(\emph{may not be yet available in open-source... WIP})};
 \item \url{https://github.com/INESCTEC/inesctec_mrdt_line_fit_based_corner_detector_2d_laser}:
 C++ implementation compatible with \gls{ros}~1 of the
 line fitting-based corner-like detector for 2D~lasers~\cite{sousa:icara:2024};
@@ -525,8 +528,7 @@ and srrg2\_solver~\cite{grisetti:robotics:2020}.
 
 \section{Document Structure}\label{sec:intro:structure}
 
-The remaining of this document is organized as follows
-(\todo{update lated the following text}):
+The remaining of this document is organized as follows:
 \begin{itemize}
 \item \textbf{\chapref{chap:literature}}
 presents the \gls{slam} problem, covering scan matching, particle filters,
@@ -534,23 +536,19 @@ and pose graph formulations. The chapter also reviews literature on
 long-term \gls{slam} in dynamic environments,
 including map representation, map matching,
 dynamic object detection, and dynamics prediction;
-% \item \textbf{\chapref{chap:datasets}}
-% describes the various mobile platforms and datasets used in this PhD~Thesis,
-% including robots such as the 5dpo omnidirectional robot,
-% the Avantgarde tricycle and Flowbotics differential autonomous forklifts,
-% and also details the IILABS~3D and other datasets from the literature;
 \item \textbf{\chapref{chap:features}}
 presents a corner-like feature detection algorithm for 2D laser scanner data
 and evaluates its geometric invariance to various viewpoints;
 \item \textbf{\chapref{chap:distance-maps}}
 explores the concept of using distance maps for data registration,
 discussing optimization algorithms, covariance estimation,
-and point-to-point and point-to-plane alignment error formulations;
+and proposing point-to-point and point-to-plane alignment error formulations
+based on distance map representations;
 \item \textbf{\chapref{chap:slam}}
 presents the research conducted in this PhD~Thesis on
 \gls{slam} in dynamic environments,
-focusing on techniques such as online \gls{slam},
-dynamics removal, and offline global bundle adjustment;
+focusing on online \gls{slam}, dynamics removal, and
+offline global bundle adjustment;
 \item \textbf{\chapref{chap:conclusions}}
 summarizes the conclusions and contributions of this research
 and offers final remarks on future work,
