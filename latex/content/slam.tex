@@ -3070,11 +3070,12 @@ distance field, analogously to the behaviour reported for the
 synthetic registration benchmark
 in~\secref{sec:distance-maps:results:synthetic:registration}, and
 reduces the sensitivity of the residual to the noise-induced errors
-in the point-to-point correspondences -- an effect that proves even
+in the point-to-point correspondences. The results in
+\tabref{tab:slam:results:gba} indicate that this effect proves even
 more favourable in the multi-keyframe optimization of this
-experiment than in the pairwise setting of
-\chapref{chap:distance-maps}. The point-to-plane formulations
-similarly retain sub-centimetre translational accuracy under noise,
+experiment than in the point cloud registration problem from
+\chapref{chap:distance-maps}. Similarly, the point-to-plane formulations
+retain sub-centimetre translational accuracy under noise,
 with both $\mathcal{D}_{\mathrm{p2pl}}(\mathcal{M}_0)$ and
 $\mathcal{D}_{\mathrm{p2pl}}(\mathcal{M}_2)$ converging to
 $\varepsilon_{\mathbf{t}} \leq \SI{0.009}{\metre}$. Representative
@@ -3083,19 +3084,17 @@ $\mathcal{D}_{\mathrm{p2p}}(\mathcal{M}_1)$ and
 $\mathcal{D}_{\mathrm{p2pl}}(\mathcal{M}_2)$ under this noise
 condition are shown in
 \figref{fig:slam:results:gba:precomputed:vox-y:noise-0.03}.
-Considering both noise conditions jointly, the precomputed
+Considering both noise conditions, the precomputed
 $\mathcal{D}_{\mathrm{p2p}}(\mathcal{M}_1)$ formulation with
 voxelization emerges as the most balanced configuration for distance
-map-based \gls{gba} in this benchmark, with the analytical
-$\mathcal{D}_{\mathrm{p2pl}}(\mathcal{M}_0)$ as a close second,
-particularly attractive in environments with strongly structured
-planar surfaces.
+map-based \gls{gba} in this benchmark, achieving competitive results even
+against point-to-plane variants.
 
 \paragraph{Implications for offline refinement of the online graph}
 The results of this synthetic benchmark confirm that the distance
-map-based \gls{gba} factors proposed in \secref{sec:slam:gba} can
-globally optimize a factor graph and recover from substantially
-perturbed initial conditions. Although the graph topology of this
+map-based \gls{gba} factors proposed in \secref{sec:slam:gba} within the scope
+of this PhD~Thesis can globally optimize a factor graph and recover from
+substantially perturbed initial conditions. Although the graph topology of this
 benchmark is regular and the scene well-structured, the results
 indicate that the proposed factors are well suited to globally
 refining the back-end pose graph produced by the online RicoSLAM
@@ -3111,3 +3110,167 @@ RicoSLAM pipeline and its validation in real-world environments
 remain work in progress, and are left to future work.
 
 \section{Summary and Conclusions}\label{sec:slam:conclusions}
+
+This chapter presents RicoSLAM, a graph-based
+2D~\glslink{slam}{\glsentryfull{slam}} framework for
+dynamic environments developed in the scope of this PhD~Thesis in
+collaboration with Prof.~Dr.~Giorgio~Grisetti from Sapienza Università di Roma.
+The proposed framework integrates the distance map-based tracker from
+\chapref{chap:distance-maps} as its front-end with
+the srrg2\_solver~\cite{grisetti:robotics:2020} optimization back-end,
+together with two offline post-processing stages
+(distance map-based \glslink{gba}{\glsentryfull{gba}} and 2D~occupancy grid mapping)
+that operate on the optimized pose graph once RicoSLAM completes the online run.
+
+The tracker front-end extends the registration aligner of
+\chapref{chap:distance-maps} with split and merge triggering criteria
+that monitor the aligner pose estimation (translation, orientation, viewpoint
+that combines travelled distance with angular displacement), its registration
+statistics (inlier ratio), and the timestamp of the latest processed scan
+to determine when to commit the current keyframe to the back-end graph or
+merge new returns into a local map represented by a 2D~point cloud.
+On the back-end side, the factor graph adopts the $SE(2)$ pose-pose geodesic
+error factors from the srrg2\_solver~\cite{grisetti:robotics:2020} framework
+whose Jacobians are derived via right-sided perturbation,
+following the same convention adopted throughout this PhD~Thesis.
+A loop closure detection procedure combines world-frame proximity around the
+current robot pose with a graph-distance constraint to discard trivial loop
+geometries, validating each candidate through a loop aligner that may be the
+same from the front-end module or a completely different one.
+On top of these components, a relocalization policy was proposed in the
+scope of this PhD~Thesis to transfer the tracker into an existing keyframe of
+the back-end graph whenever a short-loop candidate is available,
+mitigating the unbounded graph growth problem inherent to long-term operation.
+Two robot pose history streams (online corrected and offline corrected) are
+logged by RicoSLAM throughout the run, the latter retroactively propagating
+post-optimization keyframe updates to all poses for trajectory evaluation.
+
+Beyond the online graph \gls{slam} operation,
+this chapter proposes a dynamics removal
+strategy operating at two distinct stages of RicoSLAM. The online removal
+runs during local map maintenance, treating each laser beam as an observation
+from the surrounding scene that may see through a previously mapped point or add new
+observations to the local representation, removing transient returns from
+the keyframe's local map. The offline stage operates during 2D~occupancy
+grid map generation by combining the same ray model used during online dynamics removal with a
+Bresenham-like~\cite{bresenham:ibm:1965,zingl:uas:2016} line rasterization
+to suppress dynamic returns when integrating all scans into the final
+occupancy grid. Complementing these contributions, this chapter introduces
+distance map-based \gls{gba} per-point factors, both in their
+point-to-point and point-to-plane formulations, building on the
+corresponding 2D~point cloud registration error formulations from
+\chapref{chap:distance-maps} and deriving their Jacobians via right-sided
+perturbation on the $SE(2)$ manifold.
+
+Four experiments were conducted to evaluate the contributions presented
+in this chapter. The trajectory accuracy benchmark on the four planar
+sequences (Nav~A~Diff, Nav~A~Omni, Loop, and Slippage) of the
+IILABS~3D~\cite{ribeiro:access:2025} dataset compared RicoSLAM against
+GMapping~\cite{grisetti:tro:2007} and
+SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021} as established
+2D~\gls{slam} baselines. RicoSLAM achieved the lowest \gls{ate} of the
+experiment across the four sequences considered for the best online
+configuration of each system. The offline pose-correction stream
+further reduced the \gls{ate} on the three longer sequences
+(Nav~A~Diff, Nav~A~Omni, and Loop), while leaving the Slippage
+results essentially unchanged given the short straight-line trajectory of
+that sequence. Alongside this accuracy improvement, the dispersion
+$\sigma_{\mathrm{ATE}}$ of the per-pose translational error decreased
+considerably in the offline stream, suggesting that the residual error is
+dominated by systematic sources (extrinsic calibration, sensor noise,
+ground-truth precision) rather than by accumulated front-end drift or loop closure alignment errors. Among
+the five RicoSLAM configurations evaluated, the \emph{scan} variant
+produced the most accurate offline trajectory, consistent with the
+absence of accumulated registration residuals from the ray-based merger
+into the local maps.
+
+Closely related to the trajectory accuracy results, the scalability
+analysis on the same dataset evaluated the number of keyframes, scans, and edges
+integrated by each system. All RicoSLAM variants produced substantially smaller
+pose graphs than SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021} for
+comparable, and often better, trajectory accuracy. This result
+evidences the potential of the proposed inlier-ratio splitting criterion
+to keep the back-end graph compact without compromising trajectory
+accuracy. When activating the relocalization policy proposed in the scope of
+this PhD~Thesis, it reduced the back-end graph size further while remaining
+competitive in \gls{ate} once the offline pose correction was applied.
+The combination of relocalization
+with the local-map operating mode (\emph{local~w/reloc.}\ variant)
+produced a back-end whose size depends primarily on the spatial extent of
+the explored environment rather than on the duration of operation or
+path length, even when the robot revisits the same locations multiple
+times.
+
+In terms of the mapping results of the framework, the experimental
+evaluation of the offline dynamics removal mechanism considered the
+IILABS~3D~\cite{ribeiro:access:2025} dataset together with four
+additional datasets from real-world \gls{amr} deployments (Avantgarde,
+Cappero, Flowbotic, and Kuka). Across every sequence, operating mode,
+and threshold considered in the experiment, the proposed mechanism
+consistently sharpened the empirical occupancy distribution of the
+occupancy probability map relative to the \emph{standard} rasterization baseline.
+As a complementary effect, the mechanism reclassified to \emph{unknown}
+cells whose only supporting observations were transient dynamic
+returns, removing additional artefacts from the final occupancy grid map.
+A qualitative inspection of representative crops from the resulting occupancy probability maps
+indicates that the proposed mechanism successfully suppresses both transient dynamic returns
+(people moving in the scene, moving platforms) and sensor noise
+(reflective surfaces) from the occupancy grid maps. Among the datasets
+considered, the Avantgarde sequences exposed the main limitation of the
+proposed mechanism: semi-static dynamics (\eg, boxes left on the ground,
+platforms still observed during the last sensor sweep integrated by the
+tracker) cannot be fully cleared without more recent contradicting see-through
+evidence on the same ray, given the simplified single-return model
+adopted in \secref{sec:slam:dynamics:offline}.
+
+Lastly, the synthetic benchmark on the distance map-based \gls{gba}
+factors proposed in this chapter confirmed that the corresponding factors
+can globally optimize a multi-keyframe pose graph and recover from
+substantially perturbed initial conditions, both under noise-free and
+noisy scenarios. The precomputed point-to-point variant
+$\mathcal{D}_{\mathrm{p2p}}(\mathcal{M}_1)$ with voxelization of the
+moving point clouds obtained the lowest translation and orientation errors
+under range noise conditions that showed the potential of
+distance map-based point-to-point formulations even against point-to-plane
+variants, a result also noted during the experiments from \chapref{chap:distance-maps}.
+Also, the voxelization pre-processing step proved beneficial for
+the analytical point-to-point formulation $\mathcal{D}_{\mathrm{p2p}}(\mathcal{M}_0)$,
+where it reduced the translational and rotational \gls{rmse} by approximately one order of
+magnitude in both noise conditions, an effect amplified in the
+multi-keyframe setting relative to the point cloud registration evaluation of
+\chapref{chap:distance-maps}.
+
+Overall, the experimental evaluation presented in this chapter
+indicates that RicoSLAM can operate in highly dynamic, noisy
+environments, producing trajectory estimates and 2D~occupancy grid maps
+that outperform established 2D~\gls{slam} baselines on the considered
+metrics, while keeping the back-end pose graph compact through the
+inlier-driven splitting and the proposed relocalization policy. The
+proposed distance map-based \gls{gba} factors complete the framework with
+a globally consistent refinement stage compatible with the precomputed
+distance map representation adopted by the tracker and validated on a
+synthetic benchmark.
+
+Several directions remain open as future work. First, the full
+integration of the proposed distance map-based \gls{gba} stage with the
+online RicoSLAM pipeline and its end-to-end validation in real-world
+environments stands out, given that this stage is currently evaluated in
+isolation and under controlled conditions.
+Furthermore, the comparison against additional 2D~\gls{slam} baselines such as
+Cartographer~\cite{hess:icra:2016}, the evaluation on further sequences
+from the literature, and the explicit measurement of the front-end and
+back-end computation times together with the memory usage of the
+RicoSLAM system will complement the trajectory accuracy and scalability
+analyses presented in this chapter. On the application side, the
+dominant systematic errors observed in the offline pose-corrected
+stream motivates a potential use of RicoSLAM as a pseudo-ground-truth
+source for calibration tasks in which the wheeled odometry and the laser scanner
+extrinsic parameters of the platform are estimated
+simultaneously, exploiting the ability of the framework to operate
+without requiring wheeled odometry or the sensor pose \gls{wrt} the
+robot geometric frame. Finally, the simplified
+single-return ray model adopted by the online and offline dynamics
+removal mechanisms will be extended to multi-return formulations,
+addressing the residual semi-static dynamics observed in the Avantgarde
+sequences and further improving the cleaning effect of the proposed
+mechanism on the final occupancy grid representation.
