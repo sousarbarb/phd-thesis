@@ -2595,6 +2595,8 @@ ambiguous occupancy states under the \emph{standard} variant.
   \label{fig:slam:results:dynamics::diff:kuka}
 \end{figure}
 
+\clearpage
+
 \paragraph{Sharpening of the empirical occupancy distribution}
 As shown by the quantitative results of
 \tabref{tab:slam:results:dyn-rmv}, the offline dynamics removal
@@ -2956,9 +2958,16 @@ under range noise and initial perturbation added before the \gls{gba} stage
   \hfill
   \subfloat[][]{\includegraphics[width=0.49\textwidth]{slam/gba/dmap_p2p_m0_vox-n_noise-0.03m_square_final.png}
   \label{fig:slam:results:gba:p2p_m0_vox-n:noise-0.03}}
-\caption[%
-    TBC]{%
-    TBC.}
+  \caption[%
+      Final configuration of the factor graph optimized with
+      the point-to-point distance map-based GBA factor
+      at representation level $\mathcal{M}_0$ without voxelization]{%
+      Final configuration of the factor graph optimized with
+      the point-to-point distance map-based \gls{gba} factor
+      $\mathcal{D}_{\mathrm{p2p}}(\mathcal{M}_0)$ proposed in
+      \secref{sec:slam:gba:p2p}, without voxelization of the point clouds:
+      (a) noise-free synthetic scans; (b) synthetic scans with Gaussian range
+      noise of $\sigma = \SI{0.03}{\metre}$.}
   \label{fig:slam:results:gba:p2p_m0_vox-n}
 \end{figure}
 
@@ -2969,10 +2978,136 @@ under range noise and initial perturbation added before the \gls{gba} stage
   \hfill
   \subfloat[][]{\includegraphics[width=0.49\textwidth]{slam/gba/dmap_p2pl_m2_vox-y_noise-0.03m_square_final.png}
   \label{fig:slam:results:gba:p2pl_m2_vox-y:noise-0.03}}
-\caption[%
-    TBC]{%
-    TBC.}
+  \caption[%
+      Final configuration of the factor graph optimized with
+      the precomputed-representation variants of
+      the proposed distance map-based GBA factors under noise]{%
+      Final configuration of the factor graph optimized with
+      the precomputed-representation variants of
+      the proposed distance map-based \gls{gba} factors,
+      with voxelization of the moving point clouds enabled and synthetic scans
+      with Gaussian range noise of $\sigma = \SI{0.03}{\metre}$:
+      (a) point-to-point factor
+      $\mathcal{D}_{\mathrm{p2p}}(\mathcal{M}_1)$ from
+      \secref{sec:slam:gba:p2p};
+      (b) point-to-plane factor
+      $\mathcal{D}_{\mathrm{p2pl}}(\mathcal{M}_2)$ from
+      \secref{sec:slam:gba:p2pl}.}
   \label{fig:slam:results:gba:precomputed:vox-y:noise-0.03}
 \end{figure}
+
+\paragraph{Effect of the voxelization}
+On the $\mathcal{D}_{\mathrm{p2p}}(\mathcal{M}_0)$ formulation,
+enabling voxelization of the moving point clouds reduces the
+translational \gls{rmse} from $\SI{0.267}{\metre}$ to
+$\SI{0.013}{\metre}$ in the noise-free case and from
+$\SI{0.187}{\metre}$ to $\SI{0.009}{\metre}$ under sensor noise, resulting in a
+relative improvement of approximately one order of magnitude in both
+noise conditions. Accordingly, the rotational \gls{rmse} drops from
+above $\SI{1.5}{\degree}$ to $\SI{0.06}{\degree}$ when enabling voxelization.
+The main cause of this effect is the radial scanning geometry of the
+laser sensor, which produces a non-uniform point density along each
+scan, as already discussed for the synthetic benchmark on 2D~point cloud
+registration in~\secref{sec:distance-maps:results:synthetic:registration}.
+Without voxelization, the optimizer over-weights the denser regions
+originated from observations near the sensor, introducing a biases on the global
+solution towards close-range observations at the expense of distant surfaces.
+This effect is visible in \figref{fig:slam:results:gba:p2p_m0_vox-n}, where the
+non-voxelized $\mathcal{D}_{\mathrm{p2p}}(\mathcal{M}_0)$
+configuration yields neighboring poses that are locally consistent
+but exhibit a clear global drift across the grid. Thus, the voxelization
+step at the distance map resolution $\delta = \SI{0.03}{\metre}$
+regularizes the point density by averaging every point that falls into a
+given voxel into a single point, reducing the density-induced weighting bias.
+This regularization, only marginally observable in the experimental evaluation
+from \chapref{chap:distance-maps}, is amplified here in the \gls{gba} setting,
+where the cumulative weight of the denser regions across multiple keyframes
+degrades the global alignment. The remaining variants of the
+$\mathcal{D}_{\mathrm{p2p}}$ formulation ($\mathcal{M}_1$) and the
+point-to-plane formulation $\mathcal{D}_{\mathrm{p2pl}}$
+($\mathcal{M}_0$ and $\mathcal{M}_2$) exhibit less
+sensitivity to voxelization, consistent with the smoothing effect
+introduced by the precomputed gradient in $\mathcal{M}_1$ and with
+the higher accuracy of the point-to-plane formulation,
+which projects the residual onto the local surface normal direction.
+
+\paragraph{Behaviour of the point-to-plane formulation under
+noise-free conditions}
+Both voxelization variants of
+$\mathcal{D}_{\mathrm{p2pl}}(\mathcal{M}_0)$ result in
+$\varepsilon_{\mathbf{t}} = \SI{0}{\metre}$ and
+$\varepsilon_{\theta} = \SI{0}{\degree}$ within the numerical
+precision of the reported values in the noise-free case, mirroring
+the corresponding results reported in \chapref{chap:distance-maps}.
+This result is possibly due to the square scene of this benchmark without noise
+providing four planar surfaces with precise normals, the error formulation from
+$\mathcal{D}_{\mathrm{p2pl}}(\mathcal{M}_0)$ being an analytical expression
+without relying on approximations of the precomputed variants, and the
+point-to-plane residual projecting the point-to-point error onto the local
+surface normal direction with improved accuracy over its point-to-point counterpart.
+The $\mathcal{D}_{\mathrm{p2pl}}(\mathcal{M}_2)$ variant, which
+relies on precomputed finite-difference gradients and Hessians of
+the distance map rather than on its analytical form, exhibits a
+small residual ($\varepsilon_{\mathbf{t}} \leq \SI{0.03}{\metre}$,
+$\varepsilon_{\theta} \leq \SI{0.12}{\degree}$) under
+noise-free conditions. This residual is a direct consequence of two
+approximations introduced by the $\mathcal{M}_2$ precomputation:
+bilinear interpolation being disabled, and the cells onto which the projected
+2D~scan points fall are assigned a distance of zero to simplify the
+distance map computation, which discards the residual sub-cell
+offset of each correspondence.
+
+\paragraph{Behaviour under sensor noise}
+Under sensor noise ($\sigma = \SI{0.03}{\metre}$), the
+$\mathcal{D}_{\mathrm{p2p}}(\mathcal{M}_1)$ formulation yields the
+lowest translational and rotational \gls{rmse} of the experiment
+($\varepsilon_{\mathbf{t}} \leq \SI{0.004}{\metre}$,
+$\varepsilon_{\theta} \leq \SI{0.02}{\degree}$), both with and
+without voxelization, outperforming the analytical $\mathcal{M}_0$
+variant of the same formulation. The finite-difference gradient
+precomputed in $\mathcal{M}_1$ smooths the local geometry of the
+distance field, analogously to the behaviour reported for the
+synthetic registration benchmark
+in~\secref{sec:distance-maps:results:synthetic:registration}, and
+reduces the sensitivity of the residual to the noise-induced errors
+in the point-to-point correspondences -- an effect that proves even
+more favourable in the multi-keyframe optimization of this
+experiment than in the pairwise setting of
+\chapref{chap:distance-maps}. The point-to-plane formulations
+similarly retain sub-centimetre translational accuracy under noise,
+with both $\mathcal{D}_{\mathrm{p2pl}}(\mathcal{M}_0)$ and
+$\mathcal{D}_{\mathrm{p2pl}}(\mathcal{M}_2)$ converging to
+$\varepsilon_{\mathbf{t}} \leq \SI{0.009}{\metre}$. Representative
+post-optimization configurations for the precomputed variants
+$\mathcal{D}_{\mathrm{p2p}}(\mathcal{M}_1)$ and
+$\mathcal{D}_{\mathrm{p2pl}}(\mathcal{M}_2)$ under this noise
+condition are shown in
+\figref{fig:slam:results:gba:precomputed:vox-y:noise-0.03}.
+Considering both noise conditions jointly, the precomputed
+$\mathcal{D}_{\mathrm{p2p}}(\mathcal{M}_1)$ formulation with
+voxelization emerges as the most balanced configuration for distance
+map-based \gls{gba} in this benchmark, with the analytical
+$\mathcal{D}_{\mathrm{p2pl}}(\mathcal{M}_0)$ as a close second,
+particularly attractive in environments with strongly structured
+planar surfaces.
+
+\paragraph{Implications for offline refinement of the online graph}
+The results of this synthetic benchmark confirm that the distance
+map-based \gls{gba} factors proposed in \secref{sec:slam:gba} can
+globally optimize a factor graph and recover from substantially
+perturbed initial conditions. Although the graph topology of this
+benchmark is regular and the scene well-structured, the results
+indicate that the proposed factors are well suited to globally
+refining the back-end pose graph produced by the online RicoSLAM
+pipeline, ideally compensating for the distortions accumulated
+during the online stage even when the initial configuration is
+challenging. In contrast to the online stage, in which pose-pose
+factors carry a fixed information matrix and an immutable relative
+measurement once inserted into the back-end graph, the \gls{gba}
+stage can leverage observations from both before and after the
+timestamp of a given keyframe to refine its pose globally.
+Nevertheless, the full integration of the \gls{gba} stage into the
+RicoSLAM pipeline and its validation in real-world environments
+remain work in progress, and are left to future work.
 
 \section{Summary and Conclusions}\label{sec:slam:conclusions}
