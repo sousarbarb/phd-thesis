@@ -1,7 +1,8 @@
 \chapter{Simultaneous Localization and Mapping~(SLAM) in Dynamic Environments}\label{chap:slam}
 
 This chapter presents RicoSLAM, a graph-based 2D~\gls{slam} framework for dynamic
-environments developed within the scope of this PhD~Thesis, building on the 2D
+environments developed within the scope of this PhD~Thesis and in collaboration
+with Prof.~Dr.~Giorgio~Grisetti from Sapienza Università di Roma, building on the 2D
 point cloud registration framework introduced in \chapref{chap:distance-maps}.
 RicoSLAM integrates the distance map-based tracker from
 \chapref{chap:distance-maps} as its front-end with the
@@ -10,17 +11,16 @@ an $SE(2)$ pose graph, detecting loop closures by combining nodes' proximity
 in the world frame with graph-distance of the loop chain.
 The proposed \gls{slam} framework filters dynamic observations
 online during local map maintenance using a 2D laser scanner ray model,
-while providing an offline 2D occupancy grid map generation step in which
+while providing an offline dynamics removal mechanism in which
 the same ray model is combined with
 Bresenham-like~\cite{bresenham:ibm:1965,zingl:uas:2016} line rasterization to
 ignore dynamic observations when projecting all scans considered during online
 \gls{slam} onto the final grid map. Additionally, this chapter presents
 novel formulations for \gls{gba} based on distance map-based per-point factors,
 building on the point-to-point and point-to-plane distance map-based
-formulations presented in \chapref{chap:distance-maps}.
+formulations from \chapref{chap:distance-maps}.
 Experimental results indicate that RicoSLAM can operate in highly dynamic,
-noisy environments while filtering dynamic observations from
-the 2D~occupancy grid representation of the environment.
+noisy environments while sharpening the 2D~occupancy grid representation of the environment.
 
 This chapter is organized as follows.
 First, \secref{sec:slam:ricoslam} presents a high-level overview of the RicoSLAM
