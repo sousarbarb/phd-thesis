@@ -21,9 +21,208 @@ Then, \secref{sec:conclusions:final-remarks} presents final remarks and
 the directions of future work, including the involvement of
 the candidate in the scientific community throughout the PhD~Thesis.
 
-\section{Conclusions and Contributions}
+\section{Conclusions and Contributions}\label{sec:conclusions:contributions}
 
-TBC
+The research questions and hypotheses formulated in
+\secref{sec:intro:rq+h} guided the development of the contributions
+reported in \chapref{chap:features} to \chapref{chap:slam}.
+On the localization side, the corner-like
+feature detector of \chapref{chap:features}, the distance map-based
+registration framework of \chapref{chap:distance-maps}, and the
+local-map operating mode of RicoSLAM (\chapref{chap:slam}) address
+the hypotheses on geometric features
+(Hypothesis~\ref{hypothesis:localization:features}), distance maps
+as a correspondence-free representation
+(Hypothesis~\ref{hypothesis:localization:distance-maps}), and local
+maps continuously updated with the latest sensor observations
+(Hypothesis~\ref{hypothesis:localization:local-maps}).
+On the mapping side, the online and offline dynamics removal mechanisms
+of \secref{sec:slam:dynamics}, the relocalization policy of
+\secref{sec:slam:online:relocalization}, and the distance map-based \gls{gba}
+formulations proposed in \secref{sec:slam:gba} cover the hypotheses on ray
+tracing-based map updating (Hypothesis~\ref{hypothesis:mapping:ray-tracing})
+and cleaner static maps via offline dynamics removal
+(Hypothesis~\ref{hypothesis:mapping:clean-map}),
+bounded graph growth through relocalization
+(Hypothesis~\ref{hypothesis:mapping:relocalization}), and offline global
+map refinement (Hypothesis~\ref{hypothesis:mapping:ogba}).
+The remainder of this section summarizes the main conclusions drawn from
+the corresponding chapters.
+
+\chapref{chap:features} introduces a line fitting-based corner-like
+detector for 2D~laser scanner data~\cite{sousa:icara:2024}, in which
+the keypoint is computed as the closed-form intersection of two
+locally fitted lines at multiple distance-based neighborhood scales. This
+formulation avoids the dependency on global line-segment extractors
+that characterizes most literature corner detectors and produces
+feature locations that do not need to coincide with a particular
+laser return. Experimental results showed that the proposed
+corner-like features exhibit viewpoint invariance, where
+$6$~features attained a $100\%$ observability ratio under the
+considered sensor \gls{fov} and pose uncertainty, while $20$ and $16$ features
+remained observable above $50\%$ and $75\%$ across the experiments, respectively.
+In addition, the analysis of the association distance among the $39$
+most persistent features showed that $91.5\%$ of the possible
+feature associations have a standard deviation at or below
+$\SI{0.03}{\metre}$, consistent with the characteristic noise of the
+Hokuyo~UST-10LX 2D~laser scanner sensor while yielding geometric invariance.
+These results indicate that the proposed corner-like features are stable enough
+to be used as input to a feature-based tracking module for mobile robots.
+
+\chapref{chap:distance-maps} introduces a 2D~point cloud registration
+framework that replaces the explicit nearest-neighbor search performed
+at every iteration of classical
+\gls{icp}~\cite{besl-mckay:tpami:1992,chen-medioni:icra:1991} with up
+to $O(1)$ grid lookups on a precomputed distance map data structure.
+Both point-to-point and point-to-plane error formulations are derived
+within the Gauss-Newton framework on the $SE(2)$ manifold, with the
+Jacobians of both variants obtained through right-sided perturbation.
+The unified distance map data structure introduced in this chapter
+supports dense and sparse storage layouts and three representation
+levels~$\mathcal{M}_l$, while remaining compatible with the classical
+\gls{icp} formulations used as baselines. Across the synthetic and
+IILABS~3D~\cite{ribeiro:access:2025} benchmarks, the precomputed
+point-to-point variant $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ stood
+out as the best-performing point-to-point formulation, consistently
+improving over its analytical counterparts
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_0)$ and
+$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2p}}$ on the \gls{rte} and
+\gls{rre} metrics across all four planar sequences of the
+IILABS~3D~\cite{ribeiro:access:2025} dataset (Nav~A~Diff, Nav~A~Omni,
+Loop, and Slippage), in agreement with the synthetic results
+discussed in \chapref{chap:distance-maps}. More importantly,
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ also reached competitive
+accuracy against the analytical point-to-plane formulations
+$\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_0)$ and
+$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$. On Nav~A~Omni
+at $r_\mathrm{max} = \SI{30}{\metre}$, $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$
+obtained the lowest drift overall both on \gls{rte}
+(\SI{0.81}{\percent}) and on \gls{rre} (\SI{0.063}{\degree\per\metre}).
+On Nav~A~Diff at the same range, $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$
+attained the lowest \gls{rre} overall (\SI{0.078}{\degree\per\metre}) with
+a \gls{rte} of \SI{0.95}{\percent}, within \SI{0.07}{\percent} of the
+$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$ baseline. On the Loop sequence,
+the point-to-plane formulations retained an advantage, with
+$\mathrm{ICP}_{\mathcal{D},\,\mathrm{p2pl}}$ attaining
+\SI{1.37}{\percent} \gls{rte} and \SI{0.106}{\degree\per\metre}
+\gls{rre} against \SI{2.14}{\percent} and \SI{0.123}{\degree\per\metre}
+for $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$, consistent with the
+chapter's discussion of the residual gap that emerges when traversing
+large spaces through narrow passages. Overall, these results
+underline the relevance of the precomputed distance field to
+regularize point-to-point correspondences against sensor noise and to
+provide an effective alternative to analytical point-to-plane
+formulations in a broad range of operating conditions,
+avoiding kd-tree search~\cite{bentley:cacm:1975} traditionally required at every
+\gls{icp}~\cite{besl-mckay:tpami:1992,chen-medioni:icra:1991} iteration.
+
+\chapref{chap:slam} presents the RicoSLAM framework developed within the scope
+of this PhD~Thesis, including the distance map-based tracker from
+\chapref{chap:distance-maps} with split and merge triggering criteria for
+keyframe management, a loop closure detection procedure based on world-frame
+proximity and graph-distance, and a relocalization policy that
+transfers the tracker into an existing keyframe of the back-end graph
+whenever a short-loop candidate is available. On the
+IILABS~3D~\cite{ribeiro:access:2025} dataset, RicoSLAM attains the
+lowest \gls{ate} across its operating modes on all four planar
+sequences considered in the trajectory accuracy benchmark, with
+\SI{0.047}{\metre} on Nav~A~Diff (\emph{local} mode),
+\SI{0.030}{\metre} on Nav~A~Omni (\emph{local~w/upd.}\ mode),
+\SI{0.033}{\metre} on Loop (\emph{local~w/upd.}\ mode), and
+\SI{0.014}{\metre} on Slippage (\emph{scan~w/reloc.}\ mode). These
+values are lower than the \SI{0.053}{\metre}, \SI{0.061}{\metre},
+\SI{0.040}{\metre}, and \SI{0.042}{\metre} obtained by the best
+SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021} configurations, and
+substantially lower than the GMapping~\cite{grisetti:tro:2007}
+results, which fails to close the loop on the Loop sequence.
+The offline pose-correction stream proposed in
+\secref{sec:slam:online:pose-history} further reduces the \gls{ate} on
+the three longer sequences, while its dispersion analysis suggests
+that the residual error is dominated by systematic sources
+(\eg, extrinsic calibration, sensor noise, ground-truth precision)
+rather than by front-end drift or loop closure misalignment. In
+terms of scalability, all RicoSLAM variants produce smaller back-end graphs than
+SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021} for comparable, and
+often better, trajectory accuracy. The combination of the
+relocalization policy with the local-map operating mode
+(\emph{local~w/reloc.}\ variant) produces a back-end whose size
+depends primarily on the spatial extent of the explored environment
+rather than on the duration of operation or the path length, even
+when revisiting the same locations multiple times.
+
+Furthermore, the dynamics removal strategy proposed in \chapref{chap:slam}
+operates at two complementary stages of RicoSLAM. The online stage
+runs during local map maintenance and treats each laser beam as an
+observation from the surrounding scene that may either see through a
+previously mapped point or add new observations to the local
+representation. The offline stage runs during 2D~occupancy grid map
+generation and combines the same ray model with a
+Bresenham-like~\cite{bresenham:ibm:1965,zingl:uas:2016} line
+rasterization to suppress dynamic returns before integrating the
+scans into the final occupancy grid. The experimental evaluation
+considered the IILABS~3D~\cite{ribeiro:access:2025} dataset together
+with four additional datasets from real-world \gls{amr} deployments
+(Avantgarde, Cappero, Flowbotic, and Kuka), spanning sensor sampling
+rates from \SI{6}{\hertz} to \SI{40}{\hertz}, sequence durations
+from a few minutes up to roughly \SI{78}{\minute}, and path lengths
+from tens of meters up to kilometers. Across every sequence,
+operating mode, and threshold considered in the experiment, the
+proposed offline dynamics removal mechanism consistently sharpened
+the empirical occupancy distribution of the final probability map
+relative to the standard rasterization baseline and reclassified to
+an \emph{unknown} state cells whose only supporting observations were
+transient dynamic returns. Together with the trajectory accuracy
+and scalability results, these mapping experiments demonstrate that
+RicoSLAM is able to produce a cleaner and more compact representation
+of the environment suitable for downstream localization in
+autonomous operation, even in the presence of dynamic returns and
+sensor noise from industrial \gls{amr} deployments.
+
+Lastly, the distance map-based \gls{gba} factors introduced in
+\secref{sec:slam:gba} augment the pose-pose constraints of the online
+graph with per-point distance map factors, both in their
+point-to-point and point-to-plane formulations. The Jacobians of
+these factors are derived via right-sided perturbation on the
+$SE(2)$ manifold, building on the corresponding error formulations
+from \chapref{chap:distance-maps}. The synthetic benchmark evaluated
+four \gls{gba} factor configurations on a Manhattan-like grid of
+$289$ poses perturbed by $\pm\SI{1.5}{\metre}$ on translation and
+$\pm\SI{20}{\degree}$ on orientation, considering noise-free
+conditions and a Gaussian range noise of
+$\sigma = \SI{0.03}{\metre}$. Although the graph topology and the
+synthetic scene are regular and well-structured, the results
+indicate that the proposed factors are suited to globally refining
+the back-end pose graph produced by the online RicoSLAM pipeline.
+Consistent with the registration evaluation of
+\chapref{chap:distance-maps}, the precomputed point-to-point variant
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ with voxelization of the
+moving point clouds attained the lowest translational and rotational
+errors under range noise conditions, reinforcing the relevance of
+distance map-based point-to-point formulations even when compared
+against point-to-plane variants. The full integration of the
+proposed \gls{gba} stage with the online RicoSLAM pipeline and its
+end-to-end validation in real-world environments remains a work in
+progress at the time of writing this PhD~Thesis, and is identified as
+the main open direction in \secref{sec:conclusions:final-remarks}.
+
+Beyond the scientific contributions discussed above,
+the PhD~Thesis materializes into a set of peer-reviewed publications
+covering the systematic literature review on long-term localization
+and mapping~\cite{sousa:jfr:2023} (\appxref{appx:slr}), the corner-like feature
+detector~\cite{sousa:icara:2024} (\appxref{appx:features}), the multimodal
+mobile platform~\cite{sousa:icarsc:2025} (\appxref{appx:hangfaq2})
+used for data acquisition of the IILABS~3D~\cite{ribeiro:access:2025}
+(\appxref{appx:iilabs3d}), and the usage of RicoSLAM during container unloading
+applications~\cite{lopes:icara:2026} (\appxref{appx:cargo}), complemented by
+the public release of the IILABS~3D~\cite{ribeiro:access:2025}
+dataset and of the corresponding software repositories listed in
+\secref{sec:intro:contributions}. The combination of these
+contributions provides a unified \gls{slam} solution that ties
+together distance map-based registration,
+dynamics-aware local mapping, and offline global refinement,
+addressing in an integrated manner to the two research questions related to
+improving localization and mapping process in dynamic environments
+formulated in \secref{sec:intro:rq+h}.
 
 \section{Final Remarks and Future Work}
 
