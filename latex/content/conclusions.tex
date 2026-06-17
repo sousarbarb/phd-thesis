@@ -17,8 +17,8 @@ for future research.
 This chapter is divided into two sections.
 First, \secref{sec:conclusions:contributions} summarizes the
 conclusions and contributions of the PhD~Thesis.
-Then, \secref{sec:conclusions:final-remarks} presents final remarks and
-the directions of future work, including the involvement of
+Then, \secref{sec:conclusions:final-remarks} presents the directions of future
+work and final remarks, including the involvement of
 the candidate in the scientific community throughout the PhD~Thesis.
 
 \section{Conclusions and Contributions}\label{sec:conclusions:contributions}
@@ -347,55 +347,136 @@ This subsection consolidates these activities, organized into collaborations,
 scientific projects, and supervision.
 
 \subsubsection{Collaborations}
-Giorgio Sapienza, Rome (PhD Internship, 6 months, February - July 2024).
 
-5dpo Robotics Team:
+The international collaboration established with Prof.~Dr.~Giorgio~Grisetti from
+Sapienza Università di Roma, materialized through a six-month research
+visit between February and July 2024, shaped the
+core contributions of the second part of the PhD~Thesis:
+the distance map-based 2D~point cloud registration
+framework introduced in \chapref{chap:distance-maps}, the RicoSLAM
+framework presented in \chapref{chap:slam}, and the corresponding
+distance map-based \gls{gba} formulations all originated from
+discussions and joint development with Prof.~Dr.~Giorgio~Grisetti.
+The visit also gave direct access to the srrg2\_solver~\cite{grisetti:robotics:2020}
+optimization framework adopted as the back-end of RicoSLAM, and
+provided the \emph{Cappero} and \emph{Kuka} sequences used to evaluate
+the offline dynamics removal mechanism in
+\secref{sec:slam:results:dynamics} on real-world data beyond the
+IILABS~3D~\cite{ribeiro:access:2025} dataset and the
+\gls{inesctec} industrial deployments.
+
+At the national level, the candidate maintained an active collaboration
+with the 5dpo robotics team~\cite{5dpo} at \gls{feup}, whose
+three-wheeled omnidirectional platform was used as the experimental
+platform for the corner-like feature detector reported in
+\chapref{chap:features}. The collaboration with the 5dpo team
+predates and continued throughout the PhD~Thesis, covering wheel
+odometry calibration, pose control of omnidirectional robots, and
+the development of a robotic framework in the scope of participating in multiple
+editions of the Robot@Factory~4.0 competition at the RoboCup Portugal Open:
 \begin{description}[leftmargin=1.25cm,style=nextline,font=\normalfont]
 \item[\cite{sousa:icarsc:2021}] \fullcite{sousa:icarsc:2021}
+\item[\cite{sousa:jint:2022}]   \fullcite{sousa:jint:2022}
 \item[\cite{sousa:icarsc:2024}] \fullcite{sousa:icarsc:2024}
 \item[\cite{lopes:icarsc:2025}] \fullcite{lopes:icarsc:2025}
 \end{description}
 
 \subsubsection{Scientific projects}
-APPLICATION:
-SLAM4all (SLAM em tempo real para multi-domínio com múltiplos robôs sob transmissão de dados limitada).
 
-PROJECTS:
-VINCI7D (Gerber parser);
-GreenAuto;
-PRODUTECH R3.
-
+The PhD~Thesis was developed in articulation with a set of
+applied research projects hosted at \gls{criis}/\gls{iilab} from \gls{inesctec}.
+The primary alignment of this PhD~Thesis is with the
+\textit{GreenAuto Agenda: Green Innovation for the Automotive Industry}~\cite{greenauto},
+the main funding source of this PhD~Thesis through \gls{pps}18 -- \textit{3D~navigation system
+for mobile robotic equipment} of \gls{wp}10 -- \textit{automated
+logistics for the automotive industry}, as already discussed in
+\secref{sec:intro:scope}. The Flowbotic real-world sequences in industrial-scale
+environments considered in the dynamics removal experiment of
+\secref{sec:slam:results:dynamics} is a consequence of this
+articulation. In addition to GreenAuto, the candidate contributed to the
+following scientific projects:
 \begin{itemize}
-% \item GreenAuto:
-%   \begin{description}[leftmargin=1.25cm,style=nextline,font=\normalfont]
-%   \end{description}
-\item PRODUTECH~R3:
+\item \textbf{PRODUTECH~R3:} a national project on the
+      reconfiguration, recovery, and resilience of the Portuguese
+      manufacturing sector, within which the candidate contributed to
+      the integration of mobile manipulators with RicoSLAM for tracking the
+      robot pose during container unloading applications, 5G~communications
+      for teleoperation of industrial \glspl{amr}, and pallet detection in
+      intralogistics environments.
+      This contribution led to the following publications:
   \begin{description}[leftmargin=1.25cm,style=nextline,font=\normalfont]
-  \item[\cite{levin:robot:2024}] \fullcite{levin:robot:2024}
   \item[\cite{caldana:robot:2024}] \fullcite{caldana:robot:2024}
+  \item[\cite{levin:robot:2024}] \fullcite{levin:robot:2024}
   \item[\cite{pacheco:icarsc:2025}] \fullcite{pacheco:icarsc:2025}
+  \item[\cite{lopes:icara:2026}] \fullcite{lopes:icara:2026}
   \end{description}
-\item VINCI~7D:
+\item \textbf{VINCI~7D:} a project focused on industrial printing-on-surfaces
+      applications, in which the candidate contributed to a
+      Gerber-format parser for printed-circuit-board layouts supporting bitmap
+      and parametric representations, materialized in the publication below:
   \begin{description}[leftmargin=1.25cm,style=nextline,font=\normalfont]
   \item[\cite{sousa:access:2022}] \fullcite{sousa:access:2022}
   \end{description}
 \end{itemize}
 
-
-
 \subsubsection{Supervision}
-B.Sc. supervision (not official) at FEUP (February - June 2023; 2nd semester 2022/23):
-Rodrigo de Vasconcelos e Miguel (Compensação do Movimento do Robô nos Dados de Sensores Exteroceptivos);
-José Miguel Guedes (Controlo de Trajetórias de Robôs Móveis com o Hangfa Discovery Q2);
-André Luís Pires (Robótica e Sistemas Autónomos em Localização e Mapeamento de Robôs Móveis com o 3-omni 5DPO MSL);
-Ana Luísa Mota (Robótica e Sistemas Autónomos em Localização e Mapeamento de Robôs Móveis com o Hangfa Discovery Q2).
 
-B.Sc. supervision (not official) at ISEP (March - July 2023; 2nd semester 2022/23):
-Paulo Ricardo Barbosa (Teste de algoritmos de mapeamento open source recorrendo ao sensor RS-Helios-5515).
+Throughout the PhD~Thesis, the candidate co-supervised a number of
+BSc students from \gls{feup} and \gls{isep} at \gls{inesctec}, on topics
+related to the research lines of this work. Several of these supervisions
+focused on modifying mobile platforms, sensorization, and \gls{slam} algorithms.
+During the 2nd semester of the 2022/23 academic year (February to
+June 2023), the candidate co-supervised BSc students from \gls{feup}
+on the following topics, related to the PhD~Thesis's
+focus on 2D laser-based localization and mapping for mobile robots:
+\begin{itemize}
+\item Ana Luísa Mota -- \emph{Localization and Mapping with the Hangfa
+      Discovery~Q2 Mobile Platform}, exploring 3D~\gls{slam} with RGB-D sensors,
+      while adopting the same platform modified in the scope of this
+      PhD~Thesis~\cite{sousa:icarsc:2025} and used during the acquisition of the
+      IILABS~3D~\cite{ribeiro:access:2025} dataset;
+\item André Luís Pires -- \textit{Localization and Mapping with a
+      Three-wheeled Omnidirectional Mobile Platform},
+      addressing the same problem as Ana~Mota, but adopting the same platform
+      of the 5dpo robotics team~\cite{5dpo} used as the experimental platform
+      for the experimental evaluation in \chapref{chap:features};
+\item José Miguel Guedes -- \textit{Trajectory Control of Omnidirectional Robots
+      with the Hangfa Discovery~Q2 Mobile Platform}, focused on trajectory
+      tracking control with the Hangfa~Discovery~Q2 platform,
+      subsequently revised within this PhD~Thesis to acquire the
+      IILABS~3D~\cite{ribeiro:access:2025} dataset;
+\item Rodrigo de Vasconcelos e Miguel -- \textit{Motion Distortion Compensation
+      on 2D~Laser Scanners Data}, a problem closely related to
+      scan-distortion considerations that may affect \gls{slam} results.
+\end{itemize}
 
-BII at INESC TEC:
-Daniele da Mota Caldana (Aplicação para deteção de local para manipulação de paletes e paletes danificadas);
-Duarte Filipe Monteiro (Caixas metalicas GreenAuto);
-David José Castro (Caixas metalicas GreenAuto);
-João Miguel Oliveira (tele-controlo AMRs);
-Thiago Baldassarri Levin (comunicações 5G).
+In the same semester, the candidate also co-supervised a student from \gls{isep}:
+\begin{itemize}
+\item Paulo Ricardo Barbosa -- \textit{Test of 3D LiDAR SLAM Algorithms
+      with the RoboSense RS-Helios-5515}, focused on the experimental
+      validation of open-source 3D~\gls{slam} algorithms with the
+      sensor referenced in the title, with this work predating the
+      benchmark study by Ribeiro~\etal~\cite{ribeiro:access:2025}, a
+      complementary contribution of this PhD~Thesis.
+\end{itemize}
+
+Finally, the candidate co-supervised \gls{bii} fellows at \gls{inesctec}
+on topics that contributed to the project portfolio enumerated above
+and, in some cases, materialized in the peer-reviewed publications
+listed under the PRODUTECH~R3 project:
+\begin{itemize}
+\item Daniele da Mota Caldana --
+      \textit{Pallet Detection in Intralogistics Environments},
+      addressing pallet detection for autonomous handling within
+      PRODUTECH~R3, with results contributing to the publication
+      \cite{caldana:robot:2024};
+\item Duarte Filipe Monteiro and David José Castro --
+      \textit{Metallic Boxes Detection for the Automotive Sector},
+      contributing to the metallic-box perception pipeline of the
+      GreenAuto project that hosted this PhD~Thesis;
+\item João Miguel Oliveira and Thiago Baldassarri Levin --
+      \textit{Teleoperation of \glspl{amr} in 5G Networks},
+      developing joystick-based teleoperation interfaces over
+      5G~connectivity within PRODUTECH~R3, with results contributing
+      to the publication \cite{levin:robot:2024}.
+\end{itemize}
