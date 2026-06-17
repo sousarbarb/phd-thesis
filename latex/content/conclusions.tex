@@ -240,7 +240,98 @@ involvement in the scientific community throughout the PhD~Thesis.
 
 \subsection{Future work}\label{sec:conclusions:future-work}
 
-\subsection{Future work}
+The directions of future work identified in
+\chapref{chap:features}, \chapref{chap:distance-maps}, and
+\chapref{chap:slam} are consolidated as follows, ranging from the front-end
+perception modules to the offline global refinement stages:
+\begin{itemize}
+\item \textbf{Covariance estimation for the corner-like features.}
+The corner-like feature detector proposed in \chapref{chap:features}
+produces the keypoint location as the closed-form intersection of two
+locally fitted lines at multiple distance-based scales, but does not
+yet provide an explicit uncertainty model for the feature observation.
+Propagating the covariance of the line-fitting parameters through the
+closed-form intersection step would yield a per-feature covariance
+suitable for weighting the feature observations within a probabilistic
+data association and tracking module. This extension is a prerequisite
+for the integration of the corner-like features as observations within
+a feature-based tracking module;
+\item \textbf{Hybrid raw-scan, feature, and beacon-based \gls{slam}
+framework.}
+The current RicoSLAM framework focuses on the raw 2D~laser scanner data
+as the only perceptual modality. A natural extension is the
+development of a hybrid pose-landmark \gls{slam} framework that
+simultaneously supports raw scan observations, geometric features
+(\eg, line segments, the corner-like features proposed in
+\chapref{chap:features}), and artificial beacons (\eg, reflective
+cylinders). Such a framework would combine the robustness of dense
+distance map-based registration with the long-range associability of
+beacon-based and feature-based observations, while reusing the
+$SE(2)$ graph back-end already adopted by RicoSLAM. The
+covariance estimation extension for the corner-like features mentioned
+above is a prerequisite for this development;
+\item \textbf{Improvements on the precomputed point-to-plane
+formulation.}
+The precomputed point-to-plane variant
+$\mathcal{D}_\mathrm{p2pl}(\mathcal{M}_2)$ achieves competitive
+registration accuracy with respect to the \gls{icp} baselines, but
+is more sensitive to range noise than the precomputed point-to-point
+variant $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$, attributed to the
+compounding of finite-difference errors when approximating both the
+gradient and the Hessian of the distance field. Alternative strategies
+to estimate these quantities, such as semi-analytical formulations that combine
+the analytical gradient at $\mathcal{M}_1$ with a smoothed Hessian, or
+truncated-distance reformulations that explicitly handle the
+truncation boundaries, may reduce this sensitivity and improve the
+robustness of the precomputed point-to-plane variant under noise.
+\item \textbf{Improvements on the uncertainty estimation analysis for
+2D~point cloud registration.}
+The pose-error consistency metric
+$\chi^2_{\boldsymbol{\varepsilon}}$ adopted in
+\secref{sec:distance-maps:results:synthetic} is an
+approximation rather than a true Mahalanobis statistic, because the
+target-frame pose error
+$\boldsymbol{\varepsilon}\!\left(\mathbf{x}\right)$ derived from
+$\mathbf{x}\cdot\mathbf{x}^{*,-1}$ and the body-frame information
+matrix $\boldsymbol{\Omega}$ returned by the Gauss-Newton solver
+under the right-sided perturbation update live on different tangent
+spaces of $SE(2)$. Both representations only coincide, up to the
+adjoint twist $\mathrm{Ad}_{\mathbf{x}^*}^T\,\boldsymbol{\Omega}\,
+\mathrm{Ad}_{\mathbf{x}^*}$, in the small angular residual regime.
+Nevertheless, the target-frame parametrization was preferred in this
+PhD~Thesis because of its diagnostic value in degenerate scenes,
+projecting otherwise unobservable residuals onto the observable directions of
+$\boldsymbol{\Omega}$ and inflates the metric whenever the alignment
+fails along a degenerate axis.
+\item \textbf{Improvements on the online dynamics removal mechanism.}
+The online dynamics removal stage of RicoSLAM operates on a
+per-keyframe basis and commits the updated local map directly to the
+back-end graph once a split or merge criterion is triggered. An
+intermediate buffering stage between the tracker and the back-end,
+which could accumulate evidence over a sliding window of keyframes
+before committing them, may further reduce the influence of transient
+returns on the back-end graph and improve the robustness of the
+framework in highly dynamic scenarios. In addition, the simplified
+single-return ray model adopted by the online and offline dynamics
+removal mechanisms could be extended to multi-return formulations,
+addressing the residual semi-static dynamics observed in the Avantgarde
+sequences and improving the cleaning effect on the final occupancy
+grid representation.
+\item \textbf{Integration and real-world validation of the distance
+map-based \gls{gba}.}
+The distance map-based \gls{gba} factors proposed in
+\secref{sec:slam:gba} were validated on a synthetic benchmark with
+ground-truth poses, isolating their contribution from the online
+operation of RicoSLAM. The full integration of the proposed \gls{gba}
+stage with the online RicoSLAM pipeline and its end-to-end validation
+in real-world environments stands out as the most immediate direction
+of future work. This integration would close the loop between the
+online graph \gls{slam} operation and the offline global refinement
+stage, enabling the explicit measurement of the contribution of the
+\gls{gba} stage to the trajectory accuracy and to the quality of the
+2D~occupancy grid maps produced by RicoSLAM in real-world industrial
+deployments.
+\end{itemize}
 
 \subsection{Involvement in the scientific community}\label{sec:conclusions:community}
 TBC
