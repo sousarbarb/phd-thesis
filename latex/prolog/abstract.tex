@@ -1,21 +1,168 @@
 \chapter*{Resumo}
 \addcontentsline{toc}{chapter}{Resumo}
 
-TBC
+A crescente adoção de AMRs nas indústrias de logística, intralogística,
+retalho e manufatura é uma motivação para melhorar a robustez dos
+algoritmos de Simultaneous Localization and Mapping (SLAM) em condições
+reais de operação, nas quais o ambiente se encontra continuamente
+afetado por pessoas, veículos e equipamentos em movimento. As formulações
+clássicas de SLAM~2D, fundamentadas no pressuposto de um mundo estático,
+tendem a produzir mapas distorcidos ou esbatidos e estimativas instáveis
+da pose do robô quando estas observações dinâmicas são integradas sem as
+devidas considerações. Esta Tese de Doutoramento, intitulada
+\textit{RicoSLAM: localization and mapping in dynamic environments},
+investiga como a dinâmica do ambiente pode ser integrada nos processos
+de localização e mapeamento de um sistema de SLAM~2D, recorrendo
+exclusivamente a odometria das rodas e a um \emph{scanner} laser 2D como
+modalidades de perceção.
 
-\hfill\break
+A investigação organiza-se em torno de três contribuições principais.
+Primeiro, propõe-se um detetor de pontos de interesse do tipo canto para
+dados de \emph{scanner} laser 2D, em que o ponto-chave resulta da
+interseção em forma fechada de duas linhas ajustadas localmente em
+múltiplas escalas de vizinhança baseadas em distância. Os resultados
+experimentais evidenciam a invariância ao ponto de vista e à geometria
+do ambiente das características extraídas. Segundo, introduz-se uma
+estrutura de registo de nuvens de pontos 2D baseada em mapas de
+distância, que substitui a pesquisa explícita do vizinho mais próximo
+característica do Iterative Closest Point (ICP) clássico por um acesso
+até $O(1)$ numa matriz de distâncias pré-calculada.
+Derivam-se formulações ponto-a-ponto e ponto-a-plano sobre o \emph{manifold}
+$SE(2)$, no contexto do método de Gauss-Newton, recorrendo a uma
+perturbação à direita, com suporte para múltiplos níveis de
+representação e organizações de armazenamento esparsas ou densas.
+Por fim, desenvolve-se a framework RicoSLAM propriamente dita, que
+integra o \emph{tracker} baseado em mapas de distância como
+\emph{front-end} com um \emph{back-end} de grafo de fatores suportado
+pela biblioteca srrg2\_solver~\cite{grisetti:robotics:2020}.
+A framework inclui critérios de mudança e integração de dados baseados na razão
+de \emph{inliers} para a gestão de \emph{keyframes}, um mecanismo de deteção
+de visitas a lugares já mapeados combina proximidade no referencial global com
+distância em grafo, e uma política de relocalização que
+transfere o \emph{tracker} para um \emph{keyframe} existente do grafo de
+forma a limitar o seu crescimento. Dois mecanismos complementares
+abordam a dinâmica do ambiente: uma fusão \emph{online} baseada em \emph{ray tracing}
+que mantém o mapa local de cada \emph{keyframe} filtrando retornos \emph{see-through}
+e adicionando novas observações, e uma etapa \emph{offline} baseada em \emph{ray tracing}
+para suprimir observações dinâmicas durante a geração da grelha de
+ocupação~2D. Adicionalmente, propõem-se fatores em otimização por grafo de
+Global Bundle Adjustment (GBA) baseados em mapas de distância, que
+complementam as restrições de pose-pose do grafo \emph{online} com
+fatores por ponto, derivados nas variantes ponto-a-ponto e
+ponto-a-plano para alinhamento de núvens de pontos 2D.
 
-\textbf{Palavras-chave:} TBC.
+As contribuições propostas são avaliadas no \emph{dataset}
+IILABS~3D~\cite{ribeiro:access:2025} e comparadas com os algoritmos
+GMapping~\cite{grisetti:tro:2007} e
+SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021}. O RicoSLAM atinge o
+menor Absolute Trajectory Error (ATE) nas quatro sequências planares
+consideradas, com a correção de pose \emph{offline} a reduzir ainda mais
+o erro nas sequências com múltiplas revisitas ao mesmo local.
+A ativação da política de relocalização mantém o grafo do
+\emph{back-end} compacto, com uma dimensão que depende essencialmente da
+extensão espacial do ambiente explorado e não do tempo de operação ou
+da distância percorrida. O mecanismo \emph{offline} de remoção da
+dinâmica é avaliado em sequências adicionais de datasets de AMRs em
+ambientes industriais e académico (Avantgarde, Cappero, Flowbotic e Kuka),
+melhorando consistentemente a distribuição empírica de ocupação da grelha~2D
+resultante e reclassificando para um estado \emph{desconhecido} as
+células cujas únicas observações de suporte correspondiam a observações dinâmicas.
+Por fim, um \emph{benchmark} sintético valida os fatores de GBA propostos como
+uma etapa de otimização global do grafo de poses do \emph{back-end}.
+
+\hfill
+
+\textbf{Palavras-chave:}
+ambientes dinâmicos;
+deteção de pontos de interesse;
+\emph{global bundle adjustment};
+localização e mapeamento simultâneos;
+mapas de distância;
+otimização de grafo de poses;
+registo de nuvens de pontos;
+robôs móveis autónomos;
+\emph{scanner} laser 2D.
 
 \cleardoublepage
 
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
 
-TBC
+The growing deployment of AMRs in logistics, intralogistics, retail,
+and manufacturing industries is a motivation to improve the robustness of
+Simultaneous Localization and Mapping (SLAM) algorithms under realistic
+operating conditions, in which the scene is continuously affected by
+moving people, vehicles, and equipment. Classical 2D~SLAM formulations,
+which rely on a static-world assumption, tend to produce blurred or
+distorted maps and unstable robot pose estimates when these dynamic
+returns are integrated without proper considerations. This PhD~Thesis,
+entitled
+\textit{RicoSLAM: localization and mapping in dynamic environments},
+investigates how environment dynamics can be incorporated into both
+localization and mapping in a 2D~SLAM framework using wheeled
+odometry and 2D~laser scanner data as the only sensing modalities.
 
-\hfill\break
+The research is organized around three main contributions.
+First, a line-fitting-based corner-like feature detector for 2D~laser
+scanner data is proposed, in which the keypoint is computed as the
+closed-form intersection of two locally fitted lines at multiple
+distance-based neighborhood scales. Experimental results show that the proposed
+features exhibit viewpoint and geometric invariance suitable for
+feature-based tracking modules. Second, a 2D~point cloud registration
+framework based on unsigned distance maps is introduced, replacing the
+explicit nearest-neighbor search of classical
+Iterative Closest Point (ICP) with an up to $O(1)$ lookup on a precomputed
+distance field. Point-to-point and point-to-plane error formulations are derived
+within the Gauss-Newton framework on the $SE(2)$ manifold via right-sided
+perturbation, supporting multiple representation levels and sparse or
+dense storage layouts. Third, the RicoSLAM framework itself is
+developed, integrating the distance map-based tracker as the front-end
+with a factor-graph back-end built on top of the
+srrg2\_solver~\cite{grisetti:robotics:2020} library. The framework
+includes inlier-ratio-based split and merge triggering criteria for
+keyframe management, a loop closure detection procedure that combines
+world-frame proximity with a graph-distance constraint, and a
+relocalization policy that transfers the tracker into an existing
+keyframe of the back-end graph to bound its growth. Two complementary
+mechanisms address scene dynamics: an online ray-based merger that
+maintains the local map of each keyframe by filtering see-through and
+add-new returns, and an offline ray-based stage to suppress dynamic
+observations during 2D~occupancy grid map generation. In addition,
+distance map-based Global Bundle Adjustment (GBA) factors are
+proposed, augmenting the pose-pose constraints of the online graph with
+per-point distance map factors derived in both point-to-point and
+point-to-plane variants.
 
-\textbf{Keywords:} TBC.
+The proposed contributions are evaluated on the
+IILABS~3D~\cite{ribeiro:access:2025} dataset against the
+GMapping~\cite{grisetti:tro:2007} and
+SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021} baselines. RicoSLAM
+attains the lowest Absolute Trajectory Error (ATE) across the four
+planar sequences considered, with an offline pose-correction stream that further
+reduces the error on sequences with multiple revisits on the same location. The
+activation of the relocalization policy keeps the back-end graph
+compact, with a size that depends primarily on the spatial extent of
+the explored environment rather than on the operation time or path length.
+The offline dynamics removal mechanism is additionally evaluated on industrial
+AMR deployment sequences from the Avantgarde, Cappero, Flowbotic,
+and Kuka datasets, consistently sharpening the empirical occupancy
+distribution of the resulting 2D~grid map and reclassifying to an
+\emph{unknown} state cells whose only supporting observations were transient
+dynamic returns. Lastly, a synthetic Manhattan-like benchmark validates
+the proposed distance map-based GBA factors as a globally
+consistent refinement stage for the back-end pose graph.
+
+\hfill
+
+\textbf{Keywords:}
+2D~laser scanner;
+autonomous mobile robots;
+distance maps;
+dynamic environments;
+feature detection;
+global bundle adjustment;
+point cloud registration;
+pose graph optimization;
+simultaneous localization and mapping.
 
 \cleardoublepage
