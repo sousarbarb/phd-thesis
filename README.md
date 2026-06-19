@@ -120,7 +120,7 @@ this repository:
 
 ## License
 
-TBD
+Distributed under the GNU AGPLv3 license. See `LICENSE` for more information.
 
 ## Citation
 
@@ -143,7 +143,6 @@ PhD Thesis, Faculty of Engineering, University of Porto, Porto, Portugal,
   school  = {Faculty of Engineering, University of Porto},
   address = {Porto, Portugal},
   year    = {2026},
-  month   = {jun},
   type    = {{PhD} Thesis}}
 ```
 
@@ -178,7 +177,10 @@ contact:
   [INESC TEC - Institute for Systems and Computer Engineering, Technology and Science](https://www.inesctec.pt/en/)
 - [Faculty of Engineering, University of Porto (FEUP)](https://sigarra.up.pt/feup/en/)
 - [Flowbotic Mobile Systems, Lda](https://www.flowbotic.eu/)
-- [Robots Vision and Perception (RVP)](https://rvp-group.net/)
+- [Robots Vision and Perception (RVP)](https://rvp-group.net/) research group
+  from the
+  [Department of Computer, Control, and Management Engineering Antonio Ruberti (DIAG)](https://www.diag.uniroma1.it/en)
+  of [Sapienza University of Rome](https://www.uniroma1.it/en)
 
 ## Funding
 
