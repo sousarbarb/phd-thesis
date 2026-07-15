@@ -2,12 +2,14 @@
 """
 Extract map -> base_link from a rosbag's TF tree, sampled at scan timestamps,
 into a TUM trajectory file consumable by evo.
+
+Offline: no roscore required. Uses tf2_py.BufferCore directly to avoid the
+`~tf2_frames` service advertisement that tf2_ros.Buffer does on construction.
 """
 import argparse
 import rosbag
-import rospy
-import tf2_ros
 import tf2_py
+import genpy
 
 
 def main():
@@ -23,7 +25,7 @@ def main():
 
     # Cache large enough to hold the full bag's TFs
     cache_s = (bag.get_end_time() - bag.get_start_time()) + 100.0
-    buf = tf2_ros.Buffer(cache_time=rospy.Duration(cache_s))
+    buf = tf2_py.BufferCore(genpy.Duration(cache_s))
 
     # 1) Pre-load every TF in the bag (dynamic + static)
     print('Loading TFs...')
@@ -41,7 +43,8 @@ def main():
     with open(args.out_tum, 'w') as f:
         for _, msg, _ in bag.read_messages(topics=[args.scan]):
             try:
-                tf = buf.lookup_transform(args.map, args.base, msg.header.stamp)
+                tf = buf.lookup_transform_core(
+                    args.map, args.base, msg.header.stamp)
             except (tf2_py.LookupException,
                     tf2_py.ExtrapolationException,
                     tf2_py.ConnectivityException):
