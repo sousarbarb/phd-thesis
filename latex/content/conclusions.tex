@@ -26,26 +26,208 @@ the candidate in the scientific community throughout the PhD~Thesis.
 The research questions and hypotheses formulated in
 \secref{sec:intro:rq+h} guided the development of the contributions
 reported in \chapref{chap:features} to \chapref{chap:slam}.
-On the localization side, the corner-like
-feature detector of \chapref{chap:features}, the distance map-based
-registration framework of \chapref{chap:distance-maps}, and the
-local-map operating mode of RicoSLAM (\chapref{chap:slam}) address
-the hypotheses on geometric features
-(Hypothesis~\ref{hypothesis:localization:features}), distance maps
-as a correspondence-free representation
-(Hypothesis~\ref{hypothesis:localization:distance-maps}), and local
-maps continuously updated with the latest sensor observations
-(Hypothesis~\ref{hypothesis:localization:local-maps}).
-On the mapping side, the online and offline dynamics removal mechanisms
-of \secref{sec:slam:dynamics}, the relocalization policy of
-\secref{sec:slam:online:relocalization}, and the distance map-based \gls{gba}
-formulations proposed in \secref{sec:slam:gba} cover the hypotheses on ray
-tracing-based map updating (Hypothesis~\ref{hypothesis:mapping:ray-tracing})
-and cleaner static maps via offline dynamics removal
-(Hypothesis~\ref{hypothesis:mapping:clean-map}),
-bounded graph growth through relocalization
-(Hypothesis~\ref{hypothesis:mapping:relocalization}), and offline global
-map refinement (Hypothesis~\ref{hypothesis:mapping:ogba}).
+This section is organized in two parts.
+First, \secref{sec:conclusions:rq+h} restates both research questions and
+reports, hypothesis by hypothesis, the outcome supported by the
+experimental evidence gathered throughout this PhD~Thesis.
+Then, \secref{sec:conclusions:summary} consolidates the main conclusions
+drawn from the corresponding chapters.
+In \secref{sec:conclusions:rq+h}, a hypothesis is reported as
+\emph{supported} when the experiments conducted in this PhD~Thesis validate
+its claim under the conditions stated in the corresponding chapter, and as
+\emph{partially supported} when the proposed mechanism was formulated,
+implemented, and shown to operate, but either its isolated contribution was
+not quantified through a dedicated ablation study or its validation did not
+reach end-to-end operation in real-world conditions.
+
+\subsection{Research questions and hypotheses}\label{sec:conclusions:rq+h}
+
+\subsubsection{Research Question~\ref{question:mapping}}
+
+\emph{How to improve the mapping results when performing \gls{slam} with a
+ground mobile robot in a dynamic indoor environment?}
+
+The four hypotheses associated with this research question address the
+continuous update of the local environment representation
+(Hypothesis~\ref{hypothesis:mapping:ray-tracing}), the bounded growth of the
+back-end graph (Hypothesis~\ref{hypothesis:mapping:relocalization}),
+the removal of dynamic observations from the final map representation
+(Hypothesis~\ref{hypothesis:mapping:clean-map}), and the offline refinement
+of the global map (Hypothesis~\ref{hypothesis:mapping:ogba}):
+\begin{itemize}
+\item \textbf{Hypothesis~\ref{hypothesis:mapping:ray-tracing} --
+ray tracing to update local maps online: partially supported.}
+The ray-based merger proposed in \secref{sec:slam:dynamics:online} maintains
+the local map of the current keyframe by adding the returns falling in front
+of the mapped point on the same ray and by replacing the map points that the
+latest beam sees through, rebuilding the keyframe's distance map after every
+update so that the next alignment registers against the most recent state of
+the scene. This mechanism supports the local map operating modes of RicoSLAM,
+which attained the best online \gls{ate} results of
+\tabref{tab:slam:results:iilabs3d} on Nav~A~Diff (\SI{0.047}{\metre}),
+Nav~A~Omni (\SI{0.030}{\metre}), and Loop (\SI{0.033}{\metre}), and it keeps
+the registration reference consistent with the latest observations on the
+industrial sequences of \secref{sec:slam:results:dynamics}.
+Nevertheless, the experimental evaluation does not include an ablation study
+in which the online merger is enabled and disabled under otherwise identical
+conditions. Therefore, the part of the hypothesis claiming an increase of the
+inlier ratio and of the pose estimation stability is supported by the
+operation of the framework, but it is not quantified in isolation;
+\item \textbf{Hypothesis~\ref{hypothesis:mapping:relocalization} --
+relocalization into existing graph representations: supported.}
+The relocalization policy proposed in
+\secref{sec:slam:online:relocalization} transfers the tracker into an
+existing keyframe whenever a short-loop candidate is closer to the robot than
+the current keyframe, so that revisits reuse the existing graph nodes instead
+of creating new ones. On the four planar sequences of the
+IILABS~3D~\cite{ribeiro:access:2025} dataset
+(\tabref{tab:slam:results:iilabs3d:graph}), the local map mode with
+relocalization ends the run with $17$, $17$, $18$, and $8$ keyframe
+variables, between $5.8$ and $18$ times fewer nodes than the most compact
+SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021} configuration ($310$, $126$,
+$261$, and $46$), while its offline corrected \gls{ate}
+(\SI{0.043}{\metre}, \SI{0.031}{\metre}, \SI{0.039}{\metre}, and
+\SI{0.019}{\metre}) remains at or below the best
+SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021} result on every sequence
+(\SI{0.053}{\metre}, \SI{0.061}{\metre}, \SI{0.040}{\metre}, and
+\SI{0.042}{\metre}). On the Loop sequence, in which the robot repeats
+5~cycles through the same space, the graph drops from $83$ to $19$ nodes in
+scan mode and from $89$ to $18$ nodes in local map mode once relocalization
+is enabled. These results confirm that the back-end size follows the spatial
+extent of the explored environment rather than the duration of the operation
+or the path length;
+\item \textbf{Hypothesis~\ref{hypothesis:mapping:clean-map} --
+offline removal of dynamic points during map generation: supported.}
+The offline stage proposed in \secref{sec:slam:dynamics:offline} re-evaluates
+the same ray model over all the scans retained by the framework, now placed
+in the world frame with the optimized keyframe poses, and combines it with a
+Bresenham-like~\cite{bresenham:ibm:1965,zingl:uas:2016} rasterization so that
+only the surviving endpoints contribute to the occupancy statistics.
+Across the five datasets considered in \secref{sec:slam:results:dynamics}
+(IILABS~3D~\cite{ribeiro:access:2025}, Avantgarde, Cappero, Flowbotic, and
+Kuka), and for every sequence, operating mode, and threshold evaluated, the
+proposed mechanism sharpened the empirical occupancy distribution of the
+resulting probability map relative to the \emph{standard} rasterization
+baseline, while reclassifying to an \emph{unknown} state the cells whose only
+supporting observations were transient dynamic returns.
+The single-return ray model bounds this result: a return is only discarded
+once a later beam traverses the same ray and sees through it, leaving the
+semi-static changes observed on the Avantgarde sequences unresolved;
+\item \textbf{Hypothesis~\ref{hypothesis:mapping:ogba} --
+offline global map refinement: partially supported, demonstrated in
+principle.}
+The distance map-based \gls{gba} factors proposed in \secref{sec:slam:gba}
+replace the aggregated $SE(2)$ pose-pose measurements by per-point residuals
+evaluated against the distance map of a neighboring keyframe, with their
+Jacobians derived via right-sided perturbation on the $SE(2)$ manifold.
+The synthetic benchmark of \secref{sec:slam:results:gba} showed these factors
+recovering a Manhattan-like graph of $289$~poses perturbed by
+$\pm\SI{1.5}{\metre}$ on translation and $\pm\SI{20}{\degree}$ on
+orientation, both under noise-free and $\sigma = \SI{0.03}{\metre}$ range
+noise conditions, with $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ and
+voxelization attaining the lowest errors under noise.
+However, that benchmark supplies the factor graph instead of building it:
+the graph topology follows the ground-truth proximity between poses, each
+variable holds a single clean scan of a static scene, and the point clouds
+are already expressed in a consistent reference frame.
+Under real operation, the same inputs must come from the online pipeline,
+where keyframe local maps only partially overlap, may still contain dynamic
+returns, and the neighborhood of each variable must be determined from
+estimated rather than ground-truth poses.
+Consequently, the error formulations of the offline global refinement are
+validated and remain valid for real-world data, since neither the residuals
+nor their Jacobians depend on the synthetic nature of the scene, but the
+effect of the \gls{gba} stage on the global map produced by RicoSLAM in
+real-world deployments is not yet demonstrated
+(see \secref{sec:conclusions:future-work}).
+\end{itemize}
+
+Summing up, the mapping results of \gls{slam} in dynamic indoor environments
+improve by keeping the reference representation consistent with the latest
+observations, by reattaching the tracker to the existing graph on revisits
+instead of extending it, and by rejecting the dynamic returns through ray
+tracing before they reach the final occupancy grid map. The offline global
+refinement completes this answer at the formulation level, while its
+end-to-end validation remains open.
+
+\subsubsection{Research Question~\ref{question:localization}}
+
+\emph{How to integrate environment dynamics in the localization process when
+performing \gls{slam} with a ground mobile robot in a dynamic indoor
+environment?}
+
+The three hypotheses associated with this research question address the
+extraction of geometric features from raw 2D~laser scanner data
+(Hypothesis~\ref{hypothesis:localization:features}), the use of distance maps
+as a correspondence-free registration representation combined with robust
+estimators (Hypothesis~\ref{hypothesis:localization:distance-maps}), and the
+continuous update of local maps for a more stable scan-to-map localization
+(Hypothesis~\ref{hypothesis:localization:local-maps}):
+\begin{itemize}
+\item \textbf{Hypothesis~\ref{hypothesis:localization:features} --
+geometric feature extraction from 2D~laser scanner data: supported at the
+feature extraction level.}
+The corner-like detector proposed in \chapref{chap:features} extracts stable
+geometric information from raw 2D~laser data: $6$~features attained a
+$100\%$ observability ratio under the sensor \gls{fov} and the pose
+uncertainty of the experiments, $20$ and $16$ features remained observable
+above $50\%$ and $75\%$, respectively, and the observability ratio elsewhere
+in the map stayed below $1.0\%$, indicating few false positives.
+Regarding geometric invariance, $91.5\%$ of the possible associations among
+the $39$~most persistent features showed a standard deviation at or below
+\SI{0.03}{\metre}, matching the noise of the Hokuyo~UST-10LX sensor.
+The detector was nonetheless not adopted as the front-end of RicoSLAM, as a
+deliberate scoping decision: a detector is not yet an estimator, since
+per-feature covariance, feature descriptors, and a data association policy
+would still be required (see \secref{sec:conclusions:future-work}); geometric
+features do not remove the dynamics problem by themselves; and the distance
+map representation of \chapref{chap:distance-maps} already provides data
+association and cost evaluation at $O(1)$ over raw scans.
+Thus, the hypothesis is supported as far as extracting stable and viewpoint
+invariant geometric information from 2D~lasers is concerned, with the
+integration into a feature-based tracker left as future work;
+\item \textbf{Hypothesis~\ref{hypothesis:localization:distance-maps} --
+distance maps for 2D~point cloud registration: supported.}
+The framework of \chapref{chap:distance-maps} replaces the nearest-neighbor
+search performed at every \gls{icp}~\cite{besl-mckay:tpami:1992,chen-medioni:icra:1991}
+iteration by up to $O(1)$ grid lookups, supporting point-to-point and
+point-to-plane residuals, three representation levels, dense or sparse
+storage, and the classical \gls{icp} baselines under a single data structure.
+The precomputed point-to-point variant
+$\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ lowered the odometric drift
+relative to both of its analytical point-to-point counterparts in most
+configurations, reaching drift levels competitive with the point-to-plane
+formulations without ever estimating surface normals, and produced less
+overconfident information matrices in degenerate scenes.
+Dynamic and spurious observations are handled inside the optimization by the
+Cauchy robustifier and by the truncation of the distance field at
+$d_{\max}$, which bounds the residual and cancels its gradient beyond the
+truncation band;
+\item \textbf{Hypothesis~\ref{hypothesis:localization:local-maps} --
+continuously updated local maps: supported.}
+Aggregating the scans into the local map of the current keyframe improved the
+online \gls{ate} of RicoSLAM over the corresponding scan-based variants on
+Nav~A~Diff (from \SI{0.063}{\metre} to \SI{0.047}{\metre}) and on Nav~A~Omni
+(from \SI{0.053}{\metre} to \SI{0.043}{\metre}), while matching it on Loop
+(\SI{0.037}{\metre}), as reported in \tabref{tab:slam:results:iilabs3d}.
+Beyond trajectory accuracy, the local map is also the representation against
+which the loop closure and the relocalization candidates are validated
+through a scan-to-map alignment, and the one on which the online dynamics
+removal operates. The exception is the Slippage sequence
+(\SI{0.015}{\metre} in scan mode against \SI{0.019}{\metre} in local map
+mode), where the short straight-line trajectory gives the merger little
+opportunity to improve the reference while still accumulating the
+registration residuals of the merged scans.
+\end{itemize}
+
+Summing up, environment dynamics are integrated in the localization process
+by registering every scan against a reference that is continuously updated
+with the latest observations, and by treating the remaining dynamic returns
+as outliers inside the registration itself, through the robust estimators and
+the truncation of the distance field.
+
+\subsection{Summary of the contributions}\label{sec:conclusions:summary}
+
 The remainder of this section summarizes the main conclusions drawn from
 the corresponding chapters.
 
@@ -134,7 +316,7 @@ values are lower than the \SI{0.053}{\metre}, \SI{0.061}{\metre},
 \SI{0.040}{\metre}, and \SI{0.042}{\metre} obtained by the best
 SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021} configurations, and
 substantially lower than the GMapping~\cite{grisetti:tro:2007}
-results, which fails to close the loop on the Loop sequence.
+results, which fail to close the loop on the Loop sequence.
 The offline pose-correction stream proposed in
 \secref{sec:slam:online:pose-history} further reduces the \gls{ate} on
 the three longer sequences, while its dispersion analysis suggests
@@ -193,6 +375,18 @@ $\sigma = \SI{0.03}{\metre}$. Although the graph topology and the
 synthetic scene are regular and well-structured, the results
 indicate that the proposed factors are suited to globally refining
 the back-end pose graph produced by the online RicoSLAM pipeline.
+It is worth emphasizing what this benchmark does and does not assume.
+The factor graph is given rather than built. Its topology follows the
+ground-truth proximity between poses, every variable holds a single
+scan of a static scene, and no association errors can occur between a point
+and the distance map of a neighboring variable.
+Conversely, nothing in the derivation of the residuals or of their Jacobians
+depends on the synthetic nature of the data. So, the proposed formulations
+remain valid for real-world observations.
+Therefore, the open problem is not the formulation of the factors, but the
+construction of the graph that the \gls{gba} stage consumes, with the
+partially overlapping local maps, the residual dynamic returns, and the
+pose estimates produced by the online pipeline.
 Consistent with the registration evaluation of
 \chapref{chap:distance-maps}, the precomputed point-to-point variant
 $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ with voxelization of the
@@ -212,16 +406,24 @@ and mapping~\cite{sousa:jfr:2023} (\appxref{appx:slr}), the corner-like feature
 detector~\cite{sousa:icara:2024} (\appxref{appx:features}), the multimodal
 mobile platform~\cite{sousa:icarsc:2025} (\appxref{appx:hangfaq2})
 used for data acquisition of the IILABS~3D~\cite{ribeiro:access:2025}
-(\appxref{appx:iilabs3d}), and the usage of RicoSLAM during container unloading
-applications~\cite{lopes:icara:2026} (\appxref{appx:cargo}), complemented by
+(\appxref{appx:iilabs3d}), the distance map-based 2D~point cloud registration
+framework of \chapref{chap:distance-maps}~\cite{sousa:robot:2026}
+(\appxref{appx:dmaps}), and the usage of RicoSLAM during container unloading
+applications~\cite{lopes:icara:2026} (\appxref{appx:cargo}).
+The RicoSLAM framework of \chapref{chap:slam} is additionally reported in a
+manuscript in preparation~\cite{sousa:ral:2026} (\appxref{appx:ricoslam}),
+which extends the evaluation of this PhD~Thesis with the
+Cartographer~\cite{hess:icra:2016} baseline and with the total execution time
+of every system considered.
+These publications are complemented by
 the public release of the IILABS~3D~\cite{ribeiro:access:2025}
 dataset and of the corresponding software repositories listed in
 \secref{sec:intro:contributions}. The combination of these
 contributions provides a unified \gls{slam} solution that ties
 together distance map-based registration,
 dynamics-aware local mapping, and offline global refinement,
-addressing in an integrated manner to the two research questions related to
-improving localization and mapping process in dynamic environments
+addressing in an integrated manner the two research questions on
+improving the localization and mapping processes in dynamic environments
 formulated in \secref{sec:intro:rq+h}.
 
 \section{Future Work and Final Remarks}\label{sec:conclusions:final-remarks}
@@ -301,7 +503,7 @@ adjoint twist $\mathrm{Ad}_{\mathbf{x}^*}^T\,\boldsymbol{\Omega}\,
 Nevertheless, the target-frame parametrization was preferred in this
 PhD~Thesis because of its diagnostic value in degenerate scenes,
 projecting otherwise unobservable residuals onto the observable directions of
-$\boldsymbol{\Omega}$ and inflates the metric whenever the alignment
+$\boldsymbol{\Omega}$ and inflating the metric whenever the alignment
 fails along a degenerate axis.
 \item \textbf{Improvements on the online dynamics removal mechanism.}
 The online dynamics removal stage of RicoSLAM operates on a
@@ -317,6 +519,16 @@ removal mechanisms could be extended to multi-return formulations,
 addressing the residual semi-static dynamics observed in the Avantgarde
 sequences and improving the cleaning effect on the final occupancy
 grid representation.
+The evaluation of this mechanism also deserves a stronger validation
+protocol. The occupancy distribution analysis of
+\secref{sec:slam:results:dynamics} measures how decided the resulting map
+becomes, but a sharper map does not prove that every discarded return was
+truly dynamic, nor that no sparsely observed static structure was removed.
+A manually labelled or independently surveyed static reference map would
+enable reporting precision and recall of the removal decision, the rate of
+falsely removed static returns, and the rate of missed dynamic returns,
+turning the current evidence into a quantitative assessment of the
+mechanism;
 \item \textbf{Integration and real-world validation of the distance
 map-based \gls{gba}.}
 The distance map-based \gls{gba} factors proposed in
@@ -331,6 +543,41 @@ stage, enabling the explicit measurement of the contribution of the
 \gls{gba} stage to the trajectory accuracy and to the quality of the
 2D~occupancy grid maps produced by RicoSLAM in real-world industrial
 deployments.
+The main obstacle for this integration is not the error formulation, which
+is independent of the origin of the data, but the construction of the graph
+that the \gls{gba} stage optimizes. The synthetic benchmark of
+\secref{sec:slam:results:gba} assumes that this graph is already available.
+The neighborhood of each variable is derived from the ground-truth poses, and
+each variable holds one clean scan of a static scene. So, no association
+error can occur between a point and the distance map of a neighboring
+variable. Building the same structure from a real run requires selecting
+which pairs of keyframes share enough observed surface to be linked, handling
+local maps that only partially overlap and that may still carry dynamic or
+semi-static returns, initializing the optimization from estimated rather than
+ground-truth poses, and controlling the problem size, since every retained
+point contributes a residual across all the keyframe pairs of the graph.
+Robust estimators on the per-point residuals, a truncation band consistent
+with the expected initial misalignment, and a keyframe-pair selection policy
+derived from the loop closure machinery already available in RicoSLAM are the
+natural starting points for this development;
+\item \textbf{Broader baseline comparison and computational
+characterization of RicoSLAM.}
+The system-level evaluation of \chapref{chap:slam} compares RicoSLAM against
+GMapping~\cite{grisetti:tro:2007} and
+SLAM~Toolbox~\cite{macenski-jambrecic:joss:2021}, which supports the
+conclusion that RicoSLAM outperforms these two baselines on the evaluated
+sequences rather than a claim of general superiority over contemporary
+2D~\gls{slam} systems. Extending the benchmark to additional systems, and to
+further sequences from the literature, is required to generalize the
+conclusions. A first step in this direction is already reported in the
+manuscript in preparation~\cite{sousa:ral:2026} (\appxref{appx:ricoslam}),
+which adds the Cartographer~\cite{hess:icra:2016} baseline, evaluated with
+both its default and its real-time correlative scan matcher, together with
+the total execution time of every framework on the same hardware.
+Complementing that evaluation, the explicit measurement of the front-end and
+back-end computation times, of the distance map precomputation cost against
+the kd-tree~\cite{bentley:cacm:1975} search of classical \gls{icp}, and of
+the memory footprint of each representation level remains to be performed.
 \end{itemize}
 
 \subsection{Involvement in the scientific community}\label{sec:conclusions:community}
@@ -392,7 +639,7 @@ for mobile robotic equipment} of \gls{wp}10 -- \textit{automated
 logistics for the automotive industry}, as already discussed in
 \secref{sec:intro:scope}. The Flowbotic real-world sequences in industrial-scale
 environments considered in the dynamics removal experiment of
-\secref{sec:slam:results:dynamics} is a consequence of this
+\secref{sec:slam:results:dynamics} are a consequence of this
 articulation. In addition to GreenAuto, the candidate contributed to the
 following scientific projects:
 \begin{itemize}

@@ -22,6 +22,20 @@ formulations from \chapref{chap:distance-maps}.
 Experimental results indicate that RicoSLAM can operate in highly dynamic,
 noisy environments while sharpening the 2D~occupancy grid representation of the environment.
 
+Furthermore, the RicoSLAM framework presented in this chapter is also reported in the
+manuscript \emph{RicoSLAM: Framework for Localization and Mapping in Dynamic
+Environments}~\cite{sousa:ral:2026}, prepared for submission to the
+\emph{IEEE Robotics and Automation Letters} (RA-L) (see \appxref{appx:ricoslam}).
+Relative to this chapter, the manuscript narrows the scope to the online
+\gls{slam} operation and to the dynamics removal mechanisms, leaving out the
+\gls{gba} formulations of \secref{sec:slam:gba}, and extends the
+experimental evaluation with the Cartographer~\cite{hess:icra:2016} baseline
+(under its default and its real-time correlative scan matchers, with and
+without wheel odometry) and with the total execution time of every framework
+processing the same sequences on the same hardware.
+Both additions are discussed in \secref{sec:slam:conclusions} as directions
+that complement the evaluation reported here.
+
 This chapter is organized as follows.
 First, \secref{sec:slam:ricoslam} presents a high-level overview of the RicoSLAM
 framework, positioning the contributions of this chapter in relation to
@@ -2817,6 +2831,16 @@ replicating the local connectivity expected from a back-end pose graph populated
 by the online RicoSLAM pipeline. The first variable of the factor graph
 is marked as fixed (see~\secref{sec:slam:online:overview}),
 eliminating the global gauge freedom of the optimization problem.
+It is worth making explicit that this benchmark supplies the factor graph
+rather than building it. The topology derives from the ground-truth
+translations, each variable holds a single clean scan of a static scene, and
+consequently no association error can occur between a point and the distance
+map of a neighboring variable. This setup isolates the convergence behavior
+and the accuracy of the proposed factors, which is the purpose of the
+experiment, but it does not reproduce the conditions under which the graph is
+populated by the online pipeline of \secref{sec:slam:online}. The
+construction of that graph, rather than the error formulation itself, is the
+open problem discussed in \secref{sec:slam:conclusions}.
 The remaining variables are perturbed by uniform noise, as illustrated in
 \figref{fig:slam:results:gba:perturb-init}:
 $\pm\SI{1.5}{\metre}$ on each translational component of the initial estimation
@@ -2857,7 +2881,7 @@ registration benchmark in
 \end{itemize}
 
 In addition, each configuration is evaluated with and without
-voxelization of the point cloud associated with eac variable at the distance map
+voxelization of the point cloud associated with each variable at the distance map
 resolution $\delta = \SI{0.03}{\metre}$ before constructing the distance map
 representation. Subsequently, this approach results in 8~configurations per
 range noise condition. Two noise conditions are considered: a noise-free
@@ -3227,7 +3251,10 @@ Lastly, the synthetic benchmark on the distance map-based \gls{gba}
 factors proposed in this chapter confirmed that the corresponding factors
 can globally optimize a multi-keyframe pose graph and recover from
 substantially perturbed initial conditions, both under noise-free and
-noisy scenarios. The precomputed point-to-point variant
+noisy scenarios. This benchmark validates the error formulations, which do
+not depend on the synthetic nature of the data and remain valid for
+real-world observations, under the assumption that the factor graph is available. Its topology is derived from the ground-truth poses and
+every variable holds a single scan of a static scene. The precomputed point-to-point variant
 $\mathcal{D}_{\mathrm{p2p}}(\mathcal{M}_1)$ with voxelization of the
 moving point clouds obtained the lowest translation and orientation errors
 under range noise conditions that showed the potential of
@@ -3259,13 +3286,23 @@ Several directions remain open as future work. First, the full
 integration of the proposed distance map-based \gls{gba} stage with the
 online RicoSLAM pipeline and its end-to-end validation in real-world
 environments stands out, given that this stage is currently evaluated in
-isolation and under controlled conditions.
+isolation and under controlled conditions. The obstacle for this integration
+lies in assembling the graph that the \gls{gba} stage optimizes rather than
+in the factors themselves: selecting the keyframe pairs with enough
+overlap, handling local maps that only partially overlap and that
+may still carry dynamic or semi-static returns, initializing the optimization
+from the estimated poses of the online run, and bounding the size of a
+problem in which every retained point contributes a residual.
 Furthermore, the comparison against additional 2D~\gls{slam} baselines such as
 Cartographer~\cite{hess:icra:2016}, the evaluation on further sequences
 from the literature, and the explicit measurement of the front-end and
 back-end computation times together with the memory usage of the
 RicoSLAM system will complement the trajectory accuracy and scalability
-analyses presented in this chapter. On the application side, the
+analyses presented in this chapter. The Cartographer~\cite{hess:icra:2016}
+baseline and the total execution time of each framework are already covered
+by the manuscript in preparation~\cite{sousa:ral:2026}
+(see~\appxref{appx:ricoslam}), leaving the per-module timing and the memory
+characterization of RicoSLAM as the remaining gap. On the application side, the
 dominant systematic errors observed in the offline pose-corrected
 stream motivates a potential use of RicoSLAM as a pseudo-ground-truth
 source for calibration tasks in which the wheeled odometry and the laser scanner
@@ -3277,4 +3314,4 @@ single-return ray model adopted by the online and offline dynamics
 removal mechanisms will be extended to multi-return formulations,
 addressing the residual semi-static dynamics observed in the Avantgarde
 sequences and further improving the cleaning effect of the proposed
-mechanism on the final occupancy grid representation.
+mechanism on the final occupancy grid.

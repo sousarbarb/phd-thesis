@@ -1,16 +1,16 @@
 \chapter{Point Cloud Registration with Distance Maps}\label{chap:distance-maps}
 
 This chapter presents a novel approach for 2D~point cloud registration
-using distance maps, developed within the scope of this PhD~Thesis
-in collaboration with Prof.~Dr.~Giorgio~Grisetti from
-Sapienza Università di Roma.
+using unsigned distance maps~\cite{sousa:robot:2026}, developed within the scope
+of this PhD~Thesis in collaboration with Prof.~Dr.~Giorgio~Grisetti from
+Sapienza Università di Roma (see \appxref{appx:dmaps}).
 Distance maps encode the Euclidean distance to the nearest reference point
 at every cell of a precomputed discrete grid, decoupling data association
 from the iterative optimization loop.
 By replacing the explicit nearest-neighbor search performed at every
 iteration of classical
 \glslink{icp}{\glsentryfull{icp}}~\cite{besl-mckay:tpami:1992,chen-medioni:icra:1991}
-with an $O(1)$ grid lookup on distance map-based data structures,
+with an $O(1)$ grid lookup on distance maps,
 the proposed approach provides both point-to-point and point-to-plane error
 formulations compatible with Gauss-Newton optimization on the $SE(2)$ manifold.
 
@@ -27,7 +27,7 @@ uncertainty estimation.
 The real-world data refers to the
 \emph{IILABS 3D -- \underline{i}ilab \underline{I}ndoor
 \underline{L}iD\underline{A}R-\underline{b}ased \underline{S}LAM 3D}
-dataset~\cite{ribeiro:access:2025}, a complimentary contribution of this
+dataset~\cite{ribeiro:access:2025}, a complementary contribution of this
 PhD~Thesis (see~\appxref{appx:iilabs3d}).
 The work \emph{Integrating Multimodal Perception into Ground
 Mobile Robots}~\cite{sousa:icarsc:2025}, developed within the scope of this
@@ -3574,7 +3574,7 @@ and by the $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_0)$ with a
 $\SI{3.00}{\metre}$ splitting criterion on \gls{rre}
 (\SI{0.033}{\degree\per\metre}).
 As illustrated in \figref{fig:distance-maps:results:iilabs3d:sequences},
-the fact the the Slippage sequence is executed on the area with more close
+the fact that the Slippage sequence is executed on the area with more close
 information within the Nav~A space is a possible reason why the lowest
 maximum range considered in this evaluation leads to the best results
 on this sequence.
@@ -3583,7 +3583,9 @@ on this sequence.
 
 This chapter presents a novel framework for 2D~point cloud registration using
 unsigned distance maps, developed in the scope of this PhD~Thesis in
-collaboration with Prof.~Dr.~Giorgio~Grisetti from Sapienza Università di Roma.
+collaboration with Prof.~Dr.~Giorgio~Grisetti from Sapienza Università di Roma,
+and accepted at the 9th~Iberian Robotics Conference
+(ROBOT2026)~\cite{sousa:robot:2026} (see~\appxref{appx:dmaps}).
 The proposed approach decouples data association from the iterative optimization
 procedure by precomputing distance map-based
 representations over the reference point cloud,
@@ -3718,13 +3720,19 @@ refined by srrg2\_solver~\cite{grisetti:robotics:2020}.
 
 Future work will focus on improving the results and limitations of this work.
 While Sobreira~\etal~\cite{sobreira:jint:2019} showed in their simulation
-results that precomputed lookup tables that does not require
+results that precomputed lookup tables that do not require
 an explicit data association step brings computational benefits over
 the traditional two-step optimization procedure on classical
 \gls{icp}~\cite{besl-mckay:tpami:1992,chen-medioni:icra:1991} approaches,
 the 2D~point cloud formulations discussed in this chapter will be evaluated
 in terms of their computational performance compared to
-\gls{icp} with kd-tree search~\cite{bentley:cacm:1975}.
+\gls{icp} with kd-tree search~\cite{bentley:cacm:1975}, isolating the
+precomputation cost of each representation level from the per-iteration
+query cost. A first system-level indication in this direction is reported in
+the manuscript in preparation~\cite{sousa:ral:2026}
+(see~\appxref{appx:ricoslam}), which measures the total execution time of
+RicoSLAM using the $\mathcal{D}_\mathrm{p2p}(\mathcal{M}_1)$ tracker of this
+chapter against the 2D~\gls{slam} baselines of \chapref{chap:slam}.
 Also, we will explore alternative strategies to obtain the Hessian of the
 distance field to avoid the compounding of finite-difference errors.
 Finally, a more thorough evaluation of uncertainty estimation with more complex

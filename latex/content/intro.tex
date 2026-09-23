@@ -74,7 +74,7 @@ healthcare institutions, have inherently moving elements in the scene
 (humans, objects), reconfiguration of the environment
 (reorganization of machines, patient beds), and appearance variations
 (lighting, weather, seasonal, or daytime changes).
-The deployment of \glspl{amr} in these varying conditions are a challenge for
+The deployment of \glspl{amr} in these varying conditions is a challenge for
 the \gls{slam} system, where the system should decide how (consider the most
 current state, the evolution of the environment dynamics, or only the most
 static changes?) and when to update the map (when the variations occur, or only
@@ -343,7 +343,7 @@ sensor data, especially when dynamic elements are present in the environment.
 Moving objects, such as people, vehicles, or machinery,
 can introduce significant challenges during the data registration step.
 When these dynamic observations are considered during data registration
-without any outliers rejection technique, could introduce errors on pose
+without any outlier rejection technique, they may introduce errors on the pose
 estimation, potentially causing the robot's localization to drift
 or even fail entirely. In order to mitigate the effects of environment dynamics
 in the localization process, we explore several strategies formulated by the
@@ -472,6 +472,8 @@ as well as the development of open-source software.
 \item[\cite{sousa:jfr:2023}] \fullcite{sousa:jfr:2023}.
 \item[\cite{sousa:icara:2024}] \fullcite{sousa:icara:2024}.
 \item[\cite{sousa:icarsc:2025}] \fullcite{sousa:icarsc:2025}.
+\item[\cite{sousa:robot:2026}] \fullcite{sousa:robot:2026}.
+\item[\cite{sousa:ral:2026}] \fullcite{sousa:ral:2026}.
 \end{description}
 \subsection{Complementary contributions}
 \begin{description}[leftmargin=1cm,style=nextline,font=\normalfont]
@@ -485,8 +487,7 @@ as well as the development of open-source software.
 \subsection{Open-source software}
 \begin{itemize}[leftmargin=1cm,style=nextline,font=\normalfont]
 \item \url{https://github.com/INESCTEC/ricoslam}:
-the full framework \gls{slam} developed in the scope of this PhD~Thesis
-\textcolor{red}{(\emph{may not be yet available in open-source... WIP})};
+the full framework \gls{slam} developed in the scope of this PhD~Thesis;
 \item \url{https://github.com/INESCTEC/inesctec_mrdt_line_fit_based_corner_detector_2d_laser}:
 C++ implementation compatible with \gls{ros}~1 of the
 line fitting-based corner-like detector for 2D~lasers~\cite{sousa:icara:2024};
