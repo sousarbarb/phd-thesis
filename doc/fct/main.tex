@@ -18,8 +18,8 @@
 \IfFileExists{XCharter.sty}{\usepackage[osf]{XCharter}}{\usepackage{charter}}
 
 \usepackage{microtype}
-\usepackage[a4paper,top=3.0cm,bottom=3.4cm,left=2.6cm,right=2.6cm,
-            headheight=14pt,footskip=1.6cm]{geometry}
+\usepackage[a4paper,top=3cm,bottom=3cm,left=1.5cm,right=1.5cm,
+            headheight=14pt,footskip=1cm]{geometry}
 \usepackage{graphicx}
 \usepackage[table]{xcolor}
 \usepackage{booktabs}
@@ -107,14 +107,27 @@
 % Para usar os logótipos oficiais (barra FCT / República Portuguesa / etc.),
 % colocar o ficheiro figures/logos-financiamento.pdf; caso contrário é
 % impressa a menção textual.
+% \newcommand{\rodapefinanciamento}{%
+%   \IfFileExists{figures/logos-financiamento.pdf}{%
+%     \includegraphics[width=\textwidth]{logos-financiamento.pdf}%
+%   }{%
+%     \parbox{\textwidth}{\centering\footnotesize\color{black!60}%
+%       Bolsa de doutoramento \bolsaref{} financiada por fundos nacionais através da\\
+%       Fundação para a Ciência e a Tecnologia (FCT)%
+%       ~(DOI:~\href{https://doi.org/\bolsadoi}{\bolsadoi})}%
+%   }%
+% }
+%
+% Logótipos: figures/logo-republica-portuguesa.png e figures/logo-fct.png
+% (versão positiva, a preto, com fundo transparente).
 \newcommand{\rodapefinanciamento}{%
-  \IfFileExists{figures/logos-financiamento.pdf}{%
-    \includegraphics[width=\textwidth]{logos-financiamento.pdf}%
-  }{%
-    \parbox{\textwidth}{\centering\footnotesize\color{black!60}%
-      Bolsa de doutoramento \bolsaref{} financiada por fundos nacionais através da\\
-      Fundação para a Ciência e a Tecnologia (FCT)%
-      ~(DOI:~\href{https://doi.org/\bolsadoi}{\bolsadoi})}%
+  \parbox{\textwidth}{\centering
+    \raisebox{-0.5\height}{\includegraphics[height=1.20cm]{logo-fct.png}}%
+    \raisebox{-0.5\height}{\includegraphics[height=1.20cm]{logo-republica-portuguesa.png}}%
+    \hspace{0.50cm}%
+    \raisebox{-0.5\height}{\includegraphics[height=1.20cm]{logo-greenauto.png}}%
+    \hspace{0.50cm}%
+    \raisebox{-0.5\height}{\includegraphics[height=1.20cm]{logo-prr.png}}%
   }%
 }
 
@@ -184,6 +197,7 @@ Tecnologia e Ciência.\par}
 \vfill
 {\normalsize \datarelatorio\par}
 {\normalsize \copyright{} \autor, 2026}
+\vspace{1cm}
 \end{titlepage}
 
 %% ---------------------------------------------------------------------------
